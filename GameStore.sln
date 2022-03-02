@@ -3,9 +3,26 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32210.238
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F1D73198-AB82-4257-9B96-AE139B6B315D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GameStore.Core", "GameStore.Core\GameStore.Core.csproj", "{EEE8C393-BCF5-4777-B174-C7196937B530}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEE8C393-BCF5-4777-B174-C7196937B530}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEE8C393-BCF5-4777-B174-C7196937B530}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEE8C393-BCF5-4777-B174-C7196937B530}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEE8C393-BCF5-4777-B174-C7196937B530}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EEE8C393-BCF5-4777-B174-C7196937B530} = {F1D73198-AB82-4257-9B96-AE139B6B315D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C81CEDE7-3048-44E5-8E24-86DFA1BA43CB}
