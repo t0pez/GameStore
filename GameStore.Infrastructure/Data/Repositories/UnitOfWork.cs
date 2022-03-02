@@ -1,0 +1,36 @@
+﻿using GameStore.Infrastructure.Data.Context;
+using GameStore.SharedKernel;
+using GameStore.SharedKernel.Interfaces.DataAccess;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace GameStore.Infrastructure.Data.Repositories
+{
+    public class UnitOfWork : IUnitOfWork
+    {
+        private readonly ApplicationContext _context;
+        private readonly Dictionary<Type, object> _repositories;
+
+        public UnitOfWork(ApplicationContext context)
+        {
+            _context = context;
+            _repositories = new Dictionary<Type, object>();
+        }
+
+        public IRepository<TModel> GetRepository<TModel>() where TModel : BaseEntity
+        {
+            var modelType = typeof(TModel);
+
+            if (_repositories.ContainsKey(modelType) == false)
+                _repositories.Add(modelType, new Repository<TModel>(_context));
+
+            return (IRepository<TModel>)_repositories[modelType];
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
+        }
+    }
+}
