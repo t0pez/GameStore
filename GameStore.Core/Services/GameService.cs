@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using NLog;
 using Microsoft.Extensions.Logging;
+using GameStore.Core.Exceptions;
 
 namespace GameStore.Core.Services
 {
@@ -27,103 +28,133 @@ namespace GameStore.Core.Services
 
         public async Task<Game> CreateAsync(string key, string name, string description, byte[] file)
         {
-            var game = new Game(key, name, description, file);
+            try
+            {
+                var game = new Game(key, name, description, file);
 
-            var result = await GameRepository.AddAsync(game);
-            await _unitOfWork.SaveChangesAsync();
+                var result = await GameRepository.AddAsync(game);
+                await _unitOfWork.SaveChangesAsync();
 
-            _logger.LogInformation("Game created { Key = {0}, Name = {1}}", key, name);
+                _logger.LogInformation("Game created { Key = {0}, Name = {1}}", key, name);
 
-            return result;
+                return result;
+            }
+            catch (ItemAlreadyExistsException)
+            {
+                _logger.LogInformation("Game creation failed - game with such id already exists");
+                return await CreateAsync(key, name, description, file); // Re-generate Id and repeat operation
+            }
         }    
 
         public async Task<ICollection<Game>> GetAllAsync()
         {
-            return await GameRepository.GetBySpecificationAsync(new GamesWithDetails());
+            return await GameRepository.GetBySpecAsync(new GamesWithDetails());
         }
 
         public async Task<ICollection<Game>> GetByGenreAsync(Genre genre)
         {
-            return await GameRepository.GetBySpecificationAsync(new GameByGenreSpec(genre));
+            return await GameRepository.GetBySpecAsync(new GameByGenreSpec(genre));
         }
 
         public async Task<Game> GetByKeyAsync(string key)
         {
-            return (await GameRepository.GetBySpecificationAsync(new GameByKeySpec(key))).First();
+            try
+            {
+                var result = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(key));
+
+                return result;
+            }
+            catch (ItemNotFoundException<Game>)
+            {
+                throw new ArgumentException("Game with such key doesnt exist");
+            }
         }
 
         public async Task<ICollection<Game>> GetByPlatformTypesAsync(params PlatformType[] platformTypes)
         {
-            return await GameRepository.GetBySpecificationAsync(new GameByPlatformTypes(platformTypes));
+            return await GameRepository.GetBySpecAsync(new GameByPlatformTypes(platformTypes));
         }
 
         public async Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId)
         {
-            var game = await GameRepository.GetByIdAsync(gameId);
-            var genre = await GenreRepository.GetByIdAsync(genreId);
+            try
+            {
+                var game = await GameRepository.GetByIdAsync(gameId);
+                var genre = await GenreRepository.GetByIdAsync(genreId);
 
-            if(game is null)
+                game.Genres.Add(genre);
+
+                await GameRepository.UpdateAsync(game);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                _logger.LogInformation("Game {0} added to genre {1}", game.Name, genre.Name);
+
+                return game;
+            }
+            catch (ItemNotFoundException<Game>)
             {
                 _logger.LogInformation("Add genre to game - no game with such id {0}", gameId);
                 throw new ArgumentException("Game with such id doesnt exist");
             }
-
-            if(genre is null)
+            catch(ItemNotFoundException<Genre>)
             {
                 _logger.LogInformation("Add genre to game - no genre with such id {0}", genreId);
                 throw new ArgumentException("Genre with such id doesnt exist");
             }
-
-            game.Genres.Add(genre);
-            
-            GameRepository.Update(game);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            _logger.LogInformation("Game {0} added to genre {1}", game.Name, genre.Name);
-
-            return game;
         }
 
         public async Task UpdateAsync(Game game)
         {
-            GameRepository.Update(game);
+            try
+            {
+                await GameRepository.UpdateAsync(game);
 
-            _logger.LogInformation("Game updated - {0}", game.Name);
+                _logger.LogInformation("Game updated - {0}", game.Name);
 
-            await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
+            }
+            catch (ItemNotFoundException<Game>)
+            {
+                _logger.LogInformation("Update game failed - no game with such id {0}", game.Id);
+                throw new InvalidOperationException();
+            }
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var game = await GameRepository.GetByIdAsync(id);
-            
-            if(game is null)
+            try
+            {
+                var game = await GameRepository.GetByIdAsync(id);
+
+                await GameRepository.DeleteAsync(game); // TODO: Add overload to repository method
+
+                _logger.LogInformation("Game deleted - {0}", game.Name);
+
+                await _unitOfWork.SaveChangesAsync();
+            }
+            catch (ItemNotFoundException<Game>)
             {
                 _logger.LogInformation("Game delete failed - no game with such id {0}", id);
-                return;
+                throw new InvalidOperationException();
             }
-
-            GameRepository.Delete(game); // TODO: Add overload to repository method
-
-            _logger.LogInformation("Game deleted - {0}", game.Name);
-
-            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<byte[]> GetFileAsync(string gameKey)
         {
-            var game = (await GameRepository.GetBySpecificationAsync(new GameByKeySpec(gameKey))).FirstOrDefault();
+            try
+            {
+                var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey));
 
-            if(game is null)
+                _logger.LogInformation("File {0} downloaded", game.Name);
+
+                return game.File;
+            }
+            catch (ItemNotFoundException<Game>)
             {
                 _logger.LogInformation("Download failed - no game with such key {0}", gameKey);
                 throw new InvalidOperationException();
             }
-
-            _logger.LogInformation("File {0} downloaded", game.Name);
-
-            return game.File;
         }
     }
 }

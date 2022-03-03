@@ -1,5 +1,6 @@
 ﻿using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
+using GameStore.Core.Exceptions;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces;
@@ -25,6 +26,9 @@ namespace GameStore.Infrastructure.Data.Repositories
 
         public async Task<TModel> AddAsync(TModel model)
         {
+            if (await SetContainsModelOfId(model.Id))
+                throw new ItemAlreadyExistsException();
+
             await Set.AddAsync(model);
 
             return model;
@@ -37,27 +41,45 @@ namespace GameStore.Infrastructure.Data.Repositories
 
         public async Task<TModel> GetByIdAsync(Guid id)
         {
-            return await Set.SingleOrDefaultAsync(e => e.Id == id);
+            return await Set.SingleOrDefaultAsync(e => e.Id == id) ?? throw new ItemNotFoundException<TModel>();
         }
 
-        public async Task<ICollection<TModel>> GetBySpecificationAsync(ISpecification<TModel> specification)
+        public async Task<ICollection<TModel>> GetBySpecAsync(ISpecification<TModel> specification)
         {
             var specificationResult = ApplySpecifications(specification);
 
             return await specificationResult.ToListAsync();
         }
-
-        public void Update(TModel updated)
+        
+        public async Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> specification)
         {
+            var specificationResult = ApplySpecifications(specification);
+
+            var result = await specificationResult.FirstOrDefaultAsync();
+
+            if (result is null)
+                throw new ItemNotFoundException<TModel>();
+
+            return result;
+        }
+
+        public async Task UpdateAsync(TModel updated)
+        {
+            if (await SetContainsModelOfId(updated.Id) == false)
+                throw new ItemNotFoundException<TModel>();
+
             Set.Update(updated);
         }
 
-        public void Delete(TModel model)
+        public async Task DeleteAsync(TModel model)
         {
+            if (await SetContainsModelOfId(model.Id) == false)
+                throw new ItemNotFoundException<TModel>();
+
             if (model is ISafeDelete)
             {
                 (model as ISafeDelete).IsDeleted = true;
-                Update(model);
+                await UpdateAsync(model);
             }
             else
             {
@@ -70,6 +92,11 @@ namespace GameStore.Infrastructure.Data.Repositories
             var specEvaluator = new SpecificationEvaluator();
 
             return specEvaluator.GetQuery(Set.AsQueryable(), specification);
+        }
+
+        private async Task<bool> SetContainsModelOfId(Guid id)
+        {
+            return await Set.AnyAsync(m => m.Id == id);
         }
     }
 }

@@ -10,8 +10,9 @@ namespace GameStore.SharedKernel.Interfaces.DataAccess
         Task<TModel> AddAsync(TModel model);
         Task<TModel> GetByIdAsync(Guid id); // TODO: change Guid for repository and models for custom type
         Task<ICollection<TModel>> GetAllAsync();
-        Task<ICollection<TModel>> GetBySpecificationAsync(ISpecification<TModel> specification);
-        void Update(TModel updated);
-        void Delete(TModel model);
+        Task<ICollection<TModel>> GetBySpecAsync(ISpecification<TModel> specification);
+        Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> specification);
+        Task UpdateAsync(TModel updated);
+        Task DeleteAsync(TModel model);
     }
 }

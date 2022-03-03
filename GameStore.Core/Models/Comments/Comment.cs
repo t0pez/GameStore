@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using GameStore.Core.Models.Games;
 using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces;
@@ -38,7 +39,9 @@ namespace GameStore.Core.Models.Comments
         public string Body { get; set; }
         public DateTime Date { get; set; }
 
+        [JsonIgnore]
         public Game Game { get; set; }
+        [JsonIgnore]
         public Comment Parent { get; set; }
 
         public ICollection<Comment> Replies { get; set; } = new List<Comment>();

@@ -1,4 +1,5 @@
-﻿using GameStore.Core.Interfaces;
+﻿using GameStore.Core.Exceptions;
+using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Comments.Specifications;
 using GameStore.Core.Models.Games;
@@ -27,45 +28,49 @@ namespace GameStore.Core.Services
 
         public async Task CommentGameAsync(string gameKey, string authorName, string message)
         {
-            var game = (await _unitOfWork.GetRepository<Game>().GetBySpecificationAsync(new GameByKeySpec(gameKey))).FirstOrDefault();
+            try
+            {
+                var game = await _unitOfWork.GetRepository<Game>().GetSingleBySpecAsync(new GameByKeySpec(gameKey));
 
-            if(game is null)
+                var comment = new Comment(authorName, message, game);
+
+                await CommentRepository.AddAsync(comment);
+
+                await _unitOfWork.SaveChangesAsync();
+            }
+            catch (ItemNotFoundException<Game>)
             {
                 _logger.LogInformation("Add comment to game failed - no game with key {0}", gameKey);
                 throw new ArgumentException("Game with such id doesn't exist");
             }
-
-            var comment = new Comment(authorName, message, game);
-
-            await CommentRepository.AddAsync(comment);
-
-            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
         {
-            return await CommentRepository.GetBySpecificationAsync(new CommentsByGameKey(gameKey));
+            return await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
         }
 
         public async Task ReplyCommentAsync(Guid parentId, string authorName, string message)
         {
-            var parent = await CommentRepository.GetByIdAsync(parentId);
+            try
+            {
+                var parent = await CommentRepository.GetByIdAsync(parentId);
 
-            if(parent is null)
+                Comment reply = new Comment(authorName, message, parent.Game, parent);
+
+                await CommentRepository.AddAsync(reply);
+
+                parent.Replies.Add(reply);
+
+                await CommentRepository.UpdateAsync(parent);
+
+                await _unitOfWork.SaveChangesAsync();
+            }
+            catch (ItemNotFoundException<Comment>)
             {
                 _logger.LogInformation("Reply comment failed - parent commet not found {0}", parentId);
                 throw new ArgumentException("Parent comment with such id doesn't exists");
             }
-
-            Comment reply = new Comment(authorName, message, parent.Game, parent);
-
-            await CommentRepository.AddAsync(reply);
-
-            parent.Replies.Add(reply);
-
-            CommentRepository.Update(parent);
-
-            await _unitOfWork.SaveChangesAsync();
         }
     }
 }
