@@ -6,16 +6,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using NLog;
+using Microsoft.Extensions.Logging;
 
 namespace GameStore.Core.Services
 {
     public class GameService : IGameService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<GameService> _logger;
 
-        public GameService(IUnitOfWork unitOfWork)
+        public GameService(IUnitOfWork unitOfWork, ILogger<GameService> logger)
         {
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
@@ -27,6 +31,8 @@ namespace GameStore.Core.Services
 
             var result = await GameRepository.AddAsync(game);
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Game created { Key = {0}, Name = {1}}", key, name);
 
             return result;
         }    
@@ -56,11 +62,25 @@ namespace GameStore.Core.Services
             var game = await GameRepository.GetByIdAsync(gameId);
             var genre = await GenreRepository.GetByIdAsync(genreId);
 
+            if(game is null)
+            {
+                _logger.LogInformation("Add genre to game - no game with such id {0}", gameId);
+                throw new ArgumentException("Game with such id doesnt exist");
+            }
+
+            if(genre is null)
+            {
+                _logger.LogInformation("Add genre to game - no genre with such id {0}", genreId);
+                throw new ArgumentException("Genre with such id doesnt exist");
+            }
+
             game.Genres.Add(genre);
             
             GameRepository.Update(game);
 
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Game {0} added to genre {1}", game.Name, genre.Name);
 
             return game;
         }
@@ -68,19 +88,40 @@ namespace GameStore.Core.Services
         public async Task UpdateAsync(Game game)
         {
             GameRepository.Update(game);
+
+            _logger.LogInformation("Game updated - {0}", game.Name);
+
             await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
         {
             var game = await GameRepository.GetByIdAsync(id);
+            
+            if(game is null)
+            {
+                _logger.LogInformation("Game delete failed - no game with such id {0}", id);
+                return;
+            }
+
             GameRepository.Delete(game); // TODO: Add overload to repository method
+
+            _logger.LogInformation("Game deleted - {0}", game.Name);
+
             await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<byte[]> GetFileAsync(string gameKey)
         {
-            var game = (await GameRepository.GetBySpecificationAsync(new GameByKeySpec(gameKey))).First();
+            var game = (await GameRepository.GetBySpecificationAsync(new GameByKeySpec(gameKey))).FirstOrDefault();
+
+            if(game is null)
+            {
+                _logger.LogInformation("Download failed - no game with such key {0}", gameKey);
+                throw new InvalidOperationException();
+            }
+
+            _logger.LogInformation("File {0} downloaded", game.Name);
 
             return game.File;
         }

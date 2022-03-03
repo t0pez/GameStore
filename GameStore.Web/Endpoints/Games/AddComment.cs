@@ -1,6 +1,8 @@
 ﻿using Ardalis.ApiEndpoints;
 using GameStore.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
+using NLog;
 using System.Threading;
 using System.Threading.Tasks;
 
