@@ -1,6 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using GameStore.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,11 +18,22 @@ namespace GameStore.Web.Endpoints.Games
         }
 
         [HttpPost("games/remove")]
-        public override async Task<ActionResult> HandleAsync(Guid id, CancellationToken cancellationToken = default)
+        [SwaggerOperation(
+            Summary = "Deletes game",
+            OperationId = "Games.Delete",
+            Tags = new[] { "Games" })]
+        public override async Task<ActionResult> HandleAsync([FromBody] Guid id, CancellationToken cancellationToken = default)
         {
-            await _gameService.DeleteAsync(id);
+            try
+            {
+                await _gameService.DeleteAsync(id);
 
-            return Ok();
+                return Ok();
+            }
+            catch (InvalidOperationException)
+            {
+                return BadRequest();
+            }
         }
     }
 }

@@ -1,14 +1,12 @@
-﻿using GameStore.Core.Interfaces;
+﻿using GameStore.Core.Exceptions;
+using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
 using GameStore.SharedKernel.Interfaces.DataAccess;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
-using NLog;
-using Microsoft.Extensions.Logging;
-using GameStore.Core.Exceptions;
 
 namespace GameStore.Core.Services
 {
@@ -35,7 +33,7 @@ namespace GameStore.Core.Services
                 var result = await GameRepository.AddAsync(game);
                 await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Game created { Key = {0}, Name = {1}}", key, name);
+                _logger.LogInformation("Game created [ Key = {0}, Name = {1}]", key, name);
 
                 return result;
             }
@@ -53,7 +51,7 @@ namespace GameStore.Core.Services
 
         public async Task<ICollection<Game>> GetByGenreAsync(Genre genre)
         {
-            return await GameRepository.GetBySpecAsync(new GameByGenreSpec(genre));
+            return await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genre));
         }
 
         public async Task<Game> GetByKeyAsync(string key)
@@ -72,7 +70,7 @@ namespace GameStore.Core.Services
 
         public async Task<ICollection<Game>> GetByPlatformTypesAsync(params PlatformType[] platformTypes)
         {
-            return await GameRepository.GetBySpecAsync(new GameByPlatformTypes(platformTypes));
+            return await GameRepository.GetBySpecAsync(new GamesByPlatformTypes(platformTypes));
         }
 
         public async Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId)
@@ -129,14 +127,19 @@ namespace GameStore.Core.Services
 
                 await GameRepository.DeleteAsync(game); // TODO: Add overload to repository method
 
-                _logger.LogInformation("Game deleted - {0}", game.Name);
-
                 await _unitOfWork.SaveChangesAsync();
+                
+                _logger.LogInformation("Game deleted - {0}", game.Name);
             }
             catch (ItemNotFoundException<Game>)
             {
                 _logger.LogInformation("Game delete failed - no game with such id {0}", id);
                 throw new InvalidOperationException();
+            }
+            catch (InvalidOperationException)
+            {
+                _logger.LogInformation("Game delete failed - game already marked as deleted {0}", id);
+                // ignored
             }
         }
 

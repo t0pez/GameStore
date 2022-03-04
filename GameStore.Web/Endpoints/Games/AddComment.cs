@@ -1,8 +1,11 @@
 ﻿using Ardalis.ApiEndpoints;
 using GameStore.Core.Interfaces;
+using GameStore.Web.Attributes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using NLog;
+using Swashbuckle.AspNetCore.Annotations;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -17,12 +20,23 @@ namespace GameStore.Web.Endpoints.Games
             _commentService = commentService;
         }
 
-        [HttpPost("games/{key}/newcomment")]
-        public override async Task<ActionResult> HandleAsync(AddCommentRequest request, CancellationToken cancellationToken = default)
+        [HttpPost("games/{gameKey}/newcomment")]
+        [SwaggerOperation(
+            Summary = "Adds comment to game",
+            OperationId = "Games.AddComment",
+            Tags = new[] { "Games" })]
+        public override async Task<ActionResult> HandleAsync([FromMultiSource] AddCommentRequest request, CancellationToken cancellationToken = default)
         {
-            await _commentService.CommentGameAsync(request.GameKey, request.AuthorName, request.Message);
+            try
+            {
+                await _commentService.CommentGameAsync(request.GameKey, request.AuthorName, request.Message);
 
-            return Ok();
+                return Ok();
+            }
+            catch (ArgumentException)
+            {
+                return BadRequest();
+            }
         }
     }
 }

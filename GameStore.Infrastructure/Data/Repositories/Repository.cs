@@ -78,6 +78,9 @@ namespace GameStore.Infrastructure.Data.Repositories
 
             if (model is ISafeDelete)
             {
+                if ((model as ISafeDelete).IsDeleted)
+                    throw new InvalidOperationException("Item already deleted");
+
                 (model as ISafeDelete).IsDeleted = true;
                 await UpdateAsync(model);
             }

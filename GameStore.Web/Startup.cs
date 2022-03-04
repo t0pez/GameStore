@@ -25,7 +25,7 @@ namespace GameStore.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSwaggerGen();
+            services.AddSwaggerGen(opt => opt.EnableAnnotations());
             services.AddControllers().AddJsonOptions(opt =>
             {
                 opt.JsonSerializerOptions.Converters.Add(new ByteArrayJsonConverter());

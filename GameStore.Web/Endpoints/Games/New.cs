@@ -9,7 +9,7 @@ namespace GameStore.Web.Endpoints.Games
 {
     public class New : EndpointBaseAsync
         .WithRequest<NewRequest>
-        .WithResult<NewResponce>
+        .WithActionResult<NewResponce>
     {
         private readonly IGameService _gameService;
 
@@ -20,19 +20,27 @@ namespace GameStore.Web.Endpoints.Games
         
         [HttpPost("games/new")]
         [SwaggerOperation(
-            OperationId = "Games.New",
+            Summary = "Creates new game",
+            OperationId = "Games.Create",
             Tags = new[] { "Games" })]
-        public override async Task<NewResponce> HandleAsync(NewRequest request, CancellationToken cancellationToken = default)
+        public override async Task<ActionResult<NewResponce>> HandleAsync([FromBody] NewRequest request, CancellationToken cancellationToken = default)
         {
-            var game = await _gameService.CreateAsync(request.Key, request.Name, request.Description, request.File);
-
-            return new NewResponce
+            try
             {
-                Key = game.Key,
-                Name = game.Name,
-                Description = game.Description,
-                File = game.File
-            };
+                var game = await _gameService.CreateAsync(request.Key, request.Name, request.Description, request.File);
+
+                return Ok(new NewResponce
+                {
+                    Key = game.Key,
+                    Name = game.Name,
+                    Description = game.Description,
+                    File = game.File
+                });
+            }
+            catch
+            {
+                return NotFound();
+            }
         }
     }
 }

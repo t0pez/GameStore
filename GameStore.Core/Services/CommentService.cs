@@ -68,7 +68,7 @@ namespace GameStore.Core.Services
             }
             catch (ItemNotFoundException<Comment>)
             {
-                _logger.LogInformation("Reply comment failed - parent commet not found {0}", parentId);
+                _logger.LogInformation("Reply comment failed - parent comment not found {0}", parentId);
                 throw new ArgumentException("Parent comment with such id doesn't exists");
             }
         }

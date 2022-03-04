@@ -1,6 +1,7 @@
 ﻿using Ardalis.ApiEndpoints;
 using GameStore.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -18,11 +19,22 @@ namespace GameStore.Web.Endpoints.Games
         }
 
         [HttpPost("games/add_to_genre")]
-        public override async Task<ActionResult> HandleAsync(AddToGenreRequest request, CancellationToken cancellationToken = default)
+        [SwaggerOperation(
+            Summary = "Adds game to genre",
+            OperationId = "Games.AddToGenre",
+            Tags = new[] { "Games" })]
+        public override async Task<ActionResult> HandleAsync([FromBody] AddToGenreRequest request, CancellationToken cancellationToken = default)
         {
-            await _gameService.ApplyGenreAsync(request.GameId, request.GenreId);
+            try
+            {
+                await _gameService.ApplyGenreAsync(request.GameId, request.GenreId);
 
-            return Ok();
+                return Ok();
+            }
+            catch
+            {
+                return BadRequest();
+            }
         }
     }
 }

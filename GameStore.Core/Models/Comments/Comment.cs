@@ -18,17 +18,6 @@ namespace GameStore.Core.Models.Comments
             Date = DateTime.Now;
         }
 
-        private Comment(Guid id, string name, string body, DateTime date, Game game, Comment parent, bool isDeleted)
-        {
-            Id = id;
-            Name = name;
-            Body = body;
-            Date = date;
-            Game = game;
-            Parent = parent;
-            IsDeleted = isDeleted;
-        }
-
         public Comment()
         {
 
