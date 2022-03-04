@@ -23,11 +23,11 @@ namespace GameStore.Web.Endpoints.Games
             Summary = "Gets all comment of game",
             OperationId = "Games.GetComments",
             Tags = new[] { "Games" })]
-        public override async Task<ActionResult<ICollection<Comment>>> HandleAsync([FromRoute(Name = "gameKey")] string gameKey, CancellationToken cancellationToken = default)
+        public override async Task<ActionResult<ICollection<Comment>>> HandleAsync([FromRoute(Name = "gameKey")] string gameKey, CancellationToken token = default)
         {
             try
             {
-                return Ok(await _commentService.GetCommentsByGameKeyAsync(gameKey));
+                return Ok(await _commentService.GetCommentsByGameKeyAsync(gameKey, token));
             }
             catch
             {

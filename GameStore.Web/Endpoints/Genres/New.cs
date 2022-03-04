@@ -25,11 +25,18 @@ namespace GameStore.Web.Endpoints.Genres
             Summary = "Creates new genre",
             OperationId = "Genres.Create",
             Tags = new[] { "Genres" })]
-        public override async Task<ActionResult> HandleAsync(CreateGenreRequest request, CancellationToken cancellationToken = default)
+        public override async Task<ActionResult> HandleAsync(CreateGenreRequest request, CancellationToken token = default)
         {
-            var result = await _unitOfWork.GetRepository<Genre>().AddAsync(new Genre { Id = Guid.NewGuid(), Name = request.Name, Games = new List<Game>(), IsDeleted = false, SubGenres = new List<Genre>() });
+            var result = await _unitOfWork.GetRepository<Genre>().AddAsync(new Genre
+            {
+                Id = Guid.NewGuid(),
+                Name = request.Name,
+                Games = new List<Game>(),
+                IsDeleted = false,
+                SubGenres = new List<Genre>()
+            }, token);
 
-            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync(token);
 
             if (result != null)
                 return Ok();

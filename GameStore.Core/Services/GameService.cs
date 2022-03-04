@@ -6,6 +6,7 @@ using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameStore.Core.Services
@@ -24,14 +25,14 @@ namespace GameStore.Core.Services
         private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
         private IRepository<Genre> GenreRepository => _unitOfWork.GetRepository<Genre>();
 
-        public async Task<Game> CreateAsync(string key, string name, string description, byte[] file)
+        public async Task<Game> CreateAsync(string key, string name, string description, byte[] file, CancellationToken token = default)
         {
             try
             {
                 var game = new Game(key, name, description, file);
 
-                var result = await GameRepository.AddAsync(game);
-                await _unitOfWork.SaveChangesAsync();
+                var result = await GameRepository.AddAsync(game, token);
+                await _unitOfWork.SaveChangesAsync(token);
 
                 _logger.LogInformation("Game created [ Key = {0}, Name = {1}]", key, name);
 
@@ -40,25 +41,25 @@ namespace GameStore.Core.Services
             catch (ItemAlreadyExistsException)
             {
                 _logger.LogInformation("Game creation failed - game with such id already exists");
-                return await CreateAsync(key, name, description, file); // Re-generate Id and repeat operation
+                return await CreateAsync(key, name, description, file, token); // Re-generate Id and repeat operation
             }
         }    
 
-        public async Task<ICollection<Game>> GetAllAsync()
+        public async Task<ICollection<Game>> GetAllAsync(CancellationToken token = default)
         {
-            return await GameRepository.GetBySpecAsync(new GamesWithDetails());
+            return await GameRepository.GetBySpecAsync(new GamesWithDetails(), token);
         }
 
-        public async Task<ICollection<Game>> GetByGenreAsync(Genre genre)
+        public async Task<ICollection<Game>> GetByGenreAsync(Genre genre, CancellationToken token = default)
         {
-            return await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genre));
+            return await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genre), token);
         }
 
-        public async Task<Game> GetByKeyAsync(string key)
+        public async Task<Game> GetByKeyAsync(string key, CancellationToken token = default)
         {
             try
             {
-                var result = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(key));
+                var result = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(key), token);
 
                 return result;
             }
@@ -68,23 +69,23 @@ namespace GameStore.Core.Services
             }
         }
 
-        public async Task<ICollection<Game>> GetByPlatformTypesAsync(params PlatformType[] platformTypes)
+        public async Task<ICollection<Game>> GetByPlatformTypesAsync(PlatformType[] platformTypes, CancellationToken token = default)
         {
-            return await GameRepository.GetBySpecAsync(new GamesByPlatformTypes(platformTypes));
+            return await GameRepository.GetBySpecAsync(new GamesByPlatformTypes(platformTypes), token);
         }
 
-        public async Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId)
+        public async Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId, CancellationToken token = default)
         {
             try
             {
-                var game = await GameRepository.GetByIdAsync(gameId);
-                var genre = await GenreRepository.GetByIdAsync(genreId);
+                var game = await GameRepository.GetByIdAsync(gameId, token);
+                var genre = await GenreRepository.GetByIdAsync(genreId, token);
 
                 game.Genres.Add(genre);
 
-                await GameRepository.UpdateAsync(game);
+                await GameRepository.UpdateAsync(game, token);
 
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync(token);
 
                 _logger.LogInformation("Game {0} added to genre {1}", game.Name, genre.Name);
 
@@ -102,15 +103,15 @@ namespace GameStore.Core.Services
             }
         }
 
-        public async Task UpdateAsync(Game game)
+        public async Task UpdateAsync(Game game, CancellationToken token = default)
         {
             try
             {
-                await GameRepository.UpdateAsync(game);
+                await GameRepository.UpdateAsync(game, token);
 
                 _logger.LogInformation("Game updated - {0}", game.Name);
 
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync(token);
             }
             catch (ItemNotFoundException<Game>)
             {
@@ -119,15 +120,15 @@ namespace GameStore.Core.Services
             }
         }
 
-        public async Task DeleteAsync(Guid id)
+        public async Task DeleteAsync(Guid id, CancellationToken token = default)
         {
             try
             {
-                var game = await GameRepository.GetByIdAsync(id);
+                var game = await GameRepository.GetByIdAsync(id, token);
 
-                await GameRepository.DeleteAsync(game); // TODO: Add overload to repository method
+                await GameRepository.DeleteAsync(game, token); // TODO: Add overload to repository method
 
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync(token);
                 
                 _logger.LogInformation("Game deleted - {0}", game.Name);
             }
@@ -143,11 +144,11 @@ namespace GameStore.Core.Services
             }
         }
 
-        public async Task<byte[]> GetFileAsync(string gameKey)
+        public async Task<byte[]> GetFileAsync(string gameKey, CancellationToken token = default)
         {
             try
             {
-                var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey));
+                var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey), token);
 
                 _logger.LogInformation("File {0} downloaded", game.Name);
 

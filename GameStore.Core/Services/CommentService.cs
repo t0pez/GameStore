@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameStore.Core.Services
@@ -25,18 +26,19 @@ namespace GameStore.Core.Services
         }
 
         private IRepository<Comment> CommentRepository => _unitOfWork.GetRepository<Comment>();
+        private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
 
-        public async Task CommentGameAsync(string gameKey, string authorName, string message)
+        public async Task CommentGameAsync(string gameKey, string authorName, string message, CancellationToken token = default)
         {
             try
             {
-                var game = await _unitOfWork.GetRepository<Game>().GetSingleBySpecAsync(new GameByKeySpec(gameKey));
+                var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey), token);
 
                 var comment = new Comment(authorName, message, game);
 
-                await CommentRepository.AddAsync(comment);
+                await CommentRepository.AddAsync(comment, token);
 
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync(token);
             }
             catch (ItemNotFoundException<Game>)
             {
@@ -45,26 +47,26 @@ namespace GameStore.Core.Services
             }
         }
 
-        public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
+        public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey, CancellationToken token = default)
         {
-            return await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
+            return await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey), token);
         }
 
-        public async Task ReplyCommentAsync(Guid parentId, string authorName, string message)
+        public async Task ReplyCommentAsync(Guid parentId, string authorName, string message, CancellationToken token = default)
         {
             try
             {
-                var parent = await CommentRepository.GetByIdAsync(parentId);
+                var parent = await CommentRepository.GetByIdAsync(parentId, token);
 
                 Comment reply = new Comment(authorName, message, parent.Game, parent);
 
-                await CommentRepository.AddAsync(reply);
+                await CommentRepository.AddAsync(reply, token);
 
                 parent.Replies.Add(reply);
 
-                await CommentRepository.UpdateAsync(parent);
+                await CommentRepository.UpdateAsync(parent, token);
 
-                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync(token);
             }
             catch (ItemNotFoundException<Comment>)
             {

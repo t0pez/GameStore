@@ -24,11 +24,11 @@ namespace GameStore.Web.Endpoints.Games
             Summary = "Gets game with details by key",
             OperationId = "Games.GetWithDetails",
             Tags = new[] { "Games" })]
-        public override async Task<ActionResult<Game>> HandleAsync([FromRoute(Name = "gameKey")] string gameKey, CancellationToken cancellationToken = default)
+        public override async Task<ActionResult<Game>> HandleAsync([FromRoute(Name = "gameKey")] string gameKey, CancellationToken token = default)
         {
             try
             {
-                return Ok(await _gameService.GetByKeyAsync(gameKey));
+                return Ok(await _gameService.GetByKeyAsync(gameKey, token));
             }
             catch
             {

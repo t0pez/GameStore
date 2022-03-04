@@ -21,11 +21,11 @@ namespace GameStore.Web.Endpoints.Games
             Summary = "Gets game file",
             OperationId = "Games.GetFile",
             Tags = new[] { "Games" })]
-        public override async Task<ActionResult<byte[]>> HandleAsync([FromRoute(Name = "gameKey")] string gameKey, CancellationToken cancellationToken = default)
+        public override async Task<ActionResult<byte[]>> HandleAsync([FromRoute(Name = "gameKey")] string gameKey, CancellationToken token = default)
         {
             try
             {
-                return Ok(await _gameService.GetFileAsync(gameKey));
+                return Ok(await _gameService.GetFileAsync(gameKey, token));
             }
             catch
             {

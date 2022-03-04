@@ -25,11 +25,11 @@ namespace GameStore.Web.Endpoints.Games
             Summary = "Adds comment to game",
             OperationId = "Games.AddComment",
             Tags = new[] { "Games" })]
-        public override async Task<ActionResult> HandleAsync([FromMultiSource] AddCommentRequest request, CancellationToken cancellationToken = default)
+        public override async Task<ActionResult> HandleAsync([FromMultiSource] AddCommentRequest request, CancellationToken token = default)
         {
             try
             {
-                await _commentService.CommentGameAsync(request.GameKey, request.AuthorName, request.Message);
+                await _commentService.CommentGameAsync(request.GameKey, request.AuthorName, request.Message, token);
 
                 return Ok();
             }

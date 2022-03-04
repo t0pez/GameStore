@@ -23,11 +23,11 @@ namespace GameStore.Web.Endpoints.Games
             Summary = "Creates new game",
             OperationId = "Games.Create",
             Tags = new[] { "Games" })]
-        public override async Task<ActionResult<NewResponce>> HandleAsync([FromBody] NewRequest request, CancellationToken cancellationToken = default)
+        public override async Task<ActionResult<NewResponce>> HandleAsync([FromBody] NewRequest request, CancellationToken token = default)
         {
             try
             {
-                var game = await _gameService.CreateAsync(request.Key, request.Name, request.Description, request.File);
+                var game = await _gameService.CreateAsync(request.Key, request.Name, request.Description, request.File, token);
 
                 return Ok(new NewResponce
                 {

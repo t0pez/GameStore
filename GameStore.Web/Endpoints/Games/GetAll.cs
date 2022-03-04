@@ -23,9 +23,9 @@ namespace GameStore.Web.Endpoints.Games
             Summary = "Gets all non-deleted games",
             OperationId = "Games.GetAll",
             Tags = new[] { "Games" })]
-        public override async Task<ICollection<Game>> HandleAsync(CancellationToken cancellationToken = default)
+        public override async Task<ICollection<Game>> HandleAsync(CancellationToken token = default)
         {
-            var games = await _gameService.GetAllAsync();
+            var games = await _gameService.GetAllAsync(token);
 
             return games;
         }

@@ -23,11 +23,11 @@ namespace GameStore.Web.Endpoints.Games
             Summary = "Adds game to genre",
             OperationId = "Games.AddToGenre",
             Tags = new[] { "Games" })]
-        public override async Task<ActionResult> HandleAsync([FromBody] AddToGenreRequest request, CancellationToken cancellationToken = default)
+        public override async Task<ActionResult> HandleAsync([FromBody] AddToGenreRequest request, CancellationToken token = default)
         {
             try
             {
-                await _gameService.ApplyGenreAsync(request.GameId, request.GenreId);
+                await _gameService.ApplyGenreAsync(request.GameId, request.GenreId, token);
 
                 return Ok();
             }

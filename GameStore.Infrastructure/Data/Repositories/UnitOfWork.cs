@@ -3,6 +3,7 @@ using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameStore.Infrastructure.Data.Repositories
@@ -32,9 +33,9 @@ namespace GameStore.Infrastructure.Data.Repositories
             return (IRepository<TModel>)_repositories[modelType];
         }
 
-        public async Task<int> SaveChangesAsync()
+        public async Task<int> SaveChangesAsync(CancellationToken token = default)
         {
-            return await _context.SaveChangesAsync();
+            return await _context.SaveChangesAsync(token);
         }
 
         private bool HasRepositoryOfModelType(Type type)

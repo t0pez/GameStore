@@ -22,11 +22,11 @@ namespace GameStore.Web.Endpoints.Games
             Summary = "Updates game",
             OperationId = "Games.Edit",
             Tags = new[] { "Games" })]
-        public override async Task<ActionResult> HandleAsync([FromBody] Game game, CancellationToken cancellationToken = default)
+        public override async Task<ActionResult> HandleAsync([FromBody] Game game, CancellationToken token = default)
         {
             try
             {
-                await _gameService.UpdateAsync(game);
+                await _gameService.UpdateAsync(game, token);
                 return Ok();
             }
             catch
