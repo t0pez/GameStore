@@ -1,9 +1,7 @@
-using GameStore.Core.Interfaces;
-using GameStore.Core.Services;
+using GameStore.Infrastructure;
 using GameStore.Infrastructure.Data.Context;
-using GameStore.Infrastructure.Data.Repositories;
-using GameStore.SharedKernel.Interfaces.DataAccess;
 using GameStore.Web.Converters;
+using GameStore.Web.Profiles;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -25,22 +23,25 @@ namespace GameStore.Web
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddMvc().AddHybridModelBinder();
+
             services.AddSwaggerGen(opt => opt.EnableAnnotations());
             services.AddControllers().AddJsonOptions(opt =>
             {
                 opt.JsonSerializerOptions.Converters.Add(new ByteArrayJsonConverter());
                 opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             });
-            
-            services.AddScoped<IUnitOfWork, UnitOfWork>()
-                    .AddScoped<IGameService, GameService>()
-                    .AddScoped<ICommentService, CommentService>();
+
+            services.ConfigureDomainServices();
 
             services.AddDbContext<ApplicationContext>(opt =>
             {
                 var connectionString = Configuration.GetConnectionString("DefaultConnection");
                 opt.UseSqlServer(connectionString);
             });
+
+            services.AddAutoMapper(cfg => cfg.AddProfiles(
+                new[] { new CommonProfile() }));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)

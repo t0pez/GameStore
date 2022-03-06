@@ -1,6 +1,6 @@
-﻿namespace GameStore.Web.Endpoints.Games
+﻿namespace GameStore.Core.Models.Records
 {
-    public class NewResponce // TODO: change 
+    public class GameCreateModel
     {
         public string Key { get; set; }
         public string Name { get; set; }

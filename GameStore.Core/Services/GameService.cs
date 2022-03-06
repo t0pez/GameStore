@@ -2,6 +2,7 @@
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
+using GameStore.Core.Models.Records;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 using System;
@@ -25,140 +26,107 @@ namespace GameStore.Core.Services
         private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
         private IRepository<Genre> GenreRepository => _unitOfWork.GetRepository<Genre>();
 
-        public async Task<Game> CreateAsync(string key, string name, string description, byte[] file, CancellationToken token = default)
+        public async Task<Game> CreateAsync(GameCreateModel model)
         {
-            try
-            {
-                var game = new Game(key, name, description, file);
+            var game = new Game(model.Key, model.Name, model.Description, model.File);
 
-                var result = await GameRepository.AddAsync(game, token);
-                await _unitOfWork.SaveChangesAsync(token);
+            await GameRepository.AddAsync(game);
+            await _unitOfWork.SaveChangesAsync();
 
-                _logger.LogInformation("Game created [ Key = {0}, Name = {1}]", key, name);
+            _logger.LogInformation("Game created [ Key = {0}, Name = {1}]", model.Key, model.Name);
 
-                return result;
-            }
-            catch (ItemAlreadyExistsException)
-            {
-                _logger.LogInformation("Game creation failed - game with such id already exists");
-                return await CreateAsync(key, name, description, file, token); // Re-generate Id and repeat operation
-            }
-        }    
-
-        public async Task<ICollection<Game>> GetAllAsync(CancellationToken token = default)
-        {
-            return await GameRepository.GetBySpecAsync(new GamesWithDetails(), token);
+            return game;
         }
 
-        public async Task<ICollection<Game>> GetByGenreAsync(Genre genre, CancellationToken token = default)
+        public async Task<ICollection<Game>> GetAllAsync()
         {
-            return await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genre), token);
+            return await GameRepository.GetBySpecAsync(new GamesWithDetails());
         }
 
-        public async Task<Game> GetByKeyAsync(string key, CancellationToken token = default)
+        public async Task<ICollection<Game>> GetByGenreAsync(Genre genre)
         {
-            try
-            {
-                var result = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(key), token);
-
-                return result;
-            }
-            catch (ItemNotFoundException<Game>)
-            {
-                throw new ArgumentException("Game with such key doesnt exist");
-            }
+            return await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genre));
         }
 
-        public async Task<ICollection<Game>> GetByPlatformTypesAsync(PlatformType[] platformTypes, CancellationToken token = default)
+        public async Task<Game> GetByKeyAsync(string key)
         {
-            return await GameRepository.GetBySpecAsync(new GamesByPlatformTypes(platformTypes), token);
+            var result = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(key));
+
+            return result;
         }
 
-        public async Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId, CancellationToken token = default)
+        public async Task<ICollection<Game>> GetByPlatformTypesAsync(PlatformType[] platformTypes)
         {
-            try
-            {
-                var game = await GameRepository.GetByIdAsync(gameId, token);
-                var genre = await GenreRepository.GetByIdAsync(genreId, token);
+            return await GameRepository.GetBySpecAsync(new GamesByPlatformTypes(platformTypes));
+        }
 
-                game.Genres.Add(genre);
+        public async Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId)
+        {
+            var game = await GameRepository.GetByIdAsync(gameId);
 
-                await GameRepository.UpdateAsync(game, token);
-
-                await _unitOfWork.SaveChangesAsync(token);
-
-                _logger.LogInformation("Game {0} added to genre {1}", game.Name, genre.Name);
-
-                return game;
-            }
-            catch (ItemNotFoundException<Game>)
+            if (game is null)
             {
                 _logger.LogInformation("Add genre to game - no game with such id {0}", gameId);
                 throw new ArgumentException("Game with such id doesnt exist");
             }
-            catch(ItemNotFoundException<Genre>)
+
+            var genre = await GenreRepository.GetByIdAsync(genreId);
+
+            if (genre is null)
             {
                 _logger.LogInformation("Add genre to game - no genre with such id {0}", genreId);
                 throw new ArgumentException("Genre with such id doesnt exist");
             }
+
+            game.Genres.Add(genre);
+
+            GameRepository.Update(game);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Game {0} added to genre {1}", game.Name, genre.Name);
+
+            return game;
         }
 
-        public async Task UpdateAsync(Game game, CancellationToken token = default)
+        public async Task UpdateAsync(Game game)
         {
-            try
-            {
-                await GameRepository.UpdateAsync(game, token);
+            GameRepository.Update(game);
 
-                _logger.LogInformation("Game updated - {0}", game.Name);
+            _logger.LogInformation("Game updated - {0}", game.Name);
 
-                await _unitOfWork.SaveChangesAsync(token);
-            }
-            catch (ItemNotFoundException<Game>)
-            {
-                _logger.LogInformation("Update game failed - no game with such id {0}", game.Id);
-                throw new InvalidOperationException();
-            }
+            await _unitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(Guid id, CancellationToken token = default)
+        public async Task DeleteAsync(Guid id)
         {
-            try
-            {
-                var game = await GameRepository.GetByIdAsync(id, token);
+            var game = await GameRepository.GetByIdAsync(id);
 
-                await GameRepository.DeleteAsync(game, token); // TODO: Add overload to repository method
-
-                await _unitOfWork.SaveChangesAsync(token);
-                
-                _logger.LogInformation("Game deleted - {0}", game.Name);
-            }
-            catch (ItemNotFoundException<Game>)
+            if (game is null)
             {
                 _logger.LogInformation("Game delete failed - no game with such id {0}", id);
                 throw new InvalidOperationException();
             }
-            catch (InvalidOperationException)
-            {
-                _logger.LogInformation("Game delete failed - game already marked as deleted {0}", id);
-                // ignored
-            }
+
+            GameRepository.Delete(game);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation("Game deleted - {0}", game.Name);
         }
 
-        public async Task<byte[]> GetFileAsync(string gameKey, CancellationToken token = default)
+        public async Task<byte[]> GetFileAsync(string gameKey)
         {
-            try
-            {
-                var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey), token);
+            var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey));
 
-                _logger.LogInformation("File {0} downloaded", game.Name);
-
-                return game.File;
-            }
-            catch (ItemNotFoundException<Game>)
+            if (game is null)
             {
                 _logger.LogInformation("Download failed - no game with such key {0}", gameKey);
                 throw new InvalidOperationException();
             }
+            _logger.LogInformation("File {0} downloaded", game.Name);
+
+            return game.File;
         }
     }
 }

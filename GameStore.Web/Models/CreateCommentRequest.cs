@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace GameStore.Web.Endpoints.Games
+namespace GameStore.Web.Models
 {
-
-    public class AddCommentRequest
+    public class CreateCommentRequest
     {
         [FromRoute(Name = "gameKey")] public string GameKey { get; set; }
         [FromBody] public string AuthorName { get; set; }

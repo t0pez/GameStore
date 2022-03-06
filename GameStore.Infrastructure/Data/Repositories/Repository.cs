@@ -6,6 +6,7 @@ using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,65 +26,46 @@ namespace GameStore.Infrastructure.Data.Repositories
 
         private DbSet<TModel> Set => _context.Set<TModel>();
 
-        public async Task<TModel> AddAsync(TModel model, CancellationToken token = default)
+        public Task<List<TModel>> GetAllAsync()
         {
-            if (await SetContainsModelOfId(model.Id, token))
-                throw new ItemAlreadyExistsException();
-
-            await Set.AddAsync(model, token);
-
-            return model;
+            return Set.ToListAsync();
         }
 
-        public async Task<ICollection<TModel>> GetAllAsync(CancellationToken token = default)
+        public Task<TModel> GetByIdAsync(Guid id)
         {
-            return await Set.ToListAsync(token);
+            return Set.SingleOrDefaultAsync(e => e.Id == id);
         }
 
-        public async Task<TModel> GetByIdAsync(Guid id, CancellationToken token = default)
-        {
-            return await Set.SingleOrDefaultAsync(e => e.Id == id, token) ?? throw new ItemNotFoundException<TModel>();
-        }
-
-        public async Task<ICollection<TModel>> GetBySpecAsync(ISpecification<TModel> specification, CancellationToken token = default)
+        public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> specification)
         {
             var specificationResult = ApplySpecifications(specification);
 
-            return await specificationResult.ToListAsync(token);
+            return specificationResult.ToListAsync();
         }
         
-        public async Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> specification, CancellationToken token = default)
+        public Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> specification)
         {
             var specificationResult = ApplySpecifications(specification);
 
-            var result = await specificationResult.FirstOrDefaultAsync(token);
-
-            if (result is null)
-                throw new ItemNotFoundException<TModel>();
-
-            return result;
+            return specificationResult.FirstOrDefaultAsync();
         }
 
-        public async Task UpdateAsync(TModel updated, CancellationToken token = default)
+        public Task AddAsync(TModel model)
         {
-            if (await SetContainsModelOfId(updated.Id, token) == false)
-                throw new ItemNotFoundException<TModel>();
+            return Set.AddAsync(model).AsTask();
+        }
 
+        public void Update(TModel updated)
+        {
             Set.Update(updated);
         }
 
-        public async Task DeleteAsync(TModel model, CancellationToken token = default)
+        public void Delete(TModel model)
         {
-            if (await SetContainsModelOfId(model.Id, token) == false)
-                throw new ItemNotFoundException<TModel>();
-
             if (model is ISafeDelete)
             {
-                if ((model as ISafeDelete).IsDeleted)
-                    throw new InvalidOperationException("Item already deleted");
-
                 (model as ISafeDelete).IsDeleted = true;
-                await UpdateAsync(model, token);
+                Set.Update(model);
             }
             else
             {
@@ -96,11 +78,6 @@ namespace GameStore.Infrastructure.Data.Repositories
             var specEvaluator = new SpecificationEvaluator();
 
             return specEvaluator.GetQuery(Set.AsQueryable(), specification);
-        }
-
-        private async Task<bool> SetContainsModelOfId(Guid id, CancellationToken token)
-        {
-            return await Set.AnyAsync(m => m.Id == id, token);
         }
     }
 }
