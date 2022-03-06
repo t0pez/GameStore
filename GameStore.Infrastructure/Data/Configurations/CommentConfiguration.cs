@@ -15,8 +15,8 @@ namespace GameStore.Infrastructure.Data.Configurations
             builder.Property(c => c.Date).IsRequired();
             builder.Property(c => c.IsDeleted).IsRequired();
 
-            builder.HasOne(c => c.Game).WithMany(g => g.Comments);
-            builder.HasOne(c => c.Parent).WithMany(c => c.Replies);
+            builder.HasOne(c => c.Game).WithMany(g => g.Comments).HasForeignKey(c => c.GameId);
+            builder.HasOne(c => c.Parent).WithMany(c => c.Replies).HasForeignKey(c => c.ParentId);
             builder.HasMany(c => c.Replies).WithOne(c => c.Parent);
         }
     }
