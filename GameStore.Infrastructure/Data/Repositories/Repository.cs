@@ -26,18 +26,16 @@ namespace GameStore.Infrastructure.Data.Repositories
 
         private DbSet<TModel> Set => _context.Set<TModel>();
 
-        public Task<List<TModel>> GetAllAsync()
-        {
-            return Set.ToListAsync();
-        }
-
         public Task<TModel> GetByIdAsync(Guid id)
         {
             return Set.SingleOrDefaultAsync(e => e.Id == id);
         }
 
-        public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> specification)
+        public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> specification = null)
         {
+            if (specification is null)
+                return Set.ToListAsync();
+
             var specificationResult = ApplySpecifications(specification);
 
             return specificationResult.ToListAsync();
@@ -47,7 +45,7 @@ namespace GameStore.Infrastructure.Data.Repositories
         {
             var specificationResult = ApplySpecifications(specification);
 
-            return specificationResult.FirstOrDefaultAsync();
+            return specificationResult.SingleOrDefaultAsync();
         }
 
         public Task AddAsync(TModel model)
