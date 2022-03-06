@@ -44,7 +44,7 @@ namespace GameStore.Web
                 new[] { new CommonProfile() }));
         }
 
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationContext dbContext)
         {
             if (env.IsDevelopment())
             {
@@ -53,11 +53,11 @@ namespace GameStore.Web
                 app.UseSwaggerUI();
             }
 
+            dbContext.Database.EnsureCreated();
+
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
-            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {

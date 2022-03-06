@@ -4,6 +4,7 @@ using System.Text;
 
 namespace GameStore.Core.Exceptions
 {
+    [Serializable]
     public class ItemNotFoundException : Exception
     {
         public ItemNotFoundException()
