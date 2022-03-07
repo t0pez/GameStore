@@ -41,11 +41,15 @@ namespace GameStore.Core.Services
             await CommentRepository.AddAsync(comment);
 
             await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation($"Comment successfully added for game. Game.Name = {game.Name}, Comment.Body = {comment.Body}");
         }
 
         public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
         {
-            return await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
+            var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
+
+            return result;
         }
 
         public async Task ReplyCommentAsync(Guid parentId, string authorName, string message)
@@ -54,8 +58,9 @@ namespace GameStore.Core.Services
 
             if(parent is null)
             {
-                _logger.LogInformation("Reply comment failed - parent comment not found {0}", parentId);
-                throw new ArgumentException("Parent comment with such id doesn't exists");
+                _logger.LogInformation("Reply comment failed");
+                throw new ArgumentException("Parent comment with such id doesn't exists." +
+                    $"ParentId = {parentId}");
             }
 
             Comment reply = new Comment(authorName, message, parent.Game, parent);
@@ -66,7 +71,9 @@ namespace GameStore.Core.Services
 
             CommentRepository.Update(parent);
 
-            await _unitOfWork.SaveChangesAsync();   
+            await _unitOfWork.SaveChangesAsync();
+
+            _logger.LogInformation($"Comment successfully replied");
         }
     }
 }

@@ -58,7 +58,7 @@ namespace GameStore.Core.Services
 
             if (result is null)
             {
-                throw new ItemNotFoundException("Game not found");
+                throw new ItemNotFoundException($"Game not found. GameKey = {key}");
             }
 
             return result;
@@ -77,16 +77,16 @@ namespace GameStore.Core.Services
 
             if (game is null)
             {
-                _logger.LogInformation("Add genre to game - no game with such id {0}", gameId);
-                throw new ArgumentException("Game with such id doesnt exist");
+                _logger.LogInformation("Add genre to game failed");
+                throw new ArgumentException($"Game with such id doesnt exist. Id = {gameId}");
             }
 
             var genre = await GenreRepository.GetByIdAsync(genreId);
 
             if (genre is null)
             {
-                _logger.LogInformation("Add genre to game - no genre with such id {0}", genreId);
-                throw new ArgumentException("Genre with such id doesnt exist");
+                _logger.LogInformation("Add genre to game failed");
+                throw new ArgumentException($"Genre with such id doesnt exist. Id = {genreId}");
             }
 
             game.Genres.Add(genre);
@@ -95,7 +95,8 @@ namespace GameStore.Core.Services
 
             await _unitOfWork.SaveChangesAsync();
 
-            _logger.LogInformation("Game {0} added to genre {1}", game.Name, genre.Name);
+            _logger.LogInformation($"Game added to genre. " +
+                $"Game.Name = {game.Name}, Genre.Name = {genre.Name}");
 
             return game;
         }
@@ -104,7 +105,7 @@ namespace GameStore.Core.Services
         {
             GameRepository.Update(game);
 
-            _logger.LogInformation("Game updated - {0}", game.Name);
+            _logger.LogInformation($"Game updated. Game.Name = {game.Name}");
 
             await _unitOfWork.SaveChangesAsync();
         }
@@ -115,15 +116,16 @@ namespace GameStore.Core.Services
 
             if (game is null)
             {
-                _logger.LogInformation("Game delete failed - no game with such id {0}", id);
-                throw new InvalidOperationException();
+                _logger.LogInformation("Game delete failed");
+                throw new InvalidOperationException($"Game with such id doesnt exists." +
+                    $"Id = {id}");
             }
 
             GameRepository.Delete(game);
 
             await _unitOfWork.SaveChangesAsync();
 
-            _logger.LogInformation("Game deleted - {0}", game.Name);
+            _logger.LogInformation($"Game deleted. Game.Name = {game.Name}");
         }
 
         public async Task<byte[]> GetFileAsync(string gameKey)
@@ -132,10 +134,12 @@ namespace GameStore.Core.Services
 
             if (game is null)
             {
-                _logger.LogInformation("Download failed - no game with such key {0}", gameKey);
-                throw new InvalidOperationException();
+                _logger.LogInformation("Download failed");
+                throw new InvalidOperationException("Game with such key doesnt exists." +
+                    $"GameKey = {gameKey}");
             }
-            _logger.LogInformation("File {0} downloaded", game.Name);
+
+            _logger.LogInformation($"File downloaded. Game.Name = {game.Name}");
 
             return game.File;
         }

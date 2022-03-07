@@ -1,6 +1,6 @@
 ﻿using GameStore.Core.Exceptions;
 using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 
@@ -9,10 +9,12 @@ namespace GameStore.Web.Middlewares
     public class ExceptionMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly ILogger<ExceptionMiddleware> _logger;
 
-        public ExceptionMiddleware(RequestDelegate next)
+        public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
         {
             _next = next;
+            _logger = logger;
         }
 
         public async Task Invoke(HttpContext context)
@@ -23,21 +25,28 @@ namespace GameStore.Web.Middlewares
             }
             catch(ItemNotFoundException e)
             {
+                _logger.LogError(e, "ItemNotFound");
                 context.Response.StatusCode = 404;
                 context.Response.Headers.Add("exception", "ItemNotFound");
                 context.Response.Headers.Add("exceptionMessage", e.Message);
             }
             catch(InvalidOperationException e)
             {
+                _logger.LogError(e, "InvalidOperation");
                 context.Response.StatusCode = 502;
                 context.Response.Headers.Add("exception", "ItemNotFound");
                 context.Response.Headers.Add("exceptionMessage", e.Message);
             }
             catch(ArgumentException e)
             {
+                _logger.LogError(e, "Argument");
                 context.Response.StatusCode = 400;
                 context.Response.Headers.Add("exception", "ArgumentException");
                 context.Response.Headers.Add("exceptionMessage", e.Message);
+            }
+            catch
+            {
+                _logger.LogWarning($"Unhandled exception");
             }
         }
     }
