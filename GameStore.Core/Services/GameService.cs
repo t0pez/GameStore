@@ -1,4 +1,5 @@
 ﻿using GameStore.Core.Exceptions;
+using GameStore.Core.Helpers.AliasCrafting;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
@@ -16,11 +17,18 @@ namespace GameStore.Core.Services
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<GameService> _logger;
+        private readonly IAliasCraft _gameKeyAliasCraft;
 
         public GameService(IUnitOfWork unitOfWork, ILogger<GameService> logger)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
+            _gameKeyAliasCraft = new AliasCraft(
+                replacingPairs: new(),
+                symbolsToDelete: new List<char> {
+                    ' ', '\'', ',', '.', ':',
+                }
+            );
         }
 
         private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
@@ -28,12 +36,13 @@ namespace GameStore.Core.Services
 
         public async Task<Game> CreateAsync(CreateGameModel model)
         {
-            var game = new Game(model.Key, model.Name, model.Description, model.File);
+            var gameKey = _gameKeyAliasCraft.CreateAlias(model.Name);
+            var game = new Game(gameKey, model.Name, model.Description, model.File);
 
             await GameRepository.AddAsync(game);
             await _unitOfWork.SaveChangesAsync();
 
-            _logger.LogInformation("Game created [ Key = {0}, Name = {1}]", model.Key, model.Name);
+            _logger.LogInformation("Game created [ Key = {0}, Name = {1}]", game.Key, model.Name);
 
             return game;
         }
