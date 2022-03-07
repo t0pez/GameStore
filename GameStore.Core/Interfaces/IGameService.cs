@@ -13,7 +13,7 @@ namespace GameStore.Core.Interfaces
         Task<ICollection<Game>> GetByGenreAsync(Genre genre);
         Task<ICollection<Game>> GetByPlatformTypesAsync(PlatformType[] platformTypes);
         Task<Game> GetByKeyAsync(string key);
-        Task<Game> CreateAsync(GameCreateModel createModel);
+        Task<Game> CreateAsync(CreateGameModel createModel);
         Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId);
         Task UpdateAsync(Game game);
         Task DeleteAsync(Guid id);

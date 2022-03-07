@@ -1,6 +1,7 @@
 using GameStore.Infrastructure;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Web.Converters;
+using GameStore.Web.Middlewares;
 using GameStore.Web.Profiles;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -54,6 +55,8 @@ namespace GameStore.Web
             }
 
             dbContext.Database.EnsureCreated();
+
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 

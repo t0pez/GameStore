@@ -8,8 +8,8 @@ namespace GameStore.Web.Profiles
     {
         public CommonProfile()
         {
-            CreateMap<CreateGameRequest, GameCreateModel>().ReverseMap();
-            CreateMap<CreateCommentRequest, CommentCreateModel>().ReverseMap();
+            CreateMap<CreateGameRequestModel, CreateGameModel>().ReverseMap();
+            CreateMap<CreateCommentRequestModel, CreateCommentModel>().ReverseMap();
         }
     }
 }

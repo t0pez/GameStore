@@ -5,9 +5,9 @@ using System.Text;
 
 namespace GameStore.Core.Models.Games.Specifications
 {
-    internal class GamesWithDetails : Specification<Game>
+    internal class GamesWithDetailsSpec : Specification<Game>
     {
-        public GamesWithDetails()
+        public GamesWithDetailsSpec()
         {
             Query
                 .Where(g => g.IsDeleted == false)

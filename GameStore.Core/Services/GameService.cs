@@ -26,7 +26,7 @@ namespace GameStore.Core.Services
         private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
         private IRepository<Genre> GenreRepository => _unitOfWork.GetRepository<Genre>();
 
-        public async Task<Game> CreateAsync(GameCreateModel model)
+        public async Task<Game> CreateAsync(CreateGameModel model)
         {
             var game = new Game(model.Key, model.Name, model.Description, model.File);
 
@@ -40,24 +40,35 @@ namespace GameStore.Core.Services
 
         public async Task<ICollection<Game>> GetAllAsync()
         {
-            return await GameRepository.GetBySpecAsync(new GamesWithDetails());
+            var result = await GameRepository.GetBySpecAsync(new GamesWithDetailsSpec());
+
+            return result;
         }
 
         public async Task<ICollection<Game>> GetByGenreAsync(Genre genre)
         {
-            return await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genre));
+            var result = await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genre));
+
+            return result;
         }
 
         public async Task<Game> GetByKeyAsync(string key)
         {
             var result = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(key));
 
+            if (result is null)
+            {
+                throw new ItemNotFoundException("Game not found");
+            }
+
             return result;
         }
 
         public async Task<ICollection<Game>> GetByPlatformTypesAsync(PlatformType[] platformTypes)
         {
-            return await GameRepository.GetBySpecAsync(new GamesByPlatformTypes(platformTypes));
+            var result = await GameRepository.GetBySpecAsync(new GamesByPlatformTypesSpec(platformTypes));
+
+            return result;
         }
 
         public async Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId)

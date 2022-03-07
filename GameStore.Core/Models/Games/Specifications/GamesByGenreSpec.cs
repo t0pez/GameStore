@@ -8,7 +8,8 @@ namespace GameStore.Core.Models.Games.Specifications
         public GamesByGenreSpec(Genre genre)
         {
             Query
-                .Where(g => g.Genres.Contains(genre) && g.IsDeleted == false);
+                .Where(g => g.Genres.Contains(genre) 
+                    && g.IsDeleted == false);
         }
     }
 }

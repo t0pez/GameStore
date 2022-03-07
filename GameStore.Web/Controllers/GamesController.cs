@@ -51,9 +51,9 @@ namespace GameStore.Web.Controllers
         }
 
         [HttpPost("games/new")]
-        public async Task<ActionResult<Game>> Create(CreateGameRequest request)
+        public async Task<ActionResult<Game>> Create(CreateGameRequestModel request)
         {
-            var createModel = _mapper.Map<GameCreateModel>(request);
+            var createModel = _mapper.Map<CreateGameModel>(request);
 
             var result = await _gameService.CreateAsync(createModel);
 
@@ -61,9 +61,9 @@ namespace GameStore.Web.Controllers
         }
 
         [HttpPost("games/{gameKey}/newcomment")]
-        public async Task<ActionResult> CommentGame([FromHybrid] CreateCommentRequest request)
+        public async Task<ActionResult> CommentGame([FromHybrid] CreateCommentRequestModel request)
         {
-            var createModel = _mapper.Map<CommentCreateModel>(request);
+            var createModel = _mapper.Map<CreateCommentModel>(request);
 
             await _commentService.CommentGameAsync(createModel);
 

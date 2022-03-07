@@ -2,7 +2,7 @@
 
 namespace GameStore.Web.Models
 {
-    public class CreateCommentRequest
+    public class CreateCommentRequestModel
     {
         [FromRoute(Name = "gameKey")] public string GameKey { get; set; }
         [FromBody] public string AuthorName { get; set; }
