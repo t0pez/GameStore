@@ -13,5 +13,7 @@ namespace GameStore.SharedKernel.Interfaces.DataAccess
         Task AddAsync(TModel model);
         void Update(TModel updated);
         void Delete(TModel model);
+        Task<bool> AnyAsync(Guid id);
+        Task<bool> AnyAsync(ISpecification<TModel> specification);
     }
 }

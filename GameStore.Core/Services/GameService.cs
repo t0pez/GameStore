@@ -38,7 +38,7 @@ namespace GameStore.Core.Services
         {
             var gameKey = _gameKeyAliasCraft.CreateAlias(model.Name);
 
-            if (await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey)) is not null)
+            if (await GameRepository.AnyAsync(new GameByKeySpec(gameKey)))
             {
                 _logger.LogInformation("Game creation failed");
                 throw new InvalidOperationException("Game with this key already exists. " +
@@ -188,8 +188,8 @@ namespace GameStore.Core.Services
         {
             foreach (var genre in updateModel.Genres)
             {
-                var existingGenre = GenreRepository.GetByIdAsync(genre.Id).Result; // ExceptionMiddleware doesnt work with await here
-                if (existingGenre is null)                                          // Maybe should switch to filters or create method ContainsId in repository
+                // ExceptionMiddleware doesnt work with await here
+                if (GenreRepository.AnyAsync(genre.Id).Result == false)
                 {
                     throw new ArgumentException("Genre doesnt exists");
                 }
@@ -197,8 +197,7 @@ namespace GameStore.Core.Services
 
             foreach (var platformType in updateModel.PlatformTypes)
             {
-                var existingPlatformType = PlatformTypesRepository.GetByIdAsync(platformType.Id).Result;
-                if (existingPlatformType is null)
+                if (PlatformTypesRepository.AnyAsync(platformType.Id).Result == false)
                 {
                     throw new ArgumentException("Platform type doesnt exists");
                 }

@@ -77,5 +77,17 @@ namespace GameStore.Infrastructure.Data.Repositories
 
             return specEvaluator.GetQuery(Set.AsQueryable(), specification);
         }
+
+        public async Task<bool> AnyAsync(Guid id)
+        {
+            return await Set.AnyAsync(m => m.Id == id);
+        }
+
+        public async Task<bool> AnyAsync(ISpecification<TModel> specification)
+        {
+            var specResult = ApplySpecifications(specification);
+
+            return await specResult.AnyAsync();
+        }
     }
 }
