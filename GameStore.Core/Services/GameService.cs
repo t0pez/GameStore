@@ -23,12 +23,11 @@ namespace GameStore.Core.Services
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
-            _gameKeyAliasCraft = new AliasCraft(
-                replacingPairs: new(),
-                symbolsToDelete: new List<char> {
-                    ' ', '\'', ',', '.', ':',
-                }
-            );
+            _gameKeyAliasCraft =
+                new AliasCraftBuilder()
+                .AddPairToReplace('_', '-')
+                .AddSymbolsToRemove(' ', '\'', ',', '.', ':')
+                .Build();
         }
 
         private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
@@ -39,10 +38,10 @@ namespace GameStore.Core.Services
         {
             var gameKey = _gameKeyAliasCraft.CreateAlias(model.Name);
 
-            if(GameRepository.GetBySpecAsync(new GameByKeySpec(gameKey)) is not null)
+            if (await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey)) is not null)
             {
                 _logger.LogInformation("Game creation failed");
-                throw new InvalidOperationException("Game with this key already exists." +
+                throw new InvalidOperationException("Game with this key already exists. " +
                     $"GameKey = {gameKey}");
             }
 
@@ -51,7 +50,7 @@ namespace GameStore.Core.Services
             await GameRepository.AddAsync(game);
             await _unitOfWork.SaveChangesAsync();
 
-            _logger.LogInformation("Game created [ Key = {0}, Name = {1}]", game.Key, model.Name);
+            _logger.LogInformation($"Game created [ Key = {game.Key}, Name = {game.Name} ]");
 
             return game;
         }
@@ -189,7 +188,7 @@ namespace GameStore.Core.Services
         {
             foreach (var genre in updateModel.Genres)
             {
-                var existingGenre =  GenreRepository.GetByIdAsync(genre.Id).Result; // ExceptionMiddleware doesnt work with await here
+                var existingGenre = GenreRepository.GetByIdAsync(genre.Id).Result; // ExceptionMiddleware doesnt work with await here
                 if (existingGenre is null)                                          // Maybe should switch to filters or create method ContainsId in repository
                 {
                     throw new ArgumentException("Genre doesnt exists");

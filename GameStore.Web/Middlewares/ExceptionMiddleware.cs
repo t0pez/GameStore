@@ -34,7 +34,7 @@ namespace GameStore.Web.Middlewares
             {
                 _logger.LogError(e, "InvalidOperation");
                 context.Response.StatusCode = 502;
-                context.Response.Headers.Add("exception", "ItemNotFound");
+                context.Response.Headers.Add("exception", "InvalidOperation");
                 context.Response.Headers.Add("exceptionMessage", e.Message);
             }
             catch(ArgumentException e)
