@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 
 namespace GameStore.Core.Helpers.AliasCrafting
 {
@@ -16,16 +17,25 @@ namespace GameStore.Core.Helpers.AliasCrafting
 
         public string CreateAlias(string source)
         {
-            var result = ""; // TODO: Change to StringBuilder
+            var builder = new StringBuilder();
 
-            foreach (var symbol in source.ToLower()) // TODO: extract methods
+            AppendWithDeletionFilter(builder, source.ToLower());
+            ReplaceSymbols(builder);
+
+            return builder.ToString();
+        }
+
+        private void AppendWithDeletionFilter(StringBuilder builder, string source)
+        {
+            foreach (var symbol in source)
                 if (_symbolsToDelete.Contains(symbol) == false)
-                    result += symbol;
+                    builder.Append(symbol);
+        }
 
+        private void ReplaceSymbols(StringBuilder builder)
+        {
             foreach (var pair in _replacingPairs)
-                result = result.Replace(pair.Key, pair.Value);
-
-            return result;
+                builder.Replace(pair.Key, pair.Value);
         }
     }
 }
