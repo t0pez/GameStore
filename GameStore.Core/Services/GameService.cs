@@ -33,10 +33,19 @@ namespace GameStore.Core.Services
 
         private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
         private IRepository<Genre> GenreRepository => _unitOfWork.GetRepository<Genre>();
+        private IRepository<PlatformType> PlatformTypesRepository => _unitOfWork.GetRepository<PlatformType>();
 
         public async Task<Game> CreateAsync(CreateGameModel model)
         {
             var gameKey = _gameKeyAliasCraft.CreateAlias(model.Name);
+
+            if(GameRepository.GetBySpecAsync(new GameByKeySpec(gameKey)) is not null)
+            {
+                _logger.LogInformation("Game creation failed");
+                throw new InvalidOperationException("Game with this key already exists." +
+                    $"GameKey = {gameKey}");
+            }
+
             var game = new Game(gameKey, model.Name, model.Description, model.File);
 
             await GameRepository.AddAsync(game);
@@ -110,11 +119,22 @@ namespace GameStore.Core.Services
             return game;
         }
 
-        public async Task UpdateAsync(Game game)
+        public async Task UpdateAsync(UpdateGameModel updateModel)
         {
+            var game = await GameRepository.GetByIdAsync(updateModel.Id);
+
+            if (game is null)
+            {
+                _logger.LogInformation("Game update failed");
+                throw new InvalidOperationException("Game with such id doesnt exists." +
+                    $"Id = {updateModel.Id}");
+            }
+
+            SetUpdatedValues(game, updateModel);
+
             GameRepository.Update(game);
 
-            _logger.LogInformation($"Game updated. Game.Name = {game.Name}");
+            _logger.LogInformation($"Game updated. Game.Name = {updateModel.Name}");
 
             await _unitOfWork.SaveChangesAsync();
         }
@@ -151,6 +171,39 @@ namespace GameStore.Core.Services
             _logger.LogInformation($"File downloaded. Game.Name = {game.Name}");
 
             return game.File;
+        }
+
+        private void SetUpdatedValues(Game game, UpdateGameModel updateModel)
+        {
+            CheckGenres(updateModel);
+
+            game.Name = updateModel.Name;
+            game.Description = updateModel.Description;
+            game.File = updateModel.File;
+            game.Genres = updateModel.Genres;
+            game.PlatformTypes = updateModel.PlatformTypes;
+            // TODO: ask PO about re-generation key
+        }
+
+        private void CheckGenres(UpdateGameModel updateModel)
+        {
+            foreach (var genre in updateModel.Genres)
+            {
+                var existingGenre =  GenreRepository.GetByIdAsync(genre.Id).Result; // ExceptionMiddleware doesnt work with await here
+                if (existingGenre is null)                                          // Maybe should switch to filters or create method ContainsId in repository
+                {
+                    throw new ArgumentException("Genre doesnt exists");
+                }
+            }
+
+            foreach (var platformType in updateModel.PlatformTypes)
+            {
+                var existingPlatformType = PlatformTypesRepository.GetByIdAsync(platformType.Id).Result;
+                if (existingPlatformType is null)
+                {
+                    throw new ArgumentException("Platform type doesnt exists");
+                }
+            }
         }
     }
 }

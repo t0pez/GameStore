@@ -13,7 +13,7 @@ namespace GameStore.Infrastructure.Data.Configurations
         {
             builder.HasKey(pt => pt.Id);
 
-            builder.Property(pt => pt.PlatformName).IsRequired();
+            builder.Property(pt => pt.Name).IsRequired();
             builder.Property(pt => pt.IsDeleted).IsRequired();
 
             builder.HasMany(pt => pt.Games).WithMany(g => g.PlatformTypes);

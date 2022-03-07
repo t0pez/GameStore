@@ -43,7 +43,6 @@
 	<ItemGroup>
 		<Folder Include="Attributes\" />
 		<Folder Include="Endpoints\" />
-		<Folder Include="ViewModels\" />
 	</ItemGroup>
 
 </Project>

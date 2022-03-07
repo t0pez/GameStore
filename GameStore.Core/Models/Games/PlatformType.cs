@@ -8,7 +8,7 @@ namespace GameStore.Core.Models.Games
 {
     public class PlatformType : BaseEntity, ISafeDelete
     {
-        public string PlatformName { get; set; }
+        public string Name { get; set; }
 
         [JsonIgnore] public ICollection<Game> Games { get; set; }
 

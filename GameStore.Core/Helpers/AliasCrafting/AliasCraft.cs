@@ -16,7 +16,7 @@ namespace GameStore.Core.Helpers.AliasCrafting
 
         public string CreateAlias(string source)
         {
-            var result = ""; // TODO: Change for StringBuilder
+            var result = ""; // TODO: Change to StringBuilder
 
             foreach (var symbol in source.ToLower()) // TODO: extract methods
                 if (_symbolsToDelete.Contains(symbol) == false)

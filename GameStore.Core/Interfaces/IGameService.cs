@@ -15,7 +15,7 @@ namespace GameStore.Core.Interfaces
         Task<Game> GetByKeyAsync(string key);
         Task<Game> CreateAsync(CreateGameModel createModel);
         Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId);
-        Task UpdateAsync(Game game);
+        Task UpdateAsync(UpdateGameModel updateModel);
         Task DeleteAsync(Guid id);
         Task<byte[]> GetFileAsync(string gameKey);
     }

@@ -23,7 +23,7 @@ namespace GameStore.Web.Middlewares
             {
                 await _next(context);
             }
-            catch(ItemNotFoundException e)
+            catch(ItemNotFoundException e) // TODO: Extract method and keep dry
             {
                 _logger.LogError(e, "ItemNotFound");
                 context.Response.StatusCode = 404;
@@ -44,9 +44,12 @@ namespace GameStore.Web.Middlewares
                 context.Response.Headers.Add("exception", "ArgumentException");
                 context.Response.Headers.Add("exceptionMessage", e.Message);
             }
-            catch
+            catch(Exception e)
             {
                 _logger.LogWarning($"Unhandled exception");
+                context.Response.StatusCode = 500;
+                context.Response.Headers.Add("exception", "Unknown");
+                context.Response.Headers.Add("exceptionMessage", e.Message);
             }
         }
     }

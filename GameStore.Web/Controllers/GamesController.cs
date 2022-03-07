@@ -29,7 +29,7 @@ namespace GameStore.Web.Controllers
             _logger = logger;
         }
 
-        [HttpGet("games")]
+        [HttpGet("games/")]
         public async Task<ICollection<Game>> GetAll()
         {
             var result = await _gameService.GetAllAsync();
@@ -95,8 +95,9 @@ namespace GameStore.Web.Controllers
         }
 
         [HttpPost("games/update")]
-        public async Task<ActionResult<Game>> Edit([FromBody] Game game)
+        public async Task<ActionResult<Game>> Edit([FromBody] EditGameRequestModel request)
         {
+            var game = _mapper.Map<UpdateGameModel>(request);
             await _gameService.UpdateAsync(game);
 
             _logger.LogInformation("Edit request done.");
