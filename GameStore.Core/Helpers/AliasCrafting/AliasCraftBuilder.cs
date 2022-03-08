@@ -1,29 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace GameStore.Core.Helpers.AliasCrafting
 {
     internal class AliasCraftBuilder
     {
-        private readonly Dictionary<char, char> _replacingPairs = new();
-        private readonly List<char> _symbolsToDelete = new();
+        private readonly AliasCraftConfig _config = new();
 
         public AliasCraft Build()
         {
-            return new AliasCraft(_replacingPairs, _symbolsToDelete);
+            return new AliasCraft(_config);
         }
 
         public AliasCraftBuilder AddPairToReplace(char oldSymbol, char newSymbol)
         {
-            _replacingPairs.Add(oldSymbol, newSymbol);
+            _config.ReplacingPairs.Add($"{oldSymbol}", $"{newSymbol}");
 
             return this;
         }
-        
+
         public AliasCraftBuilder AddSymbolsToRemove(params char[] symbols)
         {
-            _symbolsToDelete.AddRange(symbols);
+            var pairs = symbols.Select(s => new { Key = $"{s}", Value = ""});
+
+            foreach (var pair in pairs)
+                _config.ReplacingPairs.Add(pair.Key, pair.Value);
+
+            return this;
+        }
+
+        public AliasCraftBuilder SetCaseChanges(StringCaseChanges stringCase)
+        {
+            _config.SourceCaseChanges = stringCase;
 
             return this;
         }

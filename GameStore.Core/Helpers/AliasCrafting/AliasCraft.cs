@@ -6,35 +6,42 @@ namespace GameStore.Core.Helpers.AliasCrafting
 {
     public class AliasCraft : IAliasCraft
     {
-        private readonly Dictionary<char, char> _replacingPairs;
-        private readonly List<char> _symbolsToDelete;
+        private readonly AliasCraftConfig _config;
 
-        public AliasCraft(Dictionary<char, char> replacingPairs, List<char> symbolsToDelete)
+        public AliasCraft(AliasCraftConfig config)
         {
-            _replacingPairs = replacingPairs;
-            _symbolsToDelete = symbolsToDelete;
+            _config = config;
         }
 
         public string CreateAlias(string source)
         {
             var builder = new StringBuilder();
 
-            AppendWithDeletionFilter(builder, source.ToLower());
+            SetSourceString(builder, source);
             ReplaceSymbols(builder);
 
             return builder.ToString();
         }
 
-        private void AppendWithDeletionFilter(StringBuilder builder, string source)
+        private void SetSourceString(StringBuilder builder, string source)
         {
-            foreach (var symbol in source)
-                if (_symbolsToDelete.Contains(symbol) == false)
-                    builder.Append(symbol);
+            var resultString = source;
+
+            if (_config.SourceCaseChanges == StringCaseChanges.Lower)
+            {
+                resultString = resultString.ToLower();
+            }
+            else if (_config.SourceCaseChanges == StringCaseChanges.Upper)
+            {
+                resultString = resultString.ToUpper();
+            }
+
+            builder.Append(resultString);
         }
 
         private void ReplaceSymbols(StringBuilder builder)
         {
-            foreach (var pair in _replacingPairs)
+            foreach (var pair in _config.ReplacingPairs)
                 builder.Replace(pair.Key, pair.Value);
         }
     }
