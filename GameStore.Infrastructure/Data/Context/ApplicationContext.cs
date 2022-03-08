@@ -1,7 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
 using GameStore.Infrastructure.Data.Configurations;
-using GameStore.Core.Models.Comments;
+using Microsoft.EntityFrameworkCore;
 
 namespace GameStore.Infrastructure.Data.Context
 {

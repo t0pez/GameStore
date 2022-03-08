@@ -33,9 +33,9 @@ namespace GameStore.Infrastructure.Data.Repositories
             return (IRepository<TModel>)_repositories[modelType];
         }
 
-        public async Task<int> SaveChangesAsync(CancellationToken token = default)
+        public async Task<int> SaveChangesAsync()
         {
-            return await _context.SaveChangesAsync(token);
+            return await _context.SaveChangesAsync();
         }
 
         private bool HasRepositoryOfModelType(Type type)

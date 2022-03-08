@@ -1,7 +1,4 @@
 ﻿using Ardalis.Specification;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace GameStore.Core.Models.Games.Specifications
 {

@@ -46,6 +46,7 @@ namespace GameStore.Core.Services
 
         public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
         {
+            // TODO: maybe it should check if game exists and throw 404
             var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
 
             return result;

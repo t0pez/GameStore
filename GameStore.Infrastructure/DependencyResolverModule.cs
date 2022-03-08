@@ -3,9 +3,6 @@ using GameStore.Core.Services;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace GameStore.Infrastructure
 {

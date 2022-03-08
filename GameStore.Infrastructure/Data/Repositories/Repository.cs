@@ -1,16 +1,13 @@
 ﻿using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
-using GameStore.Core.Exceptions;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.ChangeTracking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameStore.Infrastructure.Data.Repositories
@@ -71,13 +68,6 @@ namespace GameStore.Infrastructure.Data.Repositories
             }
         }
 
-        private IQueryable<TModel> ApplySpecifications(ISpecification<TModel> specification)
-        {
-            var specEvaluator = new SpecificationEvaluator();
-
-            return specEvaluator.GetQuery(Set.AsQueryable(), specification);
-        }
-
         public async Task<bool> AnyAsync(Guid id)
         {
             return await Set.AnyAsync(m => m.Id == id);
@@ -88,6 +78,13 @@ namespace GameStore.Infrastructure.Data.Repositories
             var specResult = ApplySpecifications(specification);
 
             return await specResult.AnyAsync();
+        }
+
+        private IQueryable<TModel> ApplySpecifications(ISpecification<TModel> specification)
+        {
+            var specEvaluator = new SpecificationEvaluator();
+
+            return specEvaluator.GetQuery(Set.AsQueryable(), specification);
         }
     }
 }

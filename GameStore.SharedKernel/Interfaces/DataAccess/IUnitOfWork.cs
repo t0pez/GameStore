@@ -6,6 +6,6 @@ namespace GameStore.SharedKernel.Interfaces.DataAccess
     public interface IUnitOfWork
     {
         IRepository<TModel> GetRepository<TModel>() where TModel : BaseEntity;
-        Task<int> SaveChangesAsync(CancellationToken token = default);
+        Task<int> SaveChangesAsync();
     }
 }

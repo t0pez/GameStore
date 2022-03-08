@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text.Json.Serialization;
-using GameStore.Core.Models.Games;
+﻿using GameStore.Core.Models.Games;
 using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace GameStore.Core.Models.Comments
 {

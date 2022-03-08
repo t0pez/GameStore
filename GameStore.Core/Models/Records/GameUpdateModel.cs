@@ -1,7 +1,6 @@
 ﻿using GameStore.Core.Models.Games;
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace GameStore.Core.Models.Records
 {

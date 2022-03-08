@@ -40,12 +40,11 @@ namespace GameStore.Web.Controllers
         }
 
         [HttpGet("games/{gameKey}")]
-        public async Task<ActionResult<Game>> GetWithDetails(string gameKey)
+        public async Task<ActionResult<Game>> GetWithDetails([FromRoute(Name = "gameKey")] string gameKey)
         {
             var result = await _gameService.GetByKeyAsync(gameKey);
 
             _logger.LogInformation($"GetWithDetails request done");
-
 
             return Ok(result);
         }
@@ -61,7 +60,7 @@ namespace GameStore.Web.Controllers
         }
 
         [HttpPost("games/new")]
-        public async Task<ActionResult<Game>> Create(GameCreateRequestModel request)
+        public async Task<ActionResult<Game>> Create([FromBody] GameCreateRequestModel request)
         {
             var createModel = _mapper.Map<GameCreateModel>(request);
 

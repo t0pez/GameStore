@@ -1,9 +1,6 @@
 ﻿using GameStore.Core.Models.Games;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace GameStore.Infrastructure.Data.Configurations
 {

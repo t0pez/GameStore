@@ -6,9 +6,9 @@ namespace GameStore.Core.Models.Comments.Specifications
     {
         public CommentsByGameKey(string gameKey)
         {
-            Query.
-                Where(c => c.Game.Key == gameKey).
-                Include(c => c.Replies);
+            Query
+                .Where(c => c.Game.Key == gameKey)
+                .Include(c => c.Replies);
         }
     }
 }
