@@ -2,7 +2,7 @@
 
 namespace GameStore.Web.Models
 {
-    public class CreateGameRequestModel
+    public class GameCreateRequestModel
     {
         [FromBody] public string Name { get; set; }
         [FromBody] public string Description { get; set; }

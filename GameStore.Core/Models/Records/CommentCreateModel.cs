@@ -1,6 +1,6 @@
 ﻿namespace GameStore.Core.Models.Records
 {
-    public class CreateCommentModel
+    public class CommentCreateModel
     {
         public string GameKey { get; set; }
         public string AuthorName { get; set; }

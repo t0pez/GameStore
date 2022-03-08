@@ -8,7 +8,6 @@ using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameStore.Core.Services
@@ -34,7 +33,7 @@ namespace GameStore.Core.Services
         private IRepository<Genre> GenreRepository => _unitOfWork.GetRepository<Genre>();
         private IRepository<PlatformType> PlatformTypesRepository => _unitOfWork.GetRepository<PlatformType>();
 
-        public async Task<Game> CreateAsync(CreateGameModel model)
+        public async Task<Game> CreateAsync(GameCreateModel model)
         {
             var gameKey = _gameKeyAliasCraft.CreateAlias(model.Name);
 
@@ -118,7 +117,7 @@ namespace GameStore.Core.Services
             return game;
         }
 
-        public async Task UpdateAsync(UpdateGameModel updateModel)
+        public async Task UpdateAsync(GameUpdateModel updateModel)
         {
             var game = await GameRepository.GetByIdAsync(updateModel.Id);
 
@@ -172,7 +171,7 @@ namespace GameStore.Core.Services
             return game.File;
         }
 
-        private void SetUpdatedValues(Game game, UpdateGameModel updateModel)
+        private void SetUpdatedValues(Game game, GameUpdateModel updateModel)
         {
             CheckGenres(updateModel);
 
@@ -184,7 +183,7 @@ namespace GameStore.Core.Services
             // TODO: ask PO about re-generation key
         }
 
-        private void CheckGenres(UpdateGameModel updateModel)
+        private void CheckGenres(GameUpdateModel updateModel)
         {
             foreach (var genre in updateModel.Genres)
             {

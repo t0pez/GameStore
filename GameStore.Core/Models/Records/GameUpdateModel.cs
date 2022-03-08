@@ -5,7 +5,7 @@ using System.Text;
 
 namespace GameStore.Core.Models.Records
 {
-    public class UpdateGameModel
+    public class GameUpdateModel
     {
         public Guid Id { get; set; }
 

@@ -11,7 +11,7 @@ namespace GameStore.Core.Interfaces
     public interface ICommentService
     {
         Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey);
-        Task CommentGameAsync(CreateCommentModel model);
+        Task CommentGameAsync(CommentCreateModel model);
         Task ReplyCommentAsync(Guid parentId, string authorName, string message);
     }
 }

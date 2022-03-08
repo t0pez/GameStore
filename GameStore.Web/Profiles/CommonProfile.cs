@@ -10,9 +10,9 @@ namespace GameStore.Web.Profiles
     {
         public CommonProfile()
         {
-            CreateMap<CreateGameRequestModel, CreateGameModel>().ReverseMap();
-            CreateMap<CreateCommentRequestModel, CreateCommentModel>().ReverseMap();
-            CreateMap<EditGameRequestModel, UpdateGameModel>().ReverseMap();
+            CreateMap<GameCreateRequestModel, GameCreateModel>().ReverseMap();
+            CreateMap<CommentCreateRequestModel, CommentCreateModel>().ReverseMap();
+            CreateMap<GameEditRequestModel, GameUpdateModel>().ReverseMap();
 
             CreateMap<Genre, GenreViewModel>().ReverseMap();
             CreateMap<PlatformType, PlatformTypeViewModel>().ReverseMap();

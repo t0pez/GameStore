@@ -1,6 +1,6 @@
 ﻿namespace GameStore.Core.Models.Records
 {
-    public class CreateGameModel
+    public class GameCreateModel
     {
         public string Name { get; set; }
         public string Description { get; set; }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace GameStore.Web.Models
 {
-    public class EditGameRequestModel
+    public class GameEditRequestModel
     {
         public Guid Id { get; set; }
         public string Name { get; set; }

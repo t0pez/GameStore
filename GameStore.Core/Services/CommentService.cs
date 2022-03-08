@@ -26,7 +26,7 @@ namespace GameStore.Core.Services
         private IRepository<Comment> CommentRepository => _unitOfWork.GetRepository<Comment>();
         private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
 
-        public async Task CommentGameAsync(CreateCommentModel model)
+        public async Task CommentGameAsync(CommentCreateModel model)
         {
             var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(model.GameKey));
 

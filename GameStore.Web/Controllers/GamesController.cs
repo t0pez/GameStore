@@ -61,9 +61,9 @@ namespace GameStore.Web.Controllers
         }
 
         [HttpPost("games/new")]
-        public async Task<ActionResult<Game>> Create(CreateGameRequestModel request)
+        public async Task<ActionResult<Game>> Create(GameCreateRequestModel request)
         {
-            var createModel = _mapper.Map<CreateGameModel>(request);
+            var createModel = _mapper.Map<GameCreateModel>(request);
 
             var result = await _gameService.CreateAsync(createModel);
 
@@ -73,9 +73,9 @@ namespace GameStore.Web.Controllers
         }
 
         [HttpPost("games/{gameKey}/newcomment")]
-        public async Task<ActionResult> CommentGame([FromHybrid] CreateCommentRequestModel request)
+        public async Task<ActionResult> CommentGame([FromHybrid] CommentCreateRequestModel request)
         {
-            var createModel = _mapper.Map<CreateCommentModel>(request);
+            var createModel = _mapper.Map<CommentCreateModel>(request);
 
             await _commentService.CommentGameAsync(createModel);
 
@@ -95,9 +95,9 @@ namespace GameStore.Web.Controllers
         }
 
         [HttpPost("games/update")]
-        public async Task<ActionResult<Game>> Edit([FromBody] EditGameRequestModel request)
+        public async Task<ActionResult<Game>> Edit([FromBody] GameEditRequestModel request)
         {
-            var game = _mapper.Map<UpdateGameModel>(request);
+            var game = _mapper.Map<GameUpdateModel>(request);
             await _gameService.UpdateAsync(game);
 
             _logger.LogInformation("Edit request done.");
