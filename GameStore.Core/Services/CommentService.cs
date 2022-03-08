@@ -1,4 +1,5 @@
-﻿using GameStore.Core.Interfaces;
+﻿using GameStore.Core.Exceptions;
+using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Comments.Specifications;
 using GameStore.Core.Models.Games;
@@ -46,7 +47,11 @@ namespace GameStore.Core.Services
 
         public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
         {
-            // TODO: maybe it should check if game exists and throw 404
+            if(await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
+            {
+                throw new ItemNotFoundException($"Game not found. GameKey = {gameKey}");
+            }
+
             var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
 
             return result;
