@@ -10,7 +10,6 @@ namespace GameStore.Core.Models.Games
     {
         public Game(string key, string name, string description, byte[] file)
         {
-            Id = Guid.NewGuid();
             Key = key;
             Name = name;
             Description = description;

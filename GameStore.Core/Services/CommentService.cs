@@ -32,8 +32,7 @@ namespace GameStore.Core.Services
 
             if (game is null)
             {
-                _logger.LogInformation("Add comment to game failed - no game with key {0}", model.GameKey);
-                throw new ArgumentException("Game with such id doesn't exist");
+                throw new ArgumentException($"Game with such key doesn't exist. GameKey = {model.GameKey}");
             }
 
             var comment = new Comment(model.AuthorName, model.Message, game);
@@ -58,7 +57,6 @@ namespace GameStore.Core.Services
 
             if(parent is null)
             {
-                _logger.LogInformation("Reply comment failed");
                 throw new ArgumentException("Parent comment with such id doesn't exists." +
                     $"ParentId = {parentId}");
             }

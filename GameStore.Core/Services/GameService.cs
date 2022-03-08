@@ -40,7 +40,6 @@ namespace GameStore.Core.Services
 
             if (await GameRepository.AnyAsync(new GameByKeySpec(gameKey)))
             {
-                _logger.LogInformation("Game creation failed");
                 throw new InvalidOperationException("Game with this key already exists. " +
                     $"GameKey = {gameKey}");
             }
@@ -94,7 +93,6 @@ namespace GameStore.Core.Services
 
             if (game is null)
             {
-                _logger.LogInformation("Add genre to game failed");
                 throw new ArgumentException($"Game with such id doesnt exist. Id = {gameId}");
             }
 
@@ -102,7 +100,6 @@ namespace GameStore.Core.Services
 
             if (genre is null)
             {
-                _logger.LogInformation("Add genre to game failed");
                 throw new ArgumentException($"Genre with such id doesnt exist. Id = {genreId}");
             }
 
@@ -124,7 +121,6 @@ namespace GameStore.Core.Services
 
             if (game is null)
             {
-                _logger.LogInformation("Game update failed");
                 throw new InvalidOperationException("Game with such id doesnt exists." +
                     $"Id = {updateModel.Id}");
             }
@@ -144,7 +140,6 @@ namespace GameStore.Core.Services
 
             if (game is null)
             {
-                _logger.LogInformation("Game delete failed");
                 throw new InvalidOperationException($"Game with such id doesnt exists." +
                     $"Id = {id}");
             }
@@ -162,7 +157,6 @@ namespace GameStore.Core.Services
 
             if (game is null)
             {
-                _logger.LogInformation("Download failed");
                 throw new InvalidOperationException("Game with such key doesnt exists." +
                     $"GameKey = {gameKey}");
             }
@@ -174,7 +168,8 @@ namespace GameStore.Core.Services
 
         private void SetUpdatedValues(Game game, GameUpdateModel updateModel)
         {
-            CheckGenres(updateModel);
+            CheckIfGenresExists(updateModel);
+            CheckIfPlatformTypesExists(updateModel);
 
             game.Name = updateModel.Name;
             game.Description = updateModel.Description;
@@ -184,22 +179,25 @@ namespace GameStore.Core.Services
             // TODO: ask PO about re-generation key
         }
 
-        private void CheckGenres(GameUpdateModel updateModel)
+        private void CheckIfGenresExists(GameUpdateModel updateModel)
         {
             foreach (var genre in updateModel.Genres)
             {
                 // ExceptionMiddleware doesnt work with await here
                 if (GenreRepository.AnyAsync(genre.Id).Result == false)
                 {
-                    throw new ArgumentException("Genre doesnt exists");
+                    throw new ArgumentException($"Genre doesnt exists. Id = {genre.Id}");
                 }
             }
+        }
 
+        private void CheckIfPlatformTypesExists(GameUpdateModel updateModel)
+        {
             foreach (var platformType in updateModel.PlatformTypes)
             {
                 if (PlatformTypesRepository.AnyAsync(platformType.Id).Result == false)
                 {
-                    throw new ArgumentException("Platform type doesnt exists");
+                    throw new ArgumentException($"Platform type doesnt exists. Id = {platformType.Id}");
                 }
             }
         }
