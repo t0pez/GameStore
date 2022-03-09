@@ -26,7 +26,6 @@ namespace GameStore.Core.Services
                 new AliasCraftBuilder()
                 .AddPairToReplace('_', '-')
                 .AddSymbolsToRemove(' ', '\'', ',', '.', ':')
-                .SetCaseChanges(StringCaseChanges.Lower)
                 .Build();
         }
 

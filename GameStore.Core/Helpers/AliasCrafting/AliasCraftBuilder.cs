@@ -27,12 +27,5 @@ namespace GameStore.Core.Helpers.AliasCrafting
 
             return this;
         }
-
-        public AliasCraftBuilder SetCaseChanges(StringCaseChanges stringCase)
-        {
-            _config.SourceCaseChanges = stringCase;
-
-            return this;
-        }
     }
 }

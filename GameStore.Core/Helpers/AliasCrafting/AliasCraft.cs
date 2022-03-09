@@ -13,28 +13,11 @@ namespace GameStore.Core.Helpers.AliasCrafting
 
         public string CreateAlias(string source)
         {
-            var builder = new StringBuilder();
+            var builder = new StringBuilder(source.ToLower());
 
-            SetSourceString(builder, source);
             ReplaceSymbols(builder);
 
             return builder.ToString();
-        }
-
-        private void SetSourceString(StringBuilder builder, string source)
-        {
-            var resultString = source;
-
-            if (_config.SourceCaseChanges == StringCaseChanges.Lower)
-            {
-                resultString = resultString.ToLower();
-            }
-            else if (_config.SourceCaseChanges == StringCaseChanges.Upper)
-            {
-                resultString = resultString.ToUpper();
-            }
-
-            builder.Append(resultString);
         }
 
         private void ReplaceSymbols(StringBuilder builder)
