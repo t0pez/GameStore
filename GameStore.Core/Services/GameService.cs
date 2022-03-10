@@ -4,6 +4,7 @@ using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
 using GameStore.Core.Models.Records;
+using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 using System;
@@ -124,7 +125,7 @@ namespace GameStore.Core.Services
                     $"Id = {updateModel.Id}");
             }
 
-            SetUpdatedValues(game, updateModel);
+            await SetUpdatedValuesAsync(game, updateModel);
 
             GameRepository.Update(game);
 
@@ -165,40 +166,45 @@ namespace GameStore.Core.Services
             return game.File;
         }
 
-        private void SetUpdatedValues(Game game, GameUpdateModel updateModel)
+        private async Task SetUpdatedValuesAsync(Game game, GameUpdateModel updateModel)
         {
-            CheckIfGenresExists(updateModel);
-            CheckIfPlatformTypesExists(updateModel);
+            var genres = await GetModelsAsync<Genre>(updateModel.GenresIds);
+            var platformTypes = await GetModelsAsync<PlatformType>(updateModel.PlatformTypesIds);
 
             game.Name = updateModel.Name;
             game.Description = updateModel.Description;
             game.File = updateModel.File;
-            game.Genres = updateModel.Genres;
-            game.PlatformTypes = updateModel.PlatformTypes;
-            // TODO: ask PO about re-generation key
+            game.Genres = genres;
+            game.PlatformTypes = platformTypes;
+            // TODO: ask PO about creating new key
         }
 
-        private void CheckIfGenresExists(GameUpdateModel updateModel)
+        private async Task<List<TResult>> GetModelsAsync<TResult>(ICollection<Guid> ids)
+            where TResult : BaseEntity
         {
-            foreach (var genre in updateModel.Genres)
+            var result = new List<TResult>();
+
+            foreach (var modelId in ids)
             {
                 // ExceptionMiddleware doesnt work with await here
-                if (GenreRepository.AnyAsync(genre.Id).Result == false)
-                {
-                    throw new ArgumentException($"Genre doesnt exists. Id = {genre.Id}");
-                }
-            }
-        }
+                var model = await _unitOfWork.GetRepository<TResult>().GetByIdAsync(modelId);
 
-        private void CheckIfPlatformTypesExists(GameUpdateModel updateModel)
-        {
-            foreach (var platformType in updateModel.PlatformTypes)
-            {
-                if (PlatformTypesRepository.AnyAsync(platformType.Id).Result == false)
+                if (model is null)
                 {
-                    throw new ArgumentException($"Platform type doesnt exists. Id = {platformType.Id}");
+                    throw new ArgumentException($"Model doesnt exists. " +
+                        $"ModelType = {typeof(TResult)}. Id = {modelId}");
                 }
+                
+                if (result.Contains(model))
+                {
+                    throw new ArgumentException($"Model duplicates. " +
+                        $"ModelType = {typeof(TResult)}. Id = {modelId}");
+                }
+                
+                result.Add(model);
             }
+
+            return result;
         }
     }
 }
