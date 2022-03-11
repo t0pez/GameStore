@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<TargetFramework>netcoreapp3.1</TargetFramework>
-		<LangVersion>latest</LangVersion>
+		<LangVersion>10</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -38,11 +38,6 @@
 
 	<ItemGroup>
 		<Content Update="nlog.config" CopyToOutputDirectory="PreserveNewest" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Folder Include="Attributes\" />
-		<Folder Include="Endpoints\" />
 	</ItemGroup>
 
 </Project>
