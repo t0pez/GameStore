@@ -4,12 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GameStore.Core.Interfaces
+namespace GameStore.Core.Interfaces;
+
+public interface ICommentService
 {
-    public interface ICommentService
-    {
-        Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey);
-        Task CommentGameAsync(CommentCreateModel model);
-        Task ReplyCommentAsync(Guid parentId, string authorName, string message);
-    }
+    Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey);
+    Task CommentGameAsync(CommentCreateModel model);
+    Task ReplyCommentAsync(Guid parentId, string authorName, string message);
 }

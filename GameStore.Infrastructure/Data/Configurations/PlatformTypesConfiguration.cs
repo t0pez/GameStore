@@ -2,18 +2,17 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace GameStore.Infrastructure.Data.Configurations
+namespace GameStore.Infrastructure.Data.Configurations;
+
+internal class PlatformTypesConfiguration : IEntityTypeConfiguration<PlatformType>
 {
-    internal class PlatformTypesConfiguration : IEntityTypeConfiguration<PlatformType>
+    public void Configure(EntityTypeBuilder<PlatformType> builder)
     {
-        public void Configure(EntityTypeBuilder<PlatformType> builder)
-        {
-            builder.HasKey(pt => pt.Id);
+        builder.HasKey(pt => pt.Id);
 
-            builder.Property(pt => pt.Name).IsRequired();
-            builder.Property(pt => pt.IsDeleted).IsRequired();
+        builder.Property(pt => pt.Name).IsRequired();
+        builder.Property(pt => pt.IsDeleted).IsRequired();
 
-            builder.HasMany(pt => pt.Games).WithMany(g => g.PlatformTypes);
-        }
+        builder.HasMany(pt => pt.Games).WithMany(g => g.PlatformTypes);
     }
 }

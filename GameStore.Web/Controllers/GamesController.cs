@@ -11,107 +11,106 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GameStore.Web.Controllers
+namespace GameStore.Web.Controllers;
+
+[ApiController]
+public class GamesController : Controller
 {
-    [ApiController]
-    public class GamesController : Controller
+    private readonly IGameService _gameService;
+    private readonly ICommentService _commentService;
+    private readonly IMapper _mapper;
+    private readonly ILogger<GamesController> _logger;
+
+    public GamesController(IGameService gameService, ICommentService commentService, IMapper mapper, ILogger<GamesController> logger)
     {
-        private readonly IGameService _gameService;
-        private readonly ICommentService _commentService;
-        private readonly IMapper _mapper;
-        private readonly ILogger<GamesController> _logger;
+        _gameService = gameService;
+        _commentService = commentService;
+        _mapper = mapper;
+        _logger = logger;
+    }
 
-        public GamesController(IGameService gameService, ICommentService commentService, IMapper mapper, ILogger<GamesController> logger)
-        {
-            _gameService = gameService;
-            _commentService = commentService;
-            _mapper = mapper;
-            _logger = logger;
-        }
+    [HttpGet("games/")]
+    public async Task<ICollection<Game>> GetAll()
+    {
+        var result = await _gameService.GetAllAsync();
 
-        [HttpGet("games/")]
-        public async Task<ICollection<Game>> GetAll()
-        {
-            var result = await _gameService.GetAllAsync();
+        _logger.LogInformation($"GetAll request done. Result.Count() = {result.Count}");
 
-            _logger.LogInformation($"GetAll request done. Result.Count() = {result.Count}");
+        return result;
+    }
 
-            return result;
-        }
+    [HttpGet("games/{gameKey}")]
+    public async Task<ActionResult<Game>> GetWithDetails([FromRoute(Name = "gameKey")] string gameKey)
+    {
+        var result = await _gameService.GetByKeyAsync(gameKey);
 
-        [HttpGet("games/{gameKey}")]
-        public async Task<ActionResult<Game>> GetWithDetails([FromRoute(Name = "gameKey")] string gameKey)
-        {
-            var result = await _gameService.GetByKeyAsync(gameKey);
+        _logger.LogInformation($"GetWithDetails request done");
 
-            _logger.LogInformation($"GetWithDetails request done");
+        return Ok(result);
+    }
 
-            return Ok(result);
-        }
+    [HttpPost("games/{gameKey}/download")]
+    public async Task<ActionResult<byte[]>> GetFile([FromRoute(Name = "gameKey")] string gameKey)
+    {
+        var result = await _gameService.GetFileAsync(gameKey);
 
-        [HttpPost("games/{gameKey}/download")]
-        public async Task<ActionResult<byte[]>> GetFile([FromRoute(Name = "gameKey")] string gameKey)
-        {
-            var result = await _gameService.GetFileAsync(gameKey);
+        _logger.LogInformation($"GetFile request done");
 
-            _logger.LogInformation($"GetFile request done");
+        return Ok(result);
+    }
 
-            return Ok(result);
-        }
+    [HttpPost("games/new")]
+    public async Task<ActionResult<Game>> Create([FromBody] GameCreateRequestModel request)
+    {
+        var createModel = _mapper.Map<GameCreateModel>(request);
 
-        [HttpPost("games/new")]
-        public async Task<ActionResult<Game>> Create([FromBody] GameCreateRequestModel request)
-        {
-            var createModel = _mapper.Map<GameCreateModel>(request);
+        var result = await _gameService.CreateAsync(createModel);
 
-            var result = await _gameService.CreateAsync(createModel);
+        _logger.LogInformation("Create request done");
 
-            _logger.LogInformation("Create request done");
+        return Ok(result);
+    }
 
-            return Ok(result);
-        }
+    [HttpPost("games/{gameKey}/newcomment")]
+    public async Task<ActionResult> CommentGame([FromHybrid] CommentCreateRequestModel request)
+    {
+        var createModel = _mapper.Map<CommentCreateModel>(request);
 
-        [HttpPost("games/{gameKey}/newcomment")]
-        public async Task<ActionResult> CommentGame([FromHybrid] CommentCreateRequestModel request)
-        {
-            var createModel = _mapper.Map<CommentCreateModel>(request);
+        await _commentService.CommentGameAsync(createModel);
 
-            await _commentService.CommentGameAsync(createModel);
+        _logger.LogInformation("CommentGame request done.");
 
-            _logger.LogInformation("CommentGame request done.");
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpGet("games/{gameKey}/comments")]
+    public async Task<ICollection<Comment>> GetComments([FromRoute(Name = "gameKey")] string gameKey)
+    {
+        var result = await _commentService.GetCommentsByGameKeyAsync(gameKey);
 
-        [HttpGet("games/{gameKey}/comments")]
-        public async Task<ICollection<Comment>> GetComments([FromRoute(Name = "gameKey")] string gameKey)
-        {
-            var result = await _commentService.GetCommentsByGameKeyAsync(gameKey);
+        _logger.LogInformation("GetComments request done.");
 
-            _logger.LogInformation("GetComments request done.");
+        return result;
+    }
 
-            return result;
-        }
+    [HttpPost("games/update")]
+    public async Task<ActionResult<Game>> Edit([FromBody] GameEditRequestModel request)
+    {
+        var game = _mapper.Map<GameUpdateModel>(request);
+        await _gameService.UpdateAsync(game);
 
-        [HttpPost("games/update")]
-        public async Task<ActionResult<Game>> Edit([FromBody] GameEditRequestModel request)
-        {
-            var game = _mapper.Map<GameUpdateModel>(request);
-            await _gameService.UpdateAsync(game);
+        _logger.LogInformation("Edit request done.");
 
-            _logger.LogInformation("Edit request done.");
+        return Ok();
+    }
 
-            return Ok();
-        }
+    [HttpPost("games/remove")]
+    public async Task<ActionResult> Delete([FromBody] Guid id)
+    {
+        await _gameService.DeleteAsync(id);
 
-        [HttpPost("games/remove")]
-        public async Task<ActionResult> Delete([FromBody] Guid id)
-        {
-            await _gameService.DeleteAsync(id);
+        _logger.LogInformation("Delete request done.");
 
-            _logger.LogInformation("Delete request done.");
-
-            return Ok();
-        }
+        return Ok();
     }
 }

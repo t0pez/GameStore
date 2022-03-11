@@ -1,7 +1,6 @@
-﻿namespace GameStore.Core.Helpers.AliasCrafting
+﻿namespace GameStore.Core.Helpers.AliasCrafting;
+
+public interface IAliasCraft
 {
-    public interface IAliasCraft
-    {
-        public string CreateAlias(string source);
-    }
+    public string CreateAlias(string source);
 }

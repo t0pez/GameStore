@@ -1,29 +1,28 @@
 ﻿using System.Text;
 
-namespace GameStore.Core.Helpers.AliasCrafting
+namespace GameStore.Core.Helpers.AliasCrafting;
+
+public class AliasCraft : IAliasCraft
 {
-    public class AliasCraft : IAliasCraft
+    private readonly AliasCraftConfig _config;
+
+    public AliasCraft(AliasCraftConfig config)
     {
-        private readonly AliasCraftConfig _config;
+        _config = config;
+    }
 
-        public AliasCraft(AliasCraftConfig config)
-        {
-            _config = config;
-        }
+    public string CreateAlias(string source)
+    {
+        var builder = new StringBuilder(source.ToLower());
 
-        public string CreateAlias(string source)
-        {
-            var builder = new StringBuilder(source.ToLower());
+        ReplaceSymbols(builder);
 
-            ReplaceSymbols(builder);
+        return builder.ToString();
+    }
 
-            return builder.ToString();
-        }
-
-        private void ReplaceSymbols(StringBuilder builder)
-        {
-            foreach (var pair in _config.ReplacingPairs)
-                builder.Replace(pair.Key, pair.Value);
-        }
+    private void ReplaceSymbols(StringBuilder builder)
+    {
+        foreach (var pair in _config.ReplacingPairs)
+            builder.Replace(pair.Key, pair.Value);
     }
 }

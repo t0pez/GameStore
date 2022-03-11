@@ -4,15 +4,14 @@ using GameStore.Infrastructure.Data.Repositories;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace GameStore.Infrastructure
+namespace GameStore.Infrastructure;
+
+public static class DependencyResolverModule
 {
-    public static class DependencyResolverModule
+    public static void ConfigureDomainServices(this IServiceCollection services)
     {
-        public static void ConfigureDomainServices(this IServiceCollection services)
-        {
-            services.AddScoped<IUnitOfWork, UnitOfWork>()
-                    .AddScoped<IGameService, GameService>()
-                    .AddScoped<ICommentService, CommentService>();
-        }
+        services.AddScoped<IUnitOfWork, UnitOfWork>()
+            .AddScoped<IGameService, GameService>()
+            .AddScoped<ICommentService, CommentService>();
     }
 }

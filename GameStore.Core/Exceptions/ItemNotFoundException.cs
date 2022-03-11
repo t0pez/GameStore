@@ -1,20 +1,19 @@
 ﻿using System;
 
-namespace GameStore.Core.Exceptions
-{
-    [Serializable]
-    public class ItemNotFoundException : Exception
-    {
-        public ItemNotFoundException()
-        {
-        }
+namespace GameStore.Core.Exceptions;
 
-        public ItemNotFoundException(string message) : base(message)
-        {
-        }
+[Serializable]
+public class ItemNotFoundException : Exception
+{
+    public ItemNotFoundException()
+    {
+    }
+
+    public ItemNotFoundException(string message) : base(message)
+    {
+    }
         
-        public ItemNotFoundException(string message, Exception inner) : base(message, inner)
-        {
-        }
+    public ItemNotFoundException(string message, Exception inner) : base(message, inner)
+    {
     }
 }

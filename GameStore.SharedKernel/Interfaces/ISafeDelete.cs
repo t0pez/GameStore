@@ -1,7 +1,6 @@
-﻿namespace GameStore.SharedKernel.Interfaces
+﻿namespace GameStore.SharedKernel.Interfaces;
+
+public interface ISafeDelete
 {
-    public interface ISafeDelete
-    {
-        public bool IsDeleted { get; set; }
-    }
+    public bool IsDeleted { get; set; }
 }

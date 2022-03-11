@@ -11,73 +11,72 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace GameStore.Core.Services
+namespace GameStore.Core.Services;
+
+public class CommentService : ICommentService
 {
-    public class CommentService : ICommentService
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ILogger<CommentService> _logger;
+
+    public CommentService(IUnitOfWork unitOfWork, ILogger<CommentService> logger)
     {
-        private readonly IUnitOfWork _unitOfWork;
-        private readonly ILogger<CommentService> _logger;
+        _unitOfWork = unitOfWork;
+        _logger = logger;
+    }
 
-        public CommentService(IUnitOfWork unitOfWork, ILogger<CommentService> logger)
+    private IRepository<Comment> CommentRepository => _unitOfWork.GetRepository<Comment>();
+    private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
+
+    public async Task CommentGameAsync(CommentCreateModel model)
+    {
+        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(model.GameKey));
+
+        if (game is null)
         {
-            _unitOfWork = unitOfWork;
-            _logger = logger;
+            throw new ArgumentException($"Game with such key doesn't exist. GameKey = {model.GameKey}");
         }
 
-        private IRepository<Comment> CommentRepository => _unitOfWork.GetRepository<Comment>();
-        private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
+        var comment = new Comment(model.AuthorName, model.Message, game);
 
-        public async Task CommentGameAsync(CommentCreateModel model)
+        await CommentRepository.AddAsync(comment);
+
+        await _unitOfWork.SaveChangesAsync();
+
+        _logger.LogInformation($"Comment successfully added for game. Game.Name = {game.Name}, Comment.Body = {comment.Body}");
+    }
+
+    public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
+    {
+        if(await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
         {
-            var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(model.GameKey));
-
-            if (game is null)
-            {
-                throw new ArgumentException($"Game with such key doesn't exist. GameKey = {model.GameKey}");
-            }
-
-            var comment = new Comment(model.AuthorName, model.Message, game);
-
-            await CommentRepository.AddAsync(comment);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            _logger.LogInformation($"Comment successfully added for game. Game.Name = {game.Name}, Comment.Body = {comment.Body}");
+            throw new ItemNotFoundException($"Game not found. GameKey = {gameKey}");
         }
 
-        public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
+        var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
+
+        return result;
+    }
+
+    public async Task ReplyCommentAsync(Guid parentId, string authorName, string message)
+    {
+        var parent = await CommentRepository.GetByIdAsync(parentId);
+
+        if(parent is null)
         {
-            if(await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
-            {
-                throw new ItemNotFoundException($"Game not found. GameKey = {gameKey}");
-            }
-
-            var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
-
-            return result;
+            throw new ArgumentException("Parent comment with such id doesn't exists." +
+                                        $"ParentId = {parentId}");
         }
 
-        public async Task ReplyCommentAsync(Guid parentId, string authorName, string message)
-        {
-            var parent = await CommentRepository.GetByIdAsync(parentId);
+        Comment reply = new Comment(authorName, message, parent.Game, parent);
 
-            if(parent is null)
-            {
-                throw new ArgumentException("Parent comment with such id doesn't exists." +
-                    $"ParentId = {parentId}");
-            }
+        await CommentRepository.AddAsync(reply);
 
-            Comment reply = new Comment(authorName, message, parent.Game, parent);
+        parent.Replies.Add(reply);
 
-            await CommentRepository.AddAsync(reply);
+        CommentRepository.Update(parent);
 
-            parent.Replies.Add(reply);
+        await _unitOfWork.SaveChangesAsync();
 
-            CommentRepository.Update(parent);
-
-            await _unitOfWork.SaveChangesAsync();
-
-            _logger.LogInformation($"Comment successfully replied");
-        }
+        _logger.LogInformation($"Comment successfully replied");
     }
 }

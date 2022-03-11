@@ -1,9 +1,8 @@
 ﻿using System;
 
-namespace GameStore.SharedKernel
+namespace GameStore.SharedKernel;
+
+public class BaseEntity
 {
-    public class BaseEntity
-    {
-        public Guid Id { get; set; }
-    }
+    public Guid Id { get; set; }
 }

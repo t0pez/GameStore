@@ -1,31 +1,30 @@
 ﻿using System.Linq;
 
-namespace GameStore.Core.Helpers.AliasCrafting
+namespace GameStore.Core.Helpers.AliasCrafting;
+
+internal class AliasCraftBuilder
 {
-    internal class AliasCraftBuilder
+    private readonly AliasCraftConfig _config = new();
+
+    public AliasCraft Build()
     {
-        private readonly AliasCraftConfig _config = new();
+        return new AliasCraft(_config);
+    }
 
-        public AliasCraft Build()
-        {
-            return new AliasCraft(_config);
-        }
+    public AliasCraftBuilder AddPairToReplace(char oldSymbol, char newSymbol)
+    {
+        _config.ReplacingPairs.Add($"{oldSymbol}", $"{newSymbol}");
 
-        public AliasCraftBuilder AddPairToReplace(char oldSymbol, char newSymbol)
-        {
-            _config.ReplacingPairs.Add($"{oldSymbol}", $"{newSymbol}");
+        return this;
+    }
 
-            return this;
-        }
+    public AliasCraftBuilder AddSymbolsToRemove(params char[] symbols)
+    {
+        var pairs = symbols.Select(s => new { Key = $"{s}", Value = ""});
 
-        public AliasCraftBuilder AddSymbolsToRemove(params char[] symbols)
-        {
-            var pairs = symbols.Select(s => new { Key = $"{s}", Value = ""});
+        foreach (var pair in pairs)
+            _config.ReplacingPairs.Add(pair.Key, pair.Value);
 
-            foreach (var pair in pairs)
-                _config.ReplacingPairs.Add(pair.Key, pair.Value);
-
-            return this;
-        }
+        return this;
     }
 }

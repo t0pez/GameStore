@@ -10,81 +10,80 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GameStore.Infrastructure.Data.Repositories
+namespace GameStore.Infrastructure.Data.Repositories;
+
+public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
 {
-    public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
+    private readonly ApplicationContext _context;
+
+    public Repository(ApplicationContext context)
     {
-        private readonly ApplicationContext _context;
+        _context = context;
+    }
 
-        public Repository(ApplicationContext context)
-        {
-            _context = context;
-        }
+    private DbSet<TModel> Set => _context.Set<TModel>();
 
-        private DbSet<TModel> Set => _context.Set<TModel>();
+    public Task<TModel> GetByIdAsync(Guid id)
+    {
+        return Set.SingleOrDefaultAsync(e => e.Id == id);
+    }
 
-        public Task<TModel> GetByIdAsync(Guid id)
-        {
-            return Set.SingleOrDefaultAsync(e => e.Id == id);
-        }
+    public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> specification = null)
+    {
+        if (specification is null)
+            return Set.ToListAsync();
 
-        public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> specification = null)
-        {
-            if (specification is null)
-                return Set.ToListAsync();
+        var specificationResult = ApplySpecifications(specification);
 
-            var specificationResult = ApplySpecifications(specification);
-
-            return specificationResult.ToListAsync();
-        }
+        return specificationResult.ToListAsync();
+    }
         
-        public Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> specification)
+    public Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> specification)
+    {
+        var specificationResult = ApplySpecifications(specification);
+
+        return specificationResult.SingleOrDefaultAsync();
+    }
+
+    public Task AddAsync(TModel model)
+    {
+        return Set.AddAsync(model).AsTask();
+    }
+
+    public void Update(TModel updated)
+    {
+        Set.Update(updated);
+    }
+
+    public void Delete(TModel model)
+    {
+        if (model is ISafeDelete)
         {
-            var specificationResult = ApplySpecifications(specification);
-
-            return specificationResult.SingleOrDefaultAsync();
+            (model as ISafeDelete).IsDeleted = true;
+            Set.Update(model);
         }
-
-        public Task AddAsync(TModel model)
+        else
         {
-            return Set.AddAsync(model).AsTask();
+            Set.Remove(model);
         }
+    }
 
-        public void Update(TModel updated)
-        {
-            Set.Update(updated);
-        }
+    public async Task<bool> AnyAsync(Guid id)
+    {
+        return await Set.AnyAsync(m => m.Id == id);
+    }
 
-        public void Delete(TModel model)
-        {
-            if (model is ISafeDelete)
-            {
-                (model as ISafeDelete).IsDeleted = true;
-                Set.Update(model);
-            }
-            else
-            {
-                Set.Remove(model);
-            }
-        }
+    public async Task<bool> AnyAsync(ISpecification<TModel> specification)
+    {
+        var specResult = ApplySpecifications(specification);
 
-        public async Task<bool> AnyAsync(Guid id)
-        {
-            return await Set.AnyAsync(m => m.Id == id);
-        }
+        return await specResult.AnyAsync();
+    }
 
-        public async Task<bool> AnyAsync(ISpecification<TModel> specification)
-        {
-            var specResult = ApplySpecifications(specification);
+    private IQueryable<TModel> ApplySpecifications(ISpecification<TModel> specification)
+    {
+        var specEvaluator = new SpecificationEvaluator();
 
-            return await specResult.AnyAsync();
-        }
-
-        private IQueryable<TModel> ApplySpecifications(ISpecification<TModel> specification)
-        {
-            var specEvaluator = new SpecificationEvaluator();
-
-            return specEvaluator.GetQuery(Set.AsQueryable(), specification);
-        }
+        return specEvaluator.GetQuery(Set.AsQueryable(), specification);
     }
 }

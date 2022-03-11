@@ -11,63 +11,62 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Serialization;
 
-namespace GameStore.Web
+namespace GameStore.Web;
+
+public class Startup
 {
-    public class Startup
+    public Startup(IConfiguration configuration)
     {
-        public Startup(IConfiguration configuration)
+        Configuration = configuration;
+    }
+
+    public IConfiguration Configuration { get; }
+
+    public void ConfigureServices(IServiceCollection services)
+    {
+        services.AddMvc().AddHybridModelBinder();
+
+        services.AddSwaggerGen(opt => opt.EnableAnnotations());
+        services.AddControllers().AddJsonOptions(opt =>
         {
-            Configuration = configuration;
+            opt.JsonSerializerOptions.Converters.Add(new ByteArrayJsonConverter());
+            opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        });
+
+        services.ConfigureDomainServices();
+
+        services.AddDbContext<ApplicationContext>(opt =>
+        {
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            opt.UseSqlServer(connectionString);
+        });
+
+        services.AddAutoMapper(cfg => cfg.AddProfiles(
+            new[] { new CommonProfile() }));
+    }
+
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationContext dbContext)
+    {
+        if (env.IsDevelopment())
+        {
+            app.UseDeveloperExceptionPage();
+            app.UseSwagger();
+            app.UseSwaggerUI();
         }
 
-        public IConfiguration Configuration { get; }
-
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddMvc().AddHybridModelBinder();
-
-            services.AddSwaggerGen(opt => opt.EnableAnnotations());
-            services.AddControllers().AddJsonOptions(opt =>
-            {
-                opt.JsonSerializerOptions.Converters.Add(new ByteArrayJsonConverter());
-                opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-            });
-
-            services.ConfigureDomainServices();
-
-            services.AddDbContext<ApplicationContext>(opt =>
-            {
-                var connectionString = Configuration.GetConnectionString("DefaultConnection");
-                opt.UseSqlServer(connectionString);
-            });
-
-            services.AddAutoMapper(cfg => cfg.AddProfiles(
-                new[] { new CommonProfile() }));
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationContext dbContext)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseSwagger();
-                app.UseSwaggerUI();
-            }
-
-            dbContext.Database.EnsureDeleted();
-            dbContext.Database.EnsureCreated();
-            dbContext.SeedData();
+        dbContext.Database.EnsureDeleted();
+        dbContext.Database.EnsureCreated();
+        dbContext.SeedData();
             
-            app.UseMiddleware<ExceptionMiddleware>();
+        app.UseMiddleware<ExceptionMiddleware>();
 
-            app.UseHttpsRedirection();
+        app.UseHttpsRedirection();
 
-            app.UseRouting();
+        app.UseRouting();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
-        }
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapControllers();
+        });
     }
 }
