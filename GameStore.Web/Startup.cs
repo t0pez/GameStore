@@ -54,8 +54,10 @@ namespace GameStore.Web
                 app.UseSwaggerUI();
             }
 
+            dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
-
+            dbContext.SeedData();
+            
             app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
