@@ -41,7 +41,7 @@ public class GameService : IGameService
         {
             throw new InvalidOperationException("Game with this key already exists. " +
                                                 $"GameKey = {gameKey}");
-        } // TODO: remove, gamekey should be generated anyway
+        }
 
         var game = new Game(gameKey, model.Name, model.Description, model.File);
 
@@ -147,7 +147,8 @@ public class GameService : IGameService
                                                 $"{nameof(game.Id)} = {id}");
         }
 
-        GameRepository.Delete(game);
+        game.IsDeleted = true;
+        GameRepository.Update(game);
 
         await _unitOfWork.SaveChangesAsync();
 
@@ -178,6 +179,5 @@ public class GameService : IGameService
         game.File = updateModel.File;
         game.Genres = genres;
         game.PlatformTypes = platformTypes;
-        // TODO: ask PO about creating new key
     }
 }

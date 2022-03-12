@@ -23,7 +23,7 @@ public class ExceptionMiddleware
         {
             await _next(context);
         }
-        catch(ItemNotFoundException e) // TODO: Extract method and keep dry
+        catch(ItemNotFoundException e)
         {
             _logger.LogError(e, "ItemNotFound");
             context.Response.StatusCode = 404;

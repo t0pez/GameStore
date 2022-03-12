@@ -31,7 +31,6 @@
 
 	<ItemGroup>
 		<None Include="nlog.config">
-			<!--TODO: check nlog config-->
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>

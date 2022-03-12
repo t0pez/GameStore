@@ -19,7 +19,7 @@ public class Game : BaseEntity, ISafeDelete
     public string Key { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
-    public byte[] File { get; set; } // TODO: Change for smth else
+    public byte[] File { get; set; }
 
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     public ICollection<Genre> Genres { get; set; } = new List<Genre>();

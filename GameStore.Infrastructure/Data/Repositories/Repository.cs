@@ -57,15 +57,7 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
 
     public void Delete(TModel model)
     {
-        if (model is ISafeDelete)
-        {
-            (model as ISafeDelete).IsDeleted = true;
-            Set.Update(model);
-        }
-        else
-        {
-            Set.Remove(model);
-        }
+       Set.Remove(model);
     }
 
     public Task<bool> AnyAsync(Guid id)

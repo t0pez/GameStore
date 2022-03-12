@@ -7,7 +7,7 @@ namespace GameStore.SharedKernel.Interfaces.DataAccess;
 
 public interface IRepository<TModel> where TModel : BaseEntity
 {
-    Task<TModel> GetByIdAsync(Guid id); // TODO: change Guid for repository and models for custom type
+    Task<TModel> GetByIdAsync(Guid id);
     Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> specification = null);
     Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> specification);
     Task AddAsync(TModel model);
