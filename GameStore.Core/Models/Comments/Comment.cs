@@ -15,7 +15,7 @@ public class Comment : BaseEntity, ISafeDelete
         Body = body;
         Game = game;
         Parent = parent;
-        Date = DateTime.Now;
+        DateOfCreation = DateTime.Now;
     }
 
     public Comment()
@@ -24,7 +24,7 @@ public class Comment : BaseEntity, ISafeDelete
 
     public string Name { get; set; }
     public string Body { get; set; }
-    public DateTime Date { get; set; }
+    public DateTime DateOfCreation { get; set; }
 
     public Guid GameId { get; set; }
     [JsonIgnore] public Game Game { get; set; }

@@ -81,9 +81,9 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<ICollection<Game>> GetByPlatformTypesAsync(PlatformType[] platformTypes)
+    public async Task<ICollection<Game>> GetByPlatformTypesAsync(ICollection<Guid> platformTypesIds)
     {
-        var result = await GameRepository.GetBySpecAsync(new GamesByPlatformTypesSpec(platformTypes));
+        var result = await GameRepository.GetBySpecAsync(new GamesByPlatformTypesSpec(platformTypesIds));
 
         return result;
     }

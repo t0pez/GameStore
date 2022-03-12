@@ -1,14 +1,18 @@
-﻿using Ardalis.Specification;
+﻿using System;
+using System.Collections.Generic;
+using Ardalis.Specification;
 using System.Linq;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
 internal class GamesByPlatformTypesSpec : Specification<Game>
 {
-    public GamesByPlatformTypesSpec(PlatformType[] platformTypes)
+    public GamesByPlatformTypesSpec(ICollection<Guid> platformTypesIds)
     {
         Query
-            .Where(g => g.PlatformTypes.All(x => platformTypes.Contains(x))
-                        && g.IsDeleted == false);
+            .Where(game => game.PlatformTypes
+                            .Select(type => type.Id)
+                            .All(x => platformTypesIds.Contains(x))
+                        && game.IsDeleted == false);
     }
 }

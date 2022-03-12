@@ -10,7 +10,7 @@ public interface IGameService
 {
     Task<ICollection<Game>> GetAllAsync();
     Task<ICollection<Game>> GetByGenreAsync(Genre genre);
-    Task<ICollection<Game>> GetByPlatformTypesAsync(PlatformType[] platformTypes);
+    Task<ICollection<Game>> GetByPlatformTypesAsync(ICollection<Guid> platformTypesIds);
     Task<Game> GetByKeyAsync(string key);
     Task<Game> CreateAsync(GameCreateModel createModel);
     Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId);

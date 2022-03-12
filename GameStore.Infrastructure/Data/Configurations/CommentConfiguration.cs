@@ -12,7 +12,7 @@ internal class CommentConfiguration : IEntityTypeConfiguration<Comment>
 
         builder.Property(c => c.Name).IsRequired();
         builder.Property(c => c.Body).IsRequired();
-        builder.Property(c => c.Date).IsRequired();
+        builder.Property(c => c.DateOfCreation).IsRequired();
         builder.Property(c => c.IsDeleted).IsRequired();
 
         builder.HasOne(c => c.Game).WithMany(g => g.Comments).HasForeignKey(c => c.GameId);
