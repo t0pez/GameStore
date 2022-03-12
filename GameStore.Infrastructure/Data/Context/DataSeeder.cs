@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using GameStore.Core.Models.Games;
 
 namespace GameStore.Infrastructure.Data.Context;
@@ -8,6 +9,9 @@ public static class DataSeeder
 {
     public static void SeedData(this ApplicationContext context)
     {
+        if(context.Set<Genre>().Any() || context.Set<PlatformType>().Any())
+            return;
+        
         var strategyGenre = new Genre
         {
             Id = Guid.Parse("3FA85F64-0000-0000-0000-000000000001"),

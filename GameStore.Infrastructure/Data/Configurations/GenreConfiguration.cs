@@ -14,6 +14,6 @@ internal class GenreConfiguration : IEntityTypeConfiguration<Genre>
         builder.Property(g => g.IsDeleted).IsRequired();
 
         builder.HasMany(g => g.SubGenres);
-        builder.HasMany(g => g.Games).WithMany(g => g.Genres);
+        
     }
 }

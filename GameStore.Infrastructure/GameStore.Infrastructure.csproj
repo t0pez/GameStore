@@ -20,4 +20,8 @@
 		<ProjectReference Include="..\GameStore.SharedKernel\GameStore.SharedKernel.csproj" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Data\RelationalModels" />
+	</ItemGroup>
+
 </Project>

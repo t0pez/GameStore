@@ -16,7 +16,9 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.Property(g => g.IsDeleted).IsRequired();
 
         builder.HasMany(g => g.Comments);
-        builder.HasMany(g => g.Genres).WithMany(g => g.Games);
-        builder.HasMany(g => g.PlatformTypes).WithMany(pt => pt.Games);
+        builder.HasMany(g => g.Genres)
+            .WithMany(g => g.Games);
+        builder.HasMany(g => g.PlatformTypes)
+            .WithMany(pt => pt.Games);
     }
 }

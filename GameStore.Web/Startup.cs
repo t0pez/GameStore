@@ -54,7 +54,6 @@ public class Startup
             app.UseSwaggerUI();
         }
 
-        dbContext.Database.EnsureDeleted();
         dbContext.Database.EnsureCreated();
         dbContext.SeedData();
             

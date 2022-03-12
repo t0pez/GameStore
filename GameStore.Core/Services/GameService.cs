@@ -9,6 +9,7 @@ using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace GameStore.Core.Services;
@@ -117,7 +118,7 @@ public class GameService : IGameService
 
     public async Task UpdateAsync(GameUpdateModel updateModel)
     {
-        var game = await GameRepository.GetByIdAsync(updateModel.Id);
+        var game = await GameRepository.GetSingleBySpecAsync(new GameByIdWithDetailsSpec(updateModel.Id));
 
         if (game is null)
         {
@@ -125,7 +126,7 @@ public class GameService : IGameService
                                                 $"Id = {updateModel.Id}");
         }
 
-        await SetUpdatedValuesAsync(game, updateModel);
+        await SetUpdatedValues(game, updateModel);
 
         GameRepository.Update(game);
 
@@ -166,10 +167,11 @@ public class GameService : IGameService
         return game.File;
     }
 
-    private async Task SetUpdatedValuesAsync(Game game, GameUpdateModel updateModel)
+    private async Task SetUpdatedValues(Game game, GameUpdateModel updateModel)
     {
-        var genres = await GetModelsAsync<Genre>(updateModel.GenresIds);
-        var platformTypes = await GetModelsAsync<PlatformType>(updateModel.PlatformTypesIds);
+        var genres = await GenreRepository.GetBySpecAsync(new GenresByIdsSpec(updateModel.GenresIds));
+        var platformTypes = await 
+            PlatformTypesRepository.GetBySpecAsync(new PlatformTypesByIdsSpec(updateModel.PlatformTypesIds));
 
         game.Name = updateModel.Name;
         game.Description = updateModel.Description;
@@ -177,33 +179,5 @@ public class GameService : IGameService
         game.Genres = genres;
         game.PlatformTypes = platformTypes;
         // TODO: ask PO about creating new key
-    }
-
-    private async Task<List<TResult>> GetModelsAsync<TResult>(ICollection<Guid> ids)
-        where TResult : BaseEntity
-    {
-        var result = new List<TResult>();
-
-        foreach (var modelId in ids)
-        {
-            // ExceptionMiddleware doesnt work with await here
-            var model = await _unitOfWork.GetRepository<TResult>().GetByIdAsync(modelId);
-
-            if (model is null)
-            {
-                throw new ArgumentException($"Model doesnt exists. " +
-                                            $"ModelType = {typeof(TResult)}. Id = {modelId}");
-            }
-                
-            if (result.Contains(model))
-            {
-                throw new ArgumentException($"Model duplicates. " +
-                                            $"ModelType = {typeof(TResult)}. Id = {modelId}");
-            }
-                
-            result.Add(model);
-        }
-
-        return result;
     }
 }
