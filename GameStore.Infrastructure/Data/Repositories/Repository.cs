@@ -68,16 +68,16 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
         }
     }
 
-    public async Task<bool> AnyAsync(Guid id)
+    public Task<bool> AnyAsync(Guid id)
     {
-        return await Set.AnyAsync(m => m.Id == id);
+        return Set.AnyAsync(m => m.Id == id);
     }
 
-    public async Task<bool> AnyAsync(ISpecification<TModel> specification)
+    public Task<bool> AnyAsync(ISpecification<TModel> specification)
     {
         var specResult = ApplySpecifications(specification);
 
-        return await specResult.AnyAsync();
+        return specResult.AnyAsync();
     }
 
     private IQueryable<TModel> ApplySpecifications(ISpecification<TModel> specification)
