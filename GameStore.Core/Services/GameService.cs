@@ -4,12 +4,10 @@ using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
 using GameStore.Core.Models.Records;
-using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace GameStore.Core.Services;
@@ -43,14 +41,15 @@ public class GameService : IGameService
         {
             throw new InvalidOperationException("Game with this key already exists. " +
                                                 $"GameKey = {gameKey}");
-        }
+        } // TODO: remove, gamekey should be generated anyway
 
         var game = new Game(gameKey, model.Name, model.Description, model.File);
 
         await GameRepository.AddAsync(game);
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation($"Game created [ Key = {game.Key}, Name = {game.Name} ]");
+        _logger.LogInformation("Game created. " +
+                               $"{nameof(game.Key)} = {game.Key}, {nameof(game.Name)} = {game.Name}");
 
         return game;
     }
@@ -69,13 +68,13 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<Game> GetByKeyAsync(string key)
+    public async Task<Game> GetByKeyAsync(string gameKey)
     {
-        var result = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(key));
+        var result = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey));
 
         if (result is null)
         {
-            throw new ItemNotFoundException($"Game not found. GameKey = {key}");
+            throw new ItemNotFoundException($"Game not found. {nameof(gameKey)} = {gameKey}");
         }
 
         return result;
@@ -94,14 +93,16 @@ public class GameService : IGameService
 
         if (game is null)
         {
-            throw new ArgumentException($"Game with such id doesnt exist. Id = {gameId}");
+            throw new ArgumentException("Game with such id doesnt exist. " +
+                                        $"{nameof(game.Id)} = {gameId}");
         }
 
         var genre = await GenreRepository.GetByIdAsync(genreId);
 
         if (genre is null)
         {
-            throw new ArgumentException($"Genre with such id doesnt exist. Id = {genreId}");
+            throw new ArgumentException("Genre with such id doesnt exist. " +
+                                        $"{nameof(genre.Id)} = {genreId}");
         }
 
         game.Genres.Add(genre);
@@ -110,8 +111,8 @@ public class GameService : IGameService
 
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation($"Game added to genre. " +
-                               $"Game.Name = {game.Name}, Genre.Name = {genre.Name}");
+        _logger.LogInformation("Game added to genre. " +
+                               $"{nameof(game.Id)} = {game.Id}, {nameof(genre.Id)} = {genre.Id}");
 
         return game;
     }
@@ -130,7 +131,8 @@ public class GameService : IGameService
 
         GameRepository.Update(game);
 
-        _logger.LogInformation($"Game updated. Game.Name = {updateModel.Name}");
+        _logger.LogInformation($"Game updated. " +
+                               $"{nameof(game.Id)} = {game.Id}");
 
         await _unitOfWork.SaveChangesAsync();
     }
@@ -141,15 +143,15 @@ public class GameService : IGameService
 
         if (game is null)
         {
-            throw new InvalidOperationException($"Game with such id doesnt exists." +
-                                                $"Id = {id}");
+            throw new InvalidOperationException("Game with such id doesnt exists." +
+                                                $"{nameof(game.Id)} = {id}");
         }
 
         GameRepository.Delete(game);
 
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation($"Game deleted. Game.Name = {game.Name}");
+        _logger.LogInformation($"Game deleted. {nameof(game.Id)} = {game.Id}");
     }
 
     public async Task<byte[]> GetFileAsync(string gameKey)
@@ -159,10 +161,8 @@ public class GameService : IGameService
         if (game is null)
         {
             throw new InvalidOperationException("Game with such key doesnt exists." +
-                                                $"GameKey = {gameKey}");
+                                                $"{nameof(game.Key)} = {gameKey}");
         }
-
-        _logger.LogInformation($"File downloaded. Game.Name = {game.Name}");
 
         return game.File;
     }

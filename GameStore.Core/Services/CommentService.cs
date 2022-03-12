@@ -33,7 +33,8 @@ public class CommentService : ICommentService
 
         if (game is null)
         {
-            throw new ArgumentException($"Game with such key doesn't exist. GameKey = {model.GameKey}");
+            throw new ArgumentException("Game with such key doesn't exist. " +
+                                        $"{nameof(model.GameKey)} = {model.GameKey}");
         }
 
         var comment = new Comment(model.AuthorName, model.Message, game);
@@ -42,14 +43,16 @@ public class CommentService : ICommentService
 
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation($"Comment successfully added for game. Game.Name = {game.Name}, Comment.Body = {comment.Body}");
+        _logger.LogInformation($"Comment successfully added for game. " +
+                               $"{nameof(game.Id)} = {game.Id}, {nameof(comment.Id)} = {comment.Id}");
     }
 
     public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
     {
         if(await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
         {
-            throw new ItemNotFoundException($"Game not found. GameKey = {gameKey}");
+            throw new ItemNotFoundException($"Game not found. " +
+                                            $"{nameof(gameKey)} = {gameKey}");
         }
 
         var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
@@ -64,10 +67,10 @@ public class CommentService : ICommentService
         if(parent is null)
         {
             throw new ArgumentException("Parent comment with such id doesn't exists." +
-                                        $"ParentId = {parentId}");
+                                        $"{nameof(parent.Id)} = {parentId}");
         }
 
-        Comment reply = new Comment(authorName, message, parent.Game, parent);
+        var reply = new Comment(authorName, message, parent.Game, parent);
 
         await CommentRepository.AddAsync(reply);
 
@@ -77,6 +80,7 @@ public class CommentService : ICommentService
 
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation($"Comment successfully replied");
+        _logger.LogInformation($"Reply successfully added for comment. " +
+                               $"{nameof(parent.Id)} = {parent.Id}, {nameof(reply.Id)} = {reply.Id}");
     }
 }

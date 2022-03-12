@@ -60,6 +60,8 @@ public class GamesController : Controller
 
         var result = await _gameService.CreateAsync(createModel);
 
+        _logger.LogInformation($"Game created. {nameof(result.Id)} = {result.Id}");
+        
         return Ok(result);
     }
 
@@ -70,11 +72,13 @@ public class GamesController : Controller
 
         await _commentService.CommentGameAsync(createModel);
 
+        _logger.LogInformation($"Game commented. {nameof(createModel.GameKey)} = {createModel.GameKey}");
+
         return Ok();
     }
 
     [HttpGet("games/{gameKey}/comments")]
-    public async Task<ICollection<Comment>> GetComments([FromRoute(Name = "gameKey")] string gameKey)
+    public async Task<ICollection<Comment>> GetComments([FromRoute] string gameKey)
     {
         var result = await _commentService.GetCommentsByGameKeyAsync(gameKey);
 
