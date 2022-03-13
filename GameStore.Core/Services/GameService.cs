@@ -44,7 +44,7 @@ public class GameService : IGameService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Game created. " +
-                               $"{nameof(game.Key)} = {game.Key}, {nameof(game.Name)} = {game.Name}");
+                               $"{nameof(game.Id)} = {game.Id}");
 
         return game;
     }
