@@ -87,36 +87,6 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId)
-    {
-        var game = await GameRepository.GetByIdAsync(gameId);
-
-        if (game is null)
-        {
-            throw new ArgumentException("Game with such id doesnt exist. " +
-                                        $"{nameof(game.Id)} = {gameId}");
-        }
-
-        var genre = await GenreRepository.GetByIdAsync(genreId);
-
-        if (genre is null)
-        {
-            throw new ArgumentException("Genre with such id doesnt exist. " +
-                                        $"{nameof(genre.Id)} = {genreId}");
-        }
-
-        game.Genres.Add(genre);
-
-        GameRepository.Update(game);
-
-        await _unitOfWork.SaveChangesAsync();
-
-        _logger.LogInformation("Game added to genre. " +
-                               $"{nameof(game.Id)} = {game.Id}, {nameof(genre.Id)} = {genre.Id}");
-
-        return game;
-    }
-
     public async Task UpdateAsync(GameUpdateModel updateModel)
     {
         var game = await GameRepository.GetSingleBySpecAsync(new GameByIdWithDetailsSpec(updateModel.Id));

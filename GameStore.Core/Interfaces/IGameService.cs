@@ -13,7 +13,6 @@ public interface IGameService
     Task<ICollection<Game>> GetByPlatformTypesAsync(ICollection<Guid> platformTypesIds);
     Task<Game> GetByKeyAsync(string key);
     Task<Game> CreateAsync(GameCreateModel createModel);
-    Task<Game> ApplyGenreAsync(Guid gameId, Guid genreId);
     Task UpdateAsync(GameUpdateModel updateModel);
     Task DeleteAsync(Guid id);
     Task<byte[]> GetFileAsync(string gameKey);
