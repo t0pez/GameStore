@@ -25,7 +25,8 @@ public class GameService : IGameService
         _gameKeyAliasCraft =
             new AliasCraftBuilder()
                 .AddPairToReplace('_', '-')
-                .AddSymbolsToRemove(' ', '\'', ',', '.', ':')
+                .AddPairToReplace(' ', '-')
+                .AddSymbolsToRemove(',', '.', ':', '?')
                 .Build();
     }
 
@@ -35,13 +36,7 @@ public class GameService : IGameService
 
     public async Task<Game> CreateAsync(GameCreateModel model)
     {
-        var gameKey = _gameKeyAliasCraft.CreateAlias(model.Name);
-
-        if (await GameRepository.AnyAsync(new GameByKeySpec(gameKey)))
-        {
-            throw new InvalidOperationException("Game with this key already exists. " +
-                                                $"GameKey = {gameKey}");
-        }
+        var gameKey = await CreateUniqueGameKey(model.Name);
 
         var game = new Game(gameKey, model.Name, model.Description, model.File);
 
@@ -149,5 +144,42 @@ public class GameService : IGameService
         game.File = updateModel.File;
         game.Genres = genres;
         game.PlatformTypes = platformTypes;
+    }
+
+    private async Task<string> CreateUniqueGameKey(string source)
+    {
+        var gameKey = _gameKeyAliasCraft.CreateAlias(source);
+
+        if (await KeyIsUnique(gameKey) == false)
+        {
+            return await CreateGameKeyWithCode(source);
+        }
+
+        return gameKey;
+    }
+
+    private async Task<string> CreateGameKeyWithCode(string source)
+    {
+        var attemptCode = 1;
+
+        do
+        {
+            var gameKey = CreateAliasWithCode(source, attemptCode++);
+            
+            if (await KeyIsUnique(gameKey))
+            {
+                return gameKey;
+            }
+        } while (true);
+    }
+
+    private string CreateAliasWithCode(string source, int code)
+    {
+        return _gameKeyAliasCraft.CreateAlias(source + "--" + code);
+    }
+
+    private async Task<bool> KeyIsUnique(string gameKey)
+    {
+        return await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false;
     }
 }
