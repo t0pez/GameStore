@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GameStore.Web.ViewModels;
 
 namespace GameStore.Web.Controllers;
 
@@ -30,17 +31,19 @@ public class GamesController : Controller
     }
 
     [HttpGet("games")]
-    public async Task<ICollection<Game>> GetAll()
+    public async Task<ICollection<GameViewModel>> GetAll()
     {
-        var result = await _gameService.GetAllAsync();
+        var games = await _gameService.GetAllAsync();
+        var result = _mapper.Map<ICollection<GameViewModel>>(games);
 
         return result;
     }
 
     [HttpGet("games/{gameKey}")]
-    public async Task<ActionResult<Game>> GetWithDetails([FromRoute] string gameKey)
+    public async Task<ActionResult<GameViewModel>> GetWithDetails([FromRoute] string gameKey)
     {
-        var result = await _gameService.GetByKeyAsync(gameKey);
+        var game = await _gameService.GetByKeyAsync(gameKey);
+        var result = _mapper.Map<GameViewModel>(game);
 
         return Ok(result);
     }
@@ -54,12 +57,13 @@ public class GamesController : Controller
     }
 
     [HttpPost("games/new")]
-    public async Task<ActionResult<Game>> Create([FromBody] GameCreateRequestModel request)
+    public async Task<ActionResult<GameViewModel>> Create([FromBody] GameCreateRequestModel request)
     {
         var createModel = _mapper.Map<GameCreateModel>(request);
 
-        var result = await _gameService.CreateAsync(createModel);
-
+        var game = await _gameService.CreateAsync(createModel);
+        var result = _mapper.Map<GameViewModel>(game);
+        
         _logger.LogInformation($"Game created. {nameof(result.Id)} = {result.Id}");
         
         return Ok(result);
@@ -86,7 +90,7 @@ public class GamesController : Controller
     }
 
     [HttpPost("games/update")]
-    public async Task<ActionResult<Game>> Edit([FromBody] GameEditRequestModel request)
+    public async Task<ActionResult> Edit([FromBody] GameEditRequestModel request)
     {
         var game = _mapper.Map<GameUpdateModel>(request);
         await _gameService.UpdateAsync(game);
