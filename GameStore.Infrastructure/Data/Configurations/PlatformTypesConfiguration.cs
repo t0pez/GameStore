@@ -8,12 +8,12 @@ internal class PlatformTypesConfiguration : IEntityTypeConfiguration<PlatformTyp
 {
     public void Configure(EntityTypeBuilder<PlatformType> builder)
     {
-        builder.HasKey(pt => pt.Id);
+        builder.HasKey(platformType => platformType.Id);
 
-        builder.Property(pt => pt.Name).IsRequired();
-        builder.Property(pt => pt.IsDeleted).IsRequired();
+        builder.Property(platformType => platformType.Name).IsRequired();
+        builder.Property(platformType => platformType.IsDeleted).IsRequired();
 
-        builder.HasMany(pt => pt.Games)
-            .WithMany(g => g.PlatformTypes);
+        builder.HasMany(platformType => platformType.Games)
+            .WithMany(game => game.PlatformTypes);
     }
 }

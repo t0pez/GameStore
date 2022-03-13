@@ -3,7 +3,6 @@ using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 
 namespace GameStore.Core.Models.Comments;
 
@@ -27,9 +26,9 @@ public class Comment : BaseEntity, ISafeDelete
     public DateTime DateOfCreation { get; set; }
 
     public Guid GameId { get; set; }
-    [JsonIgnore] public Game Game { get; set; }
+    public Game Game { get; set; }
     public Guid? ParentId { get; set; }
-    [JsonIgnore] public Comment Parent { get; set; }
+    public Comment Parent { get; set; }
 
     public ICollection<Comment> Replies { get; set; } = new List<Comment>();
 

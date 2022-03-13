@@ -8,17 +8,19 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
 {
     public void Configure(EntityTypeBuilder<Game> builder)
     {
-        builder.HasKey(g => g.Id);
+        builder.HasKey(game => game.Id);
 
-        builder.HasAlternateKey(g => g.Key);
-        builder.Property(g => g.Name).IsRequired();
-        builder.Property(g => g.Description).IsRequired();
-        builder.Property(g => g.IsDeleted).IsRequired();
+        builder.HasAlternateKey(game => game.Key);
+        builder.Property(game => game.Name).IsRequired();
+        builder.Property(game => game.Description).IsRequired();
+        builder.Property(game => game.IsDeleted).IsRequired();
 
-        builder.HasMany(g => g.Comments);
-        builder.HasMany(g => g.Genres)
-            .WithMany(g => g.Games);
-        builder.HasMany(g => g.PlatformTypes)
-            .WithMany(pt => pt.Games);
+        builder.HasMany(game => game.Comments)
+            .WithOne(comment => comment.Game)
+            .HasForeignKey(comment => comment.GameId);
+        builder.HasMany(game => game.Genres)
+            .WithMany(genre => genre.Games);
+        builder.HasMany(game => game.PlatformTypes)
+            .WithMany(platformType => platformType.Games);
     }
 }

@@ -8,15 +8,21 @@ internal class CommentConfiguration : IEntityTypeConfiguration<Comment>
 {
     public void Configure(EntityTypeBuilder<Comment> builder)
     {
-        builder.HasKey(c => c.Id);
+        builder.HasKey(comment => comment.Id);
 
-        builder.Property(c => c.Name).IsRequired();
-        builder.Property(c => c.Body).IsRequired();
-        builder.Property(c => c.DateOfCreation).IsRequired();
-        builder.Property(c => c.IsDeleted).IsRequired();
+        builder.Property(comment => comment.Name).IsRequired();
+        builder.Property(comment => comment.Body).IsRequired();
+        builder.Property(comment => comment.DateOfCreation).IsRequired();
+        builder.Property(comment => comment.IsDeleted).IsRequired();
 
-        builder.HasOne(c => c.Game).WithMany(g => g.Comments).HasForeignKey(c => c.GameId);
-        builder.HasOne(c => c.Parent).WithMany(c => c.Replies).HasForeignKey(c => c.ParentId);
-        builder.HasMany(c => c.Replies).WithOne(c => c.Parent);
+        builder.HasOne(comment => comment.Game)
+            .WithMany(game => game.Comments)
+            .HasForeignKey(comment => comment.GameId);
+        builder.HasOne(comment => comment.Parent)
+            .WithMany(comment => comment.Replies)
+            .HasForeignKey(reply => reply.ParentId);
+        builder.HasMany(comment => comment.Replies)
+            .WithOne(reply => reply.Parent)
+            .HasForeignKey(reply => reply.ParentId);
     }
 }

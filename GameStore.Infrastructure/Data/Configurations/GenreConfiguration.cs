@@ -8,12 +8,15 @@ internal class GenreConfiguration : IEntityTypeConfiguration<Genre>
 {
     public void Configure(EntityTypeBuilder<Genre> builder)
     {
-        builder.HasKey(g => g.Id);
+        builder.HasKey(genre => genre.Id);
 
-        builder.Property(g => g.Name).IsRequired();
-        builder.Property(g => g.IsDeleted).IsRequired();
+        builder.Property(genre => genre.Name).IsRequired();
+        builder.Property(genre => genre.IsDeleted).IsRequired();
 
-        builder.HasMany(g => g.SubGenres);
-        
+        builder.HasMany(genre => genre.SubGenres)
+            .WithOne(subGenre => subGenre.Parent)
+            .HasForeignKey(subGenre => subGenre.ParentId);
+        builder.HasMany(genre => genre.Games)
+            .WithMany(game => game.Genres);
     }
 }
