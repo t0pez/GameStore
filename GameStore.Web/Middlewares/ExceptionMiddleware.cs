@@ -23,33 +23,41 @@ public class ExceptionMiddleware
         {
             await _next(context);
         }
-        catch(ItemNotFoundException e)
+        catch (ItemNotFoundException e)
         {
-            _logger.LogError(e, "ItemNotFound");
+            _logger.LogError(e, e.Message);
+
             context.Response.StatusCode = 404;
-            context.Response.Headers.Add("exception", "ItemNotFound");
-            context.Response.Headers.Add("exceptionMessage", e.Message);
+            AddErrorToResponse(context, e);
         }
-        catch(InvalidOperationException e)
+        catch (InvalidOperationException e)
         {
-            _logger.LogError(e, "InvalidOperation");
+            _logger.LogError(e, e.Message);
+
             context.Response.StatusCode = 502;
-            context.Response.Headers.Add("exception", "InvalidOperation");
-            context.Response.Headers.Add("exceptionMessage", e.Message);
+            AddErrorToResponse(context, e);
         }
-        catch(ArgumentException e)
+        catch (ArgumentException e)
         {
-            _logger.LogError(e, "Argument");
+            _logger.LogError(e, e.Message);
+
             context.Response.StatusCode = 400;
-            context.Response.Headers.Add("exception", "ArgumentException");
-            context.Response.Headers.Add("exceptionMessage", e.Message);
+            AddErrorToResponse(context, e);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            _logger.LogWarning($"Unhandled exception");
+            _logger.LogError(e, e.Message);
+
             context.Response.StatusCode = 500;
-            context.Response.Headers.Add("exception", "Unknown");
-            context.Response.Headers.Add("exceptionMessage", e.Message);
+            AddErrorToResponse(context, e);
         }
+    }
+
+    private static void AddErrorToResponse(HttpContext context, Exception e)
+    {
+        var exceptionName = e.GetType().Name;
+        
+        context.Response.Headers.Add("exception", exceptionName);
+        context.Response.Headers.Add("exceptionMessage", e.Message);
     }
 }
