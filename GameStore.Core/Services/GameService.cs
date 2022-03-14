@@ -24,9 +24,9 @@ public class GameService : IGameService
         _logger = logger;
         _gameKeyAliasCraft =
             new AliasCraftBuilder()
-                .AddPairToReplace('_', '-')
-                .AddPairToReplace(' ', '-')
-                .AddSymbolsToRemove(',', '.', ':', '?')
+                .AddPairToReplace("_", "-")
+                .AddPairToReplace(" ", "-")
+                .AddSymbolsToRemove(",", ".", ":", "?")
                 .Build();
     }
 
@@ -86,7 +86,7 @@ public class GameService : IGameService
     {
         var game = await GameRepository.GetSingleBySpecAsync(new GameByIdWithDetailsSpec(updateModel.Id));
 
-        if (game is null)
+        if (game is null) // TODO: change to ItemNotFoundException
         {
             throw new InvalidOperationException("Game with such id doesnt exists." +
                                                 $"Id = {updateModel.Id}");
