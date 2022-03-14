@@ -86,20 +86,19 @@ public class GameService : IGameService
     {
         var game = await GameRepository.GetSingleBySpecAsync(new GameByIdWithDetailsSpec(updateModel.Id));
 
-        if (game is null) // TODO: change to ItemNotFoundException
+        if (game is null)
         {
-            throw new InvalidOperationException("Game with such id doesnt exists." +
-                                                $"Id = {updateModel.Id}");
+            throw new ItemNotFoundException("Game with such id doesnt exists." +
+                                            $"Id = {updateModel.Id}");
         }
 
         await SetUpdatedValues(game, updateModel);
 
         await GameRepository.UpdateAsync(game);
+        await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation($"Game updated. " +
                                $"{nameof(game.Id)} = {game.Id}");
-
-        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(Guid id)
@@ -108,13 +107,12 @@ public class GameService : IGameService
 
         if (game is null)
         {
-            throw new InvalidOperationException("Game with such id doesnt exists." +
-                                                $"{nameof(game.Id)} = {id}");
+            throw new ItemNotFoundException("Game with such id doesnt exists." +
+                                            $"{nameof(game.Id)} = {id}");
         }
 
         game.IsDeleted = true;
         await GameRepository.UpdateAsync(game);
-
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation($"Game deleted. {nameof(game.Id)} = {game.Id}");
@@ -126,8 +124,8 @@ public class GameService : IGameService
 
         if (game is null)
         {
-            throw new InvalidOperationException("Game with such key doesnt exists." +
-                                                $"{nameof(game.Key)} = {gameKey}");
+            throw new ItemNotFoundException("Game with such key doesnt exists." +
+                                            $"{nameof(game.Key)} = {gameKey}");
         }
 
         return game.File;
@@ -136,7 +134,7 @@ public class GameService : IGameService
     private async Task SetUpdatedValues(Game game, GameUpdateModel updateModel)
     {
         var genres = await GenreRepository.GetBySpecAsync(new GenresByIdsSpec(updateModel.GenresIds));
-        var platformTypes = await 
+        var platformTypes = await
             PlatformTypesRepository.GetBySpecAsync(new PlatformTypesByIdsSpec(updateModel.PlatformTypesIds));
 
         game.Name = updateModel.Name;
@@ -165,7 +163,7 @@ public class GameService : IGameService
         do
         {
             var gameKey = CreateAliasWithCode(source, attemptCode++);
-            
+
             if (await KeyIsUnique(gameKey))
             {
                 return gameKey;

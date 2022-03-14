@@ -50,7 +50,7 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
         return Set.AddAsync(model).AsTask();
     }
 
-    public Task UpdateAsync(TModel updated) // TODO: make method async
+    public Task UpdateAsync(TModel updated)
     {
         return Task.Run(() => Set.Update(updated));
     }

@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Comments;
-using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Records;
 using GameStore.Web.Models;
 using HybridModelBinding;
@@ -75,8 +74,6 @@ public class GamesController : Controller
         var createModel = _mapper.Map<CommentCreateModel>(request);
 
         await _commentService.CommentGameAsync(createModel);
-
-        _logger.LogInformation($"Game commented. {nameof(createModel.GameKey)} = {createModel.GameKey}");
 
         return Ok();
     }

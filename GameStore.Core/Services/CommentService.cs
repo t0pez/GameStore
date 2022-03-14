@@ -31,16 +31,15 @@ public class CommentService : ICommentService
     {
         var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(model.GameKey));
 
-        if (game is null) // TODO: change to ItemNotFoundException
+        if (game is null)
         {
-            throw new ArgumentException("Game with such key doesn't exist. " +
-                                        $"{nameof(model.GameKey)} = {model.GameKey}");
+            throw new ItemNotFoundException("Game with such key doesn't exist. " +
+                                            $"{nameof(model.GameKey)} = {model.GameKey}");
         }
 
         var comment = new Comment(model.AuthorName, model.Message, game);
 
         await CommentRepository.AddAsync(comment);
-
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation($"Comment successfully added for game. " +
@@ -49,7 +48,7 @@ public class CommentService : ICommentService
 
     public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
     {
-        if(await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
+        if (await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
         {
             throw new ItemNotFoundException($"Game not found. " +
                                             $"{nameof(gameKey)} = {gameKey}");
@@ -64,10 +63,10 @@ public class CommentService : ICommentService
     {
         var parent = await CommentRepository.GetByIdAsync(parentId);
 
-        if(parent is null) // TODO: change to ItemNotFoundException, probably 
+        if (parent is null)
         {
-            throw new ArgumentException("Parent comment with such id doesn't exists." +
-                                        $"{nameof(parent.Id)} = {parentId}");
+            throw new ItemNotFoundException("Parent comment with such id doesn't exists." +
+                                            $"{nameof(parent.Id)} = {parentId}");
         }
 
         var reply = new Comment(authorName, message, parent.Game, parent);
@@ -77,7 +76,6 @@ public class CommentService : ICommentService
         parent.Replies.Add(reply);
 
         await CommentRepository.UpdateAsync(parent);
-
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation($"Reply successfully added for comment. " +
