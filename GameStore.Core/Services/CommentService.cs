@@ -31,7 +31,7 @@ public class CommentService : ICommentService
     {
         var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(model.GameKey));
 
-        if (game is null)
+        if (game is null) // TODO: change to ItemNotFoundException
         {
             throw new ArgumentException("Game with such key doesn't exist. " +
                                         $"{nameof(model.GameKey)} = {model.GameKey}");
@@ -64,7 +64,7 @@ public class CommentService : ICommentService
     {
         var parent = await CommentRepository.GetByIdAsync(parentId);
 
-        if(parent is null)
+        if(parent is null) // TODO: change to ItemNotFoundException, probably 
         {
             throw new ArgumentException("Parent comment with such id doesn't exists." +
                                         $"{nameof(parent.Id)} = {parentId}");
@@ -76,7 +76,7 @@ public class CommentService : ICommentService
 
         parent.Replies.Add(reply);
 
-        CommentRepository.Update(parent);
+        await CommentRepository.UpdateAsync(parent);
 
         await _unitOfWork.SaveChangesAsync();
 

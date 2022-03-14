@@ -94,7 +94,7 @@ public class GameService : IGameService
 
         await SetUpdatedValues(game, updateModel);
 
-        GameRepository.Update(game);
+        await GameRepository.UpdateAsync(game);
 
         _logger.LogInformation($"Game updated. " +
                                $"{nameof(game.Id)} = {game.Id}");
@@ -113,7 +113,7 @@ public class GameService : IGameService
         }
 
         game.IsDeleted = true;
-        GameRepository.Update(game);
+        await GameRepository.UpdateAsync(game);
 
         await _unitOfWork.SaveChangesAsync();
 

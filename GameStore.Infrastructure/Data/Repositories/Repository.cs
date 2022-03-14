@@ -50,14 +50,14 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
         return Set.AddAsync(model).AsTask();
     }
 
-    public void Update(TModel updated)
+    public Task UpdateAsync(TModel updated) // TODO: make method async
     {
-        Set.Update(updated);
+        return Task.Run(() => Set.Update(updated));
     }
 
-    public void Delete(TModel model)
+    public Task DeleteAsync(TModel model)
     {
-       Set.Remove(model);
+       return Task.Run(() => Set.Remove(model));
     }
 
     public Task<bool> AnyAsync(Guid id)

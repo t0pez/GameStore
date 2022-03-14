@@ -11,8 +11,8 @@ public interface IRepository<TModel> where TModel : BaseEntity
     Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> specification = null);
     Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> specification);
     Task AddAsync(TModel model);
-    void Update(TModel updated);
-    void Delete(TModel model);
+    Task UpdateAsync(TModel updated);
+    Task DeleteAsync(TModel model);
     Task<bool> AnyAsync(Guid id);
     Task<bool> AnyAsync(ISpecification<TModel> specification);
 }
