@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace GameStore.Core.Services;
 
@@ -17,11 +18,13 @@ public class GameService : IGameService
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GameService> _logger;
     private readonly IAliasCraft _gameKeyAliasCraft;
+    private readonly IMapper _mapper;
 
-    public GameService(IUnitOfWork unitOfWork, ILogger<GameService> logger)
+    public GameService(IUnitOfWork unitOfWork, ILogger<GameService> logger, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _mapper = mapper;
         _gameKeyAliasCraft =
             new AliasCraftBuilder()
                 .AddPairToReplace("_", "-")
@@ -38,8 +41,9 @@ public class GameService : IGameService
     {
         var gameKey = await CreateUniqueGameKey(model.Name);
 
-        var game = new Game(gameKey, model.Name, model.Description, model.File);
-
+        var game = _mapper.Map<Game>(model);
+        game.Key = gameKey;
+        
         await GameRepository.AddAsync(game);
         await _unitOfWork.SaveChangesAsync();
 

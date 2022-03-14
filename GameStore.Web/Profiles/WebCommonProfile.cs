@@ -6,9 +6,9 @@ using GameStore.Web.ViewModels;
 
 namespace GameStore.Web.Profiles;
 
-public class CommonProfile : Profile
+public class WebCommonProfile : Profile
 {
-    public CommonProfile()
+    public WebCommonProfile()
     {
         CreateMap<GameCreateRequestModel, GameCreateModel>().ReverseMap();
         CreateMap<CommentCreateRequestModel, CommentCreateModel>().ReverseMap();

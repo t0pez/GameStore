@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Text.Json.Serialization;
+using AutoMapper;
+using GameStore.Core.Profiles;
 
 namespace GameStore.Web;
 
@@ -42,7 +44,7 @@ public class Startup
         });
 
         services.AddAutoMapper(cfg => cfg.AddProfiles(
-            new[] { new CommonProfile() }));
+            new Profile[] { new WebCommonProfile(), new CoreCommonProfile() }));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationContext dbContext)
