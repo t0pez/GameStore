@@ -4,27 +4,15 @@ namespace GameStore.Core.Helpers.AliasCrafting;
 
 internal class AliasCraftBuilder
 {
-    private readonly AliasCraftConfig _config = new();
-
+    public AliasCraftConfig Config { get; set; } = new();
+    
     public AliasCraft Build()
     {
-        return new AliasCraft(_config);
+        return new AliasCraft(Config);
     }
 
-    public AliasCraftBuilder AddPairToReplace(string oldValue, string newValue)
+    public AliasConfigBuilder Values(params string[] values)
     {
-        _config.ReplacingPairs.Add(oldValue, newValue);
-
-        return this;
-    }
-    
-    public AliasCraftBuilder AddSymbolsToRemove(params string[] symbols)
-    {
-        var pairs = symbols.Select(s => new { Key = s, Value = string.Empty});
-
-        foreach (var pair in pairs)
-            _config.ReplacingPairs.Add(pair.Key, pair.Value);
-
-        return this;
+        return new AliasConfigBuilder(this, values);
     }
 }

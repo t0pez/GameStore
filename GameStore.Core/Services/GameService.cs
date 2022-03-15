@@ -27,9 +27,8 @@ public class GameService : IGameService
         _mapper = mapper;
         _gameKeyAliasCraft =
             new AliasCraftBuilder()
-                .AddPairToReplace("_", "-")
-                .AddPairToReplace(" ", "-")
-                .AddSymbolsToRemove(",", ".", ":", "?")
+                .Values("_", " ").ReplaceWith("-")
+                .Values(",", ".", ":", "?").Delete()
                 .Build();
     }
 
