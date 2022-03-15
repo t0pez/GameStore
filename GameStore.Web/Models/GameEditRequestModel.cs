@@ -11,5 +11,5 @@ public class GameEditRequestModel
     public string Description { get; set; }
     public byte[] File { get; set; }
     public List<Guid> GenresIds { get; set; }
-    public List<Guid> PlatformTypesIds { get; set; }
+    public List<Guid> PlatformsIds { get; set; }
 }

@@ -28,7 +28,7 @@ public class Game : BaseEntity, ISafeDelete
 
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
     public ICollection<Genre> Genres { get; set; } = new List<Genre>();
-    public ICollection<PlatformType> PlatformTypes { get; set; } = new List<PlatformType>();
+    public ICollection<PlatformType> Platforms { get; set; } = new List<PlatformType>();
 
     public bool IsDeleted { get; set; }
 }

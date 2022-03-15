@@ -11,6 +11,6 @@ internal class GameByKeySpec : Specification<Game>, ISingleResultSpecification
                         && g.IsDeleted == false)
             .Include(g => g.Comments)
             .Include(g => g.Genres)
-            .Include(g => g.PlatformTypes);
+            .Include(g => g.Platforms);
     }
 }

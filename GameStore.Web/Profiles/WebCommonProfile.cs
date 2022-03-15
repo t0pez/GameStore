@@ -14,9 +14,7 @@ public class WebCommonProfile : Profile
         CreateMap<CommentCreateRequestModel, CommentCreateModel>().ReverseMap();
         CreateMap<GameEditRequestModel, GameUpdateModel>().ReverseMap();
 
-        CreateMap<Game, GameViewModel>()
-            .ForMember(model => model.Platforms,
-                expression => expression.MapFrom(game => game.PlatformTypes));
+        CreateMap<Game, GameViewModel>();
         CreateMap<Genre, GenreViewModel>().ReverseMap();
         CreateMap<PlatformType, PlatformTypeViewModel>().ReverseMap();
     }

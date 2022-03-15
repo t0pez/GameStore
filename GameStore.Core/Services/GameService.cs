@@ -139,13 +139,13 @@ public class GameService : IGameService
     {
         var genres = await GenreRepository.GetBySpecAsync(new GenresByIdsSpec(updateModel.GenresIds));
         var platformTypes = await
-            PlatformTypesRepository.GetBySpecAsync(new PlatformTypesByIdsSpec(updateModel.PlatformTypesIds));
+            PlatformTypesRepository.GetBySpecAsync(new PlatformTypesByIdsSpec(updateModel.PlatformsIds));
 
         game.Name = updateModel.Name;
         game.Description = updateModel.Description;
         game.File = updateModel.File;
         game.Genres = genres;
-        game.PlatformTypes = platformTypes;
+        game.Platforms = platformTypes;
     }
 
     private async Task<string> CreateUniqueGameKey(string source)

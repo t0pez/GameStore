@@ -13,6 +13,6 @@ public class GameUpdateModel
     public byte[] File { get; set; }
 
     public ICollection<Guid> GenresIds { get; set; } = new List<Guid>();
-    public ICollection<Guid> PlatformTypesIds { get; set; } = new List<Guid>();
+    public ICollection<Guid> PlatformsIds { get; set; } = new List<Guid>();
 
 }
