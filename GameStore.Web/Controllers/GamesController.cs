@@ -74,10 +74,11 @@ public class GamesController : Controller
     }
 
     [HttpGet("games/{gameKey}/comments")]
-    public async Task<ICollection<Comment>> GetComments([FromRoute] string gameKey)
+    public async Task<ICollection<CommentViewModel>> GetComments([FromRoute] string gameKey)
     {
-        var result = await _commentService.GetCommentsByGameKeyAsync(gameKey);
-
+        var comments = await _commentService.GetCommentsByGameKeyAsync(gameKey);
+        var result = _mapper.Map<ICollection<CommentViewModel>>(comments);
+        
         return result;
     }
 

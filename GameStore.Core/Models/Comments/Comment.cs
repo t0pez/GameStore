@@ -14,7 +14,7 @@ public class Comment : BaseEntity, ISafeDelete
         Body = body;
         Game = game;
         Parent = parent;
-        DateOfCreation = DateTime.Now;
+        DateOfCreation = DateTime.UtcNow;
     }
 
     public Comment()

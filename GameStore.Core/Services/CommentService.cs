@@ -1,4 +1,5 @@
-﻿using GameStore.Core.Exceptions;
+﻿using System;
+using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Comments.Specifications;
@@ -7,9 +8,9 @@ using GameStore.Core.Models.Games.Specifications;
 using GameStore.Core.Models.Records;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace GameStore.Core.Services;
 
@@ -17,11 +18,13 @@ public class CommentService : ICommentService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CommentService> _logger;
+    private readonly IMapper _mapper;   
 
-    public CommentService(IUnitOfWork unitOfWork, ILogger<CommentService> logger)
+    public CommentService(IUnitOfWork unitOfWork, ILogger<CommentService> logger, IMapper mapper)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
+        _mapper = mapper;
     }
 
     private IRepository<Comment> CommentRepository => _unitOfWork.GetRepository<Comment>();
@@ -37,12 +40,14 @@ public class CommentService : ICommentService
                                             $"{nameof(model.GameKey)} = {model.GameKey}");
         }
 
-        var comment = new Comment(model.AuthorName, model.Message, game);
+        var comment = _mapper.Map<Comment>(model);
+        comment.GameId = game.Id;
+        comment.DateOfCreation = DateTime.UtcNow;
 
         await CommentRepository.AddAsync(comment);
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation($"Comment successfully added for game. " +
+        _logger.LogInformation("Comment successfully added for game. " +
                                $"{nameof(game.Id)} = {game.Id}, {nameof(comment.Id)} = {comment.Id}");
     }
 
@@ -50,7 +55,7 @@ public class CommentService : ICommentService
     {
         if (await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
         {
-            throw new ItemNotFoundException($"Game not found. " +
+            throw new ItemNotFoundException("Game not found. " +
                                             $"{nameof(gameKey)} = {gameKey}");
         }
 
@@ -59,26 +64,24 @@ public class CommentService : ICommentService
         return result;
     }
 
-    public async Task ReplyCommentAsync(Guid parentId, string authorName, string message)
+    public async Task ReplyCommentAsync(ReplyCreateModel createModel)
     {
-        var parent = await CommentRepository.GetByIdAsync(parentId);
+        var parent = await CommentRepository.GetByIdAsync(createModel.ParentId);
 
         if (parent is null)
         {
             throw new ItemNotFoundException("Parent comment with such id doesn't exists." +
-                                            $"{nameof(parent.Id)} = {parentId}");
+                                            $"{nameof(parent.Id)} = {createModel.ParentId}");
         }
 
-        var reply = new Comment(authorName, message, parent.Game, parent);
+        var reply = _mapper.Map<Comment>(createModel);
+        reply.GameId = parent.GameId;
+        reply.DateOfCreation = DateTime.UtcNow;
 
         await CommentRepository.AddAsync(reply);
-
-        parent.Replies.Add(reply);
-
-        await CommentRepository.UpdateAsync(parent);
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation($"Reply successfully added for comment. " +
+        _logger.LogInformation("Reply successfully added for comment. " +
                                $"{nameof(parent.Id)} = {parent.Id}, {nameof(reply.Id)} = {reply.Id}");
     }
 }

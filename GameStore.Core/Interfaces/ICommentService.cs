@@ -10,5 +10,5 @@ public interface ICommentService
 {
     Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey);
     Task CommentGameAsync(CommentCreateModel model);
-    Task ReplyCommentAsync(Guid parentId, string authorName, string message);
+    Task ReplyCommentAsync(ReplyCreateModel createModel);
 }

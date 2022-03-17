@@ -100,7 +100,7 @@ public class GameService : IGameService
         await GameRepository.UpdateAsync(game);
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation($"Game updated. " +
+        _logger.LogInformation("Game updated. " +
                                $"{nameof(game.Id)} = {game.Id}");
     }
 

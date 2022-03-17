@@ -8,6 +8,7 @@ internal class CommentsByGameKey : Specification<Comment>
     {
         Query
             .Where(c => c.Game.Key == gameKey)
-            .Include(c => c.Replies);
+            .Include(c => c.Replies)
+            .Include(c => c.Game);
     }
 }
