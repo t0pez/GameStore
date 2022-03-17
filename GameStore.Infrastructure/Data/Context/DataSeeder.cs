@@ -14,7 +14,7 @@ public static class DataSeeder
         
         var strategyGenre = new Genre
         {
-            Id = Guid.Parse("3FA85F64-0000-0000-0000-000000000001"),
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7601"),
             Name = "Strategy",
             IsDeleted = false,
             Games = new List<Game>(),
@@ -22,7 +22,7 @@ public static class DataSeeder
         };
         var rtsGenre = new Genre
         {
-            Id = Guid.Parse("3FA85F64-0000-0000-0000-000000000002"),
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7602"),
             Name = "RTS",
             IsDeleted = false,
             Games = new List<Game>(),
@@ -30,7 +30,7 @@ public static class DataSeeder
         };
         var cityBuilderGenre = new Genre
         {
-            Id = Guid.Parse("3FA85F64-0000-0000-0000-000000000003"),
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7603"),
             Name = "City builder",
             IsDeleted = false,
             Games = new List<Game>(),
@@ -39,21 +39,21 @@ public static class DataSeeder
 
         var pcPlatform = new PlatformType
         {
-            Id = Guid.Parse("3FA85F64-0000-0000-0000-000000000001"),
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7611"),
             Name = "PC",
             IsDeleted = false,
             Games = new List<Game>()
         };
         var psPlatform = new PlatformType
         {
-            Id = Guid.Parse("3FA85F64-0000-0000-0000-000000000002"),
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7612"),
             Name = "PS5",
             IsDeleted = false,
             Games = new List<Game>()
         };
         var xboxPlatform = new PlatformType
         {
-            Id = Guid.Parse("3FA85F64-0000-0000-0000-000000000003"),
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7613"),
             Name = "XBOX Series",
             IsDeleted = false,
             Games = new List<Game>()

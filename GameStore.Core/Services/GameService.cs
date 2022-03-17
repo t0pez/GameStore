@@ -151,7 +151,7 @@ public class GameService : IGameService
     {
         var gameKey = _gameKeyAliasCraft.CreateAlias(source);
 
-        if (await KeyIsUnique(gameKey) == false)
+        if (await IsKeyUnique(gameKey) == false)
         {
             return await CreateGameKeyWithCode(source);
         }
@@ -167,7 +167,7 @@ public class GameService : IGameService
         {
             var gameKey = CreateAliasWithCode(source, attemptCode++);
 
-            if (await KeyIsUnique(gameKey))
+            if (await IsKeyUnique(gameKey))
             {
                 return gameKey;
             }
@@ -179,7 +179,7 @@ public class GameService : IGameService
         return _gameKeyAliasCraft.CreateAlias(source + "--" + code);
     }
 
-    private async Task<bool> KeyIsUnique(string gameKey)
+    private async Task<bool> IsKeyUnique(string gameKey)
     {
         return await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false;
     }

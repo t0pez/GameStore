@@ -13,20 +13,15 @@ internal class AliasConfigBuilder
 
     public AliasCraftBuilder ReplaceWith(string newValue)
     {
-        foreach (var oldValue in _oldValues)
-        {
+        foreach (var oldValue in _oldValues) 
             _builder.Config.ReplacingPairs.Add(oldValue, newValue);
-        }
-        
+
         return _builder;
     }
 
     public AliasCraftBuilder Delete()
     {
-        foreach (var oldValue in _oldValues)
-        {
-            _builder.Config.ReplacingPairs.Add(oldValue, string.Empty);
-        }
+        ReplaceWith(string.Empty);
         
         return _builder;
     }
