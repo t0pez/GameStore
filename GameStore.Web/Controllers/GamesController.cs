@@ -5,7 +5,6 @@ using GameStore.Core.Models.Records;
 using GameStore.Web.Models;
 using HybridModelBinding;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -19,14 +18,12 @@ public class GamesController : Controller
     private readonly IGameService _gameService;
     private readonly ICommentService _commentService;
     private readonly IMapper _mapper;
-    private readonly ILogger<GamesController> _logger;
 
-    public GamesController(IGameService gameService, ICommentService commentService, IMapper mapper, ILogger<GamesController> logger)
+    public GamesController(IGameService gameService, ICommentService commentService, IMapper mapper)
     {
         _gameService = gameService;
         _commentService = commentService;
         _mapper = mapper;
-        _logger = logger;
     }
 
     [HttpGet("games")]
@@ -62,9 +59,7 @@ public class GamesController : Controller
 
         var game = await _gameService.CreateAsync(createModel);
         var result = _mapper.Map<GameViewModel>(game);
-        
-        _logger.LogInformation($"Game created. {nameof(result.Id)} = {result.Id}");
-        
+
         return Ok(result);
     }
 

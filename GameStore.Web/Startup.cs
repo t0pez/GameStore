@@ -27,8 +27,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddMvc().AddHybridModelBinder();
-
-        services.AddSwaggerGen(opt => opt.EnableAnnotations());
+        
         services.AddControllers().AddJsonOptions(opt =>
         {
             opt.JsonSerializerOptions.Converters.Add(new ByteArrayJsonConverter());
