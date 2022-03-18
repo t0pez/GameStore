@@ -12,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 using System.Text.Json.Serialization;
 using AutoMapper;
 using GameStore.Core.Profiles;
+using GameStore.Web.Filters;
 
 namespace GameStore.Web;
 
@@ -37,6 +38,8 @@ public class Startup
 
         services.ConfigureDomainServices();
 
+        services.AddScoped<WorkTimeTrackingFilter>();
+        
         services.AddDbContext<ApplicationContext>(opt =>
         {
             var connectionString = Configuration.GetConnectionString("DefaultConnection");

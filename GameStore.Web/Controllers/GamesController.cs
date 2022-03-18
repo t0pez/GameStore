@@ -8,11 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GameStore.Web.Filters;
 using GameStore.Web.ViewModels;
 
 namespace GameStore.Web.Controllers;
 
 [ApiController]
+[ServiceFilter(typeof(WorkTimeTrackingFilter))]
 public class GamesController : Controller
 {
     private readonly IGameService _gameService;
@@ -27,6 +29,7 @@ public class GamesController : Controller
     }
 
     [HttpGet("games")]
+    [ResponseCache(Duration = 60)]
     public async Task<ICollection<GameViewModel>> GetAll()
     {
         var games = await _gameService.GetAllAsync();
@@ -36,6 +39,7 @@ public class GamesController : Controller
     }
 
     [HttpGet("games/{gameKey}")]
+    [ResponseCache(Duration = 60)]
     public async Task<ActionResult<GameViewModel>> GetWithDetails([FromRoute] string gameKey)
     {
         var game = await _gameService.GetByKeyAsync(gameKey);
@@ -45,6 +49,7 @@ public class GamesController : Controller
     }
 
     [HttpPost("games/{gameKey}/download")]
+    [ResponseCache(Duration = 60)]
     public async Task<ActionResult<byte[]>> GetFile([FromRoute] string gameKey)
     {
         var result = await _gameService.GetFileAsync(gameKey);
