@@ -11,8 +11,8 @@ internal class AliasCraftBuilder
         return new AliasCraft(Config);
     }
 
-    public AliasConfigBuilder Values(params string[] values)
+    public ReplacingPairBuilder Values(params string[] values)
     {
-        return new AliasConfigBuilder(this, values);
+        return new ReplacingPairBuilder(this, values);
     }
 }

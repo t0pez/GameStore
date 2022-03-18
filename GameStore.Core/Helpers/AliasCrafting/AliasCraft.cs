@@ -22,7 +22,13 @@ public class AliasCraft : IAliasCraft
 
     private void ReplaceSymbols(StringBuilder builder)
     {
-        foreach (var pair in _config.ReplacingPairs)
-            builder.Replace(pair.Key, pair.Value);
+        foreach (var pair in _config.ReplacingPairs) 
+            ReplaceSymbolsInPairs(builder, pair);
+    }
+
+    private static void ReplaceSymbolsInPairs(StringBuilder builder, ReplacingPair pair)
+    {
+        foreach (var oldValue in pair.OldValues)
+            builder.Replace(oldValue, pair.NewValue);
     }
 }
