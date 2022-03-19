@@ -13,6 +13,7 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.HasAlternateKey(game => game.Key);
         builder.Property(game => game.Name).IsRequired();
         builder.Property(game => game.Description).IsRequired();
+        builder.Property(game => game.File).IsRequired();
         builder.Property(game => game.IsDeleted).IsRequired();
 
         builder.HasMany(game => game.Comments)
