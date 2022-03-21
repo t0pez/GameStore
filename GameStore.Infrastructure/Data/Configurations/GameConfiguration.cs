@@ -19,9 +19,5 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.HasMany(game => game.Comments)
             .WithOne(comment => comment.Game)
             .HasForeignKey(comment => comment.GameId);
-        builder.HasMany(game => game.Genres)
-            .WithMany(genre => genre.Games);
-        builder.HasMany(game => game.Platforms)
-            .WithMany(platformType => platformType.Games);
     }
 }

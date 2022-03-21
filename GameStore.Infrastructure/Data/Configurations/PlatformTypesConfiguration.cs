@@ -12,8 +12,5 @@ internal class PlatformTypesConfiguration : IEntityTypeConfiguration<PlatformTyp
 
         builder.Property(platformType => platformType.Name).IsRequired();
         builder.Property(platformType => platformType.IsDeleted).IsRequired();
-
-        builder.HasMany(platformType => platformType.Games)
-            .WithMany(game => game.Platforms);
     }
 }

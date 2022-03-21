@@ -1,15 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using Ardalis.Specification;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-internal sealed class GenresByIdsSpec : Specification<Genre>
+internal sealed class GenreByIdSpec : Specification<Genre>
 {
-    public GenresByIdsSpec(ICollection<Guid> ids)
+    public GenreByIdSpec(Guid id)
     {
         Query
-            .Where(genre => ids.Any(id => genre.Id == id));
+            .Where(genre => genre.Id == id
+                            && genre.IsDeleted == false);
     }
 }

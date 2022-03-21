@@ -23,11 +23,6 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
 
     private DbSet<TModel> Set => _context.Set<TModel>();
 
-    public Task<TModel> GetByIdAsync(Guid id)
-    {
-        return Set.SingleOrDefaultAsync(e => e.Id == id);
-    }
-
     public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> specification = null)
     {
         if (specification is null)
@@ -50,6 +45,11 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
         return Set.AddAsync(model).AsTask();
     }
 
+    public Task AddRangeAsync(IEnumerable<TModel> models)
+    {
+        return Set.AddRangeAsync(models);
+    }
+
     public Task UpdateAsync(TModel updated)
     {
         return Task.Run(() => Set.Update(updated));
@@ -58,11 +58,6 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
     public Task DeleteAsync(TModel model)
     {
        return Task.Run(() => Set.Remove(model));
-    }
-
-    public Task<bool> AnyAsync(Guid id)
-    {
-        return Set.AnyAsync(m => m.Id == id);
     }
 
     public Task<bool> AnyAsync(ISpecification<TModel> specification)

@@ -10,6 +10,7 @@ public sealed class GameByIdWithDetailsSpec : Specification<Game>, ISingleResult
         Query
             .Include(game => game.Genres)
             .Include(game => game.Platforms)
-            .Where(game => game.Id == id);
+            .Where(game => game.Id == id
+                   && game.IsDeleted == false);
     }
 }

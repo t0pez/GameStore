@@ -8,8 +8,12 @@ using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GameStore.Core.Models.RelationalModels;
+using GameStore.Core.Models.RelationalModels.Specifications;
+using GameStore.Core.Services.RelationshipModelsServices;
 
 namespace GameStore.Core.Services;
 
@@ -19,12 +23,18 @@ public class GameService : IGameService
     private readonly ILogger<GameService> _logger;
     private readonly IAliasCraft _gameKeyAliasCraft;
     private readonly IMapper _mapper;
+    private readonly IRelationshipModelService<GameGenre> _gameGenreService;
+    private readonly IRelationshipModelService<GamePlatformType> _gamePlatformService;
 
-    public GameService(IUnitOfWork unitOfWork, ILogger<GameService> logger, IMapper mapper)
+    public GameService(IUnitOfWork unitOfWork, ILogger<GameService> logger, IMapper mapper,
+                       IRelationshipModelService<GameGenre> gameGenreService,
+                       IRelationshipModelService<GamePlatformType> gamePlatformService)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
         _mapper = mapper;
+        _gameGenreService = gameGenreService;
+        _gamePlatformService = gamePlatformService;
         _gameKeyAliasCraft =
             new AliasCraftBuilder()
                 .Values("_", " ").ReplaceWith("-")
@@ -38,7 +48,7 @@ public class GameService : IGameService
 
     public async Task<Game> CreateAsync(GameCreateModel model)
     {
-        var gameKey = await CreateUniqueGameKey(model.Name);
+        var gameKey = await CreateUniqueGameKeyAsync(model.Name);
 
         var game = _mapper.Map<Game>(model);
         game.Key = gameKey;
@@ -59,16 +69,16 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<ICollection<Game>> GetByGenreAsync(Genre genre)
+    public async Task<ICollection<Game>> GetByGenreAsync(Guid genreId)
     {
-        var result = await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genre));
+        var result = await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genreId));
 
         return result;
     }
 
     public async Task<Game> GetByKeyAsync(string gameKey)
     {
-        var result = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey));
+        var result = await GameRepository.GetSingleBySpecAsync(new GameByKeyWithDetailsSpec(gameKey));
 
         if (result is null)
         {
@@ -106,7 +116,7 @@ public class GameService : IGameService
 
     public async Task DeleteAsync(Guid id)
     {
-        var game = await GameRepository.GetByIdAsync(id);
+        var game = await GameRepository.GetSingleBySpecAsync(new GameByIdSpec(id));
 
         if (game is null)
         {
@@ -123,7 +133,7 @@ public class GameService : IGameService
 
     public async Task<byte[]> GetFileAsync(string gameKey)
     {
-        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey));
+        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeyWithDetailsSpec(gameKey));
 
         if (game is null)
         {
@@ -136,30 +146,57 @@ public class GameService : IGameService
 
     private async Task SetUpdatedValues(Game game, GameUpdateModel updateModel)
     {
-        var genres = await GenreRepository.GetBySpecAsync(new GenresByIdsSpec(updateModel.GenresIds));
-        var platformTypes = await
-            PlatformTypesRepository.GetBySpecAsync(new PlatformTypesByIdsSpec(updateModel.PlatformsIds));
+        await CheckGenresExists(updateModel.GenresIds);
+        await CheckPlatformsExists(updateModel.PlatformsIds);
+        
+        await UpdateRelationships(game, updateModel);
 
         game.Name = updateModel.Name;
         game.Description = updateModel.Description;
         game.File = updateModel.File;
-        game.Genres = genres;
-        game.Platforms = platformTypes;
     }
 
-    private async Task<string> CreateUniqueGameKey(string source)
+    private async Task CheckGenresExists(ICollection<Guid> genresIds)
+    {
+        foreach (var genreId in genresIds)
+            if (await GenreRepository.AnyAsync(new GenreByIdSpec(genreId)) == false)
+                throw new ItemNotFoundException($"Genre not found. {nameof(genreId)} = {genreId}");
+    }
+    
+    private async Task CheckPlatformsExists(ICollection<Guid> platformsIds)
+    {
+        foreach (var platformId in platformsIds)
+            if (await PlatformTypesRepository.AnyAsync(new PlatformTypeByIdSpec(platformId)) == false)
+                throw new ItemNotFoundException($"Platform not found. {nameof(platformId)} = {platformId}");
+    }
+
+    private async Task UpdateRelationships(Game game, GameUpdateModel updateModel)
+    {
+        await _gameGenreService.DeleteBySpecAsync(new GameGenresByGameId(updateModel.Id));
+        await _gamePlatformService.DeleteBySpecAsync(new GamePlatformsByPlatformId(updateModel.Id));
+
+        var newGameGenres =
+            updateModel.GenresIds.Select(id => new GameGenre { GameId = game.Id, GenreId = id });
+        var newGamePlatforms =
+            updateModel.PlatformsIds.Select(id => new GamePlatformType { GameId = game.Id, PlatformId = id });
+
+        await _gameGenreService.AddRangeAsync(newGameGenres);
+        await _gamePlatformService.AddRangeAsync(newGamePlatforms);
+    }
+
+    private async Task<string> CreateUniqueGameKeyAsync(string source)
     {
         var gameKey = _gameKeyAliasCraft.CreateAlias(source);
 
-        if (await IsKeyUnique(gameKey) == false)
+        if (await IsKeyUniqueAsync(gameKey) == false)
         {
-            return await CreateGameKeyWithCode(source);
+            return await CreateGameKeyWithCodeAsync(source);
         }
 
         return gameKey;
     }
 
-    private async Task<string> CreateGameKeyWithCode(string source)
+    private async Task<string> CreateGameKeyWithCodeAsync(string source)
     {
         var attemptCode = 1;
 
@@ -167,7 +204,7 @@ public class GameService : IGameService
         {
             var gameKey = CreateAliasWithCode(source, attemptCode++);
 
-            if (await IsKeyUnique(gameKey))
+            if (await IsKeyUniqueAsync(gameKey))
             {
                 return gameKey;
             }
@@ -179,8 +216,8 @@ public class GameService : IGameService
         return _gameKeyAliasCraft.CreateAlias(source + "--" + code);
     }
 
-    private async Task<bool> IsKeyUnique(string gameKey)
+    private async Task<bool> IsKeyUniqueAsync(string gameKey)
     {
-        return await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false;
+        return await GameRepository.AnyAsync(new GameByKeyWithDetailsSpec(gameKey)) == false;
     }
 }

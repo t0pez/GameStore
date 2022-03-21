@@ -1,5 +1,6 @@
 ﻿using GameStore.Core.Interfaces;
 using GameStore.Core.Services;
+using GameStore.Core.Services.RelationshipModelsServices;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,6 +13,7 @@ public static class DependencyResolverModule
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>()
             .AddScoped<IGameService, GameService>()
-            .AddScoped<ICommentService, CommentService>();
+            .AddScoped<ICommentService, CommentService>()
+            .AddScoped(typeof(IRelationshipModelService<>), typeof(RelationshipModelService<>)); 
     }
 }

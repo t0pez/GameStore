@@ -2,9 +2,9 @@
 
 namespace GameStore.Core.Models.Comments.Specifications;
 
-internal class CommentsByGameKey : Specification<Comment>
+internal class CommentsByGameKeySpec : Specification<Comment>
 {
-    public CommentsByGameKey(string gameKey)
+    public CommentsByGameKeySpec(string gameKey)
     {
         Query
             .Where(c => c.Game.Key == gameKey)

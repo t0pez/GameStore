@@ -16,7 +16,5 @@ internal class GenreConfiguration : IEntityTypeConfiguration<Genre>
         builder.HasMany(genre => genre.SubGenres)
             .WithOne(subGenre => subGenre.Parent)
             .HasForeignKey(subGenre => subGenre.ParentId);
-        builder.HasMany(genre => genre.Games)
-            .WithMany(game => game.Genres);
     }
 }

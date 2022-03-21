@@ -2,12 +2,13 @@
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-internal class GamesWithDetailsSpec : Specification<Game>
+internal class GameByKeyWithDetailsSpec : Specification<Game>, ISingleResultSpecification
 {
-    public GamesWithDetailsSpec()
+    public GameByKeyWithDetailsSpec(string gameKey)
     {
         Query
-            .Where(g => g.IsDeleted == false)
+            .Where(g => g.Key == gameKey 
+                        && g.IsDeleted == false)
             .Include(g => g.Comments)
             .Include(g => g.Genres)
             .ThenInclude(gameGenre => gameGenre.Genre)

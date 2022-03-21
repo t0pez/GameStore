@@ -11,7 +11,7 @@ internal class GamesByPlatformTypesSpec : Specification<Game>
     {
         Query
             .Where(game => game.Platforms
-                            .Select(type => type.Id)
+                            .Select(type => type.PlatformId)
                             .All(x => platformTypesIds.Contains(x))
                         && game.IsDeleted == false);
     }

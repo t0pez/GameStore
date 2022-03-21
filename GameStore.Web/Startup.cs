@@ -59,9 +59,6 @@ public class Startup
             app.UseSwaggerUI();
         }
 
-        dbContext.Database.EnsureCreated();
-        dbContext.SeedData();
-            
         app.UseMiddleware<ExceptionMiddleware>();
 
         app.UseHttpsRedirection();

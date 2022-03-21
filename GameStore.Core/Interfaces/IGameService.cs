@@ -9,7 +9,7 @@ namespace GameStore.Core.Interfaces;
 public interface IGameService
 {
     Task<ICollection<Game>> GetAllAsync();
-    Task<ICollection<Game>> GetByGenreAsync(Genre genre);
+    Task<ICollection<Game>> GetByGenreAsync(Guid genreId);
     Task<ICollection<Game>> GetByPlatformTypesAsync(ICollection<Guid> platformTypesIds);
     Task<Game> GetByKeyAsync(string key);
     Task<Game> CreateAsync(GameCreateModel createModel);

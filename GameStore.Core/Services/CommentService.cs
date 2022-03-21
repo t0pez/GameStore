@@ -32,7 +32,7 @@ public class CommentService : ICommentService
 
     public async Task CommentGameAsync(CommentCreateModel model)
     {
-        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(model.GameKey));
+        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeyWithDetailsSpec(model.GameKey));
 
         if (game is null)
         {
@@ -53,20 +53,20 @@ public class CommentService : ICommentService
 
     public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
     {
-        if (await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
+        if (await GameRepository.AnyAsync(new GameByKeyWithDetailsSpec(gameKey)) == false)
         {
             throw new ItemNotFoundException("Game not found. " +
                                             $"{nameof(gameKey)} = {gameKey}");
         }
 
-        var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKey(gameKey));
+        var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKeySpec(gameKey));
 
         return result;
     }
 
     public async Task ReplyCommentAsync(ReplyCreateModel createModel)
     {
-        var parent = await CommentRepository.GetByIdAsync(createModel.ParentId);
+        var parent = await CommentRepository.GetSingleBySpecAsync(new CommentByParentIdSpec(createModel.ParentId));
 
         if (parent is null)
         {
