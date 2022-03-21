@@ -3,12 +3,12 @@ using Ardalis.Specification;
 
 namespace GameStore.Core.Models.Comments.Specifications;
 
-internal sealed class CommentByParentIdSpec : Specification<Comment>
+internal sealed class CommentByIdSpec : Specification<Comment>
 {
-    public CommentByParentIdSpec(Guid parentId)
+    public CommentByIdSpec(Guid id)
     {
         Query
-            .Where(comment => comment.ParentId == parentId
+            .Where(comment => comment.Id == id
                               && comment.IsDeleted == false);
     }
 }

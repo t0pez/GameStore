@@ -32,7 +32,7 @@ public class CommentService : ICommentService
 
     public async Task CommentGameAsync(CommentCreateModel model)
     {
-        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeyWithDetailsSpec(model.GameKey));
+        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(model.GameKey));
 
         if (game is null)
         {
@@ -53,7 +53,7 @@ public class CommentService : ICommentService
 
     public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
     {
-        if (await GameRepository.AnyAsync(new GameByKeyWithDetailsSpec(gameKey)) == false)
+        if (await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
         {
             throw new ItemNotFoundException("Game not found. " +
                                             $"{nameof(gameKey)} = {gameKey}");
@@ -66,22 +66,20 @@ public class CommentService : ICommentService
 
     public async Task ReplyCommentAsync(ReplyCreateModel createModel)
     {
-        var parent = await CommentRepository.GetSingleBySpecAsync(new CommentByParentIdSpec(createModel.ParentId));
-
-        if (parent is null)
+        if (await CommentRepository.AnyAsync(new CommentByIdSpec(createModel.ParentId)) == false)
         {
             throw new ItemNotFoundException("Parent comment with such id doesn't exists." +
-                                            $"{nameof(parent.Id)} = {createModel.ParentId}");
+                                            $"{nameof(createModel.ParentId)} = {createModel.ParentId}");
         }
 
         var reply = _mapper.Map<Comment>(createModel);
-        reply.GameId = parent.GameId;
+        reply.GameId = createModel.GameId;
         reply.DateOfCreation = DateTime.UtcNow;
 
         await CommentRepository.AddAsync(reply);
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Reply successfully added for comment. " +
-                               $"{nameof(parent.Id)} = {parent.Id}, {nameof(reply.Id)} = {reply.Id}");
+                               $"{nameof(reply.ParentId)} = {reply.ParentId}, {nameof(reply.Id)} = {reply.Id}");
     }
 }

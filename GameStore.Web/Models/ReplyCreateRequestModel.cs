@@ -1,12 +1,11 @@
 ﻿using System;
-using Microsoft.AspNetCore.Mvc;
 
 namespace GameStore.Web.Models;
 
 public class ReplyCreateRequestModel
 {
-    [FromRoute(Name = "gameKey")] public string GameKey { get; set; }
-    [FromBody] public Guid ParentId { get; set; }
-    [FromBody] public string AuthorName { get; set; }
-    [FromBody] public string Message { get; set; }
+    public Guid GameId { get; set; }
+    public Guid ParentId { get; set; }
+    public string AuthorName { get; set; }
+    public string Message { get; set; }
 }
