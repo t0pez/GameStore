@@ -1,5 +1,4 @@
-﻿using GameStore.Core.Models.Games;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GameStore.Core.Models.Records;

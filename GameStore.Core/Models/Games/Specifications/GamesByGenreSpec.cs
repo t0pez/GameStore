@@ -4,13 +4,14 @@ using System.Linq;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-public class GamesByGenreSpec : Specification<Game>
+internal sealed class GamesByGenreSpec : Specification<Game>
 {
     public GamesByGenreSpec(Guid genreId)
     {
         Query
-            .Where(g => g.Genres.Select(gameGenre => gameGenre.GenreId)
-                         .Any(id => id == genreId)
-                        && g.IsDeleted == false);
+            .Where(game => game.Genres
+                               .Select(gameGenre => gameGenre.GenreId)
+                               .Any(id => id == genreId)
+                           && game.IsDeleted == false);
     }
 }

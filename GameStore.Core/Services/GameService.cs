@@ -11,9 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GameStore.Core.Interfaces.RelationshipModelsServices;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Core.Models.RelationalModels.Specifications;
-using GameStore.Core.Services.RelationshipModelsServices;
 
 namespace GameStore.Core.Services;
 
@@ -105,7 +105,7 @@ public class GameService : IGameService
                                             $"Id = {updateModel.Id}");
         }
 
-        await SetUpdatedValues(game, updateModel);
+        await UpdateGameValues(game, updateModel);
 
         await GameRepository.UpdateAsync(game);
         await _unitOfWork.SaveChangesAsync();
@@ -144,44 +144,53 @@ public class GameService : IGameService
         return game.File;
     }
 
-    private async Task SetUpdatedValues(Game game, GameUpdateModel updateModel)
+    private async Task UpdateGameValues(Game game, GameUpdateModel updateModel)
     {
-        await CheckGenresExists(updateModel.GenresIds);
-        await CheckPlatformsExists(updateModel.PlatformsIds);
+        await AssertGenresExistsAsync(updateModel.GenresIds);
+        await AssertPlatformsExistsAsync(updateModel.PlatformsIds);
         
-        await UpdateRelationships(game, updateModel);
+        await UpdateGameRelationshipModelsAsync(updateModel);
 
         game.Name = updateModel.Name;
         game.Description = updateModel.Description;
         game.File = updateModel.File;
     }
 
-    private async Task CheckGenresExists(ICollection<Guid> genresIds)
+    private async Task AssertGenresExistsAsync(IEnumerable<Guid> genresIds)
     {
         foreach (var genreId in genresIds)
             if (await GenreRepository.AnyAsync(new GenreByIdSpec(genreId)) == false)
                 throw new ItemNotFoundException($"Genre not found. {nameof(genreId)} = {genreId}");
     }
     
-    private async Task CheckPlatformsExists(ICollection<Guid> platformsIds)
+    private async Task AssertPlatformsExistsAsync(IEnumerable<Guid> platformsIds)
     {
         foreach (var platformId in platformsIds)
             if (await PlatformTypesRepository.AnyAsync(new PlatformTypeByIdSpec(platformId)) == false)
                 throw new ItemNotFoundException($"Platform not found. {nameof(platformId)} = {platformId}");
     }
 
-    private async Task UpdateRelationships(Game game, GameUpdateModel updateModel)
+    private async Task UpdateGameRelationshipModelsAsync(GameUpdateModel updateModel)
     {
-        await _gameGenreService.DeleteBySpecAsync(new GameGenresByGameId(updateModel.Id));
-        await _gamePlatformService.DeleteBySpecAsync(new GamePlatformsByPlatformId(updateModel.Id));
+        await DeletePreviousGameRelationshipsAsync(updateModel.Id);
+        await AddNewGameRelationshipsAsync(updateModel);
+    }
 
+    private async Task AddNewGameRelationshipsAsync(GameUpdateModel updateModel)
+    {
         var newGameGenres =
-            updateModel.GenresIds.Select(id => new GameGenre { GameId = game.Id, GenreId = id });
+            updateModel.GenresIds.Select(id => new GameGenre { GameId = updateModel.Id, GenreId = id });
         var newGamePlatforms =
-            updateModel.PlatformsIds.Select(id => new GamePlatformType { GameId = game.Id, PlatformId = id });
+            updateModel.PlatformsIds.Select(id => new GamePlatformType { GameId = updateModel.Id, PlatformId = id });
 
         await _gameGenreService.AddRangeAsync(newGameGenres);
         await _gamePlatformService.AddRangeAsync(newGamePlatforms);
+    }
+
+    private async Task DeletePreviousGameRelationshipsAsync(Guid gameId)
+    {
+        await _gameGenreService.DeleteBySpecAsync(new GameGenresByGameId(gameId));
+        await _gamePlatformService.DeleteBySpecAsync(new GamePlatformsByPlatformId(gameId));
     }
 
     private async Task<string> CreateUniqueGameKeyAsync(string source)

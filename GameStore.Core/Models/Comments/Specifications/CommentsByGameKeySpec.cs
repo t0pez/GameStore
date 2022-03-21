@@ -2,13 +2,14 @@
 
 namespace GameStore.Core.Models.Comments.Specifications;
 
-internal class CommentsByGameKeySpec : Specification<Comment>
+internal sealed class CommentsByGameKeySpec : Specification<Comment>
 {
     public CommentsByGameKeySpec(string gameKey)
     {
         Query
-            .Where(c => c.Game.Key == gameKey)
-            .Include(c => c.Replies)
-            .Include(c => c.Game);
+            .Where(comment => comment.Game.Key == gameKey
+                              && comment.IsDeleted == false)
+            .Include(comment => comment.Replies)
+            .Include(comment => comment.Game);
     }
 }

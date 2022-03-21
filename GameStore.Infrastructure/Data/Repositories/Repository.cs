@@ -2,10 +2,8 @@
 using Ardalis.Specification.EntityFrameworkCore;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.SharedKernel;
-using GameStore.SharedKernel.Interfaces;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -23,19 +21,19 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
 
     private DbSet<TModel> Set => _context.Set<TModel>();
 
-    public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> specification = null)
+    public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> spec = null)
     {
-        if (specification is null)
+        if (spec is null)
             return Set.ToListAsync();
 
-        var specificationResult = ApplySpecifications(specification);
+        var specificationResult = ApplySpecifications(spec);
 
         return specificationResult.ToListAsync();
     }
         
-    public Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> specification)
+    public Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> spec)
     {
-        var specificationResult = ApplySpecifications(specification);
+        var specificationResult = ApplySpecifications(spec);
 
         return specificationResult.SingleOrDefaultAsync();
     }
@@ -60,9 +58,9 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
        return Task.Run(() => Set.Remove(model));
     }
 
-    public Task<bool> AnyAsync(ISpecification<TModel> specification)
+    public Task<bool> AnyAsync(ISpecification<TModel> spec)
     {
-        var specResult = ApplySpecifications(specification);
+        var specResult = ApplySpecifications(spec);
 
         return specResult.AnyAsync();
     }

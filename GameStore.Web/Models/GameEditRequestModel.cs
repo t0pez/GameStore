@@ -1,5 +1,4 @@
-﻿using GameStore.Web.ViewModels;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GameStore.Web.Models;

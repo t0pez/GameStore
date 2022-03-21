@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace GameStore.Core.Helpers.AliasCrafting;
+﻿namespace GameStore.Core.Helpers.AliasCrafting;
 
 internal class AliasCraftBuilder
 {

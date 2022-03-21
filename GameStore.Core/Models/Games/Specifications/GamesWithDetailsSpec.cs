@@ -2,7 +2,7 @@
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-internal class GamesWithDetailsSpec : Specification<Game>
+internal sealed class GamesWithDetailsSpec : Specification<Game>
 {
     public GamesWithDetailsSpec()
     {

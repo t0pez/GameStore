@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Ardalis.Specification;
+using GameStore.Core.Interfaces.RelationshipModelsServices;
 using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 
@@ -32,20 +33,11 @@ public class RelationshipModelService<TModel> : IRelationshipModelService<TModel
         return Repository.DeleteAsync(model);
     }
 
-    public async Task DeleteBySpecAsync(ISpecification<TModel> specification)
+    public async Task DeleteBySpecAsync(ISpecification<TModel> spec)
     {
-        var specificationResult = await Repository.GetBySpecAsync(specification);
+        var specificationResult = await Repository.GetBySpecAsync(spec);
 
         foreach (var model in specificationResult) 
             await Repository.DeleteAsync(model);
     }
 }
-
-public interface IRelationshipModelService<TModel> where TModel : RelationshipModel
-{
-    public Task AddAsync(TModel model);
-    public Task AddRangeAsync(IEnumerable<TModel> models);
-    public Task DeleteAsync(TModel model);
-    public Task DeleteBySpecAsync(ISpecification<TModel> specification);
-}
-

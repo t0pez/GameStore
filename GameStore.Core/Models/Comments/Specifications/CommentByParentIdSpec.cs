@@ -3,7 +3,7 @@ using Ardalis.Specification;
 
 namespace GameStore.Core.Models.Comments.Specifications;
 
-public class CommentByParentIdSpec : Specification<Comment>
+internal sealed class CommentByParentIdSpec : Specification<Comment>
 {
     public CommentByParentIdSpec(Guid parentId)
     {

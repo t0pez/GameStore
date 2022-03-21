@@ -17,7 +17,7 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.Property(game => game.IsDeleted).IsRequired();
 
         builder.HasMany(game => game.Comments)
-            .WithOne(comment => comment.Game)
-            .HasForeignKey(comment => comment.GameId);
+               .WithOne(comment => comment.Game)
+               .HasForeignKey(comment => comment.GameId);
     }
 }

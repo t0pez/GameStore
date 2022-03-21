@@ -3,7 +3,6 @@ using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace GameStore.Infrastructure.Data.Repositories;
@@ -33,9 +32,9 @@ public class UnitOfWork : IUnitOfWork
         return (IRepository<TModel>)_repositories[modelType];
     }
 
-    public async Task<int> SaveChangesAsync()
+    public Task<int> SaveChangesAsync()
     {
-        return await _context.SaveChangesAsync();
+        return _context.SaveChangesAsync();
     }
 
     private bool HasRepositoryOfModelType(Type type)

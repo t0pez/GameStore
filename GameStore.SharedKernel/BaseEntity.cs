@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace GameStore.SharedKernel;
+﻿namespace GameStore.SharedKernel;
 
 public class BaseEntity
 {

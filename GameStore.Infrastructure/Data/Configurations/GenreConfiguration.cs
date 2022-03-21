@@ -14,7 +14,7 @@ internal class GenreConfiguration : IEntityTypeConfiguration<Genre>
         builder.Property(genre => genre.IsDeleted).IsRequired();
 
         builder.HasMany(genre => genre.SubGenres)
-            .WithOne(subGenre => subGenre.Parent)
-            .HasForeignKey(subGenre => subGenre.ParentId);
+               .WithOne(subGenre => subGenre.Parent)
+               .HasForeignKey(subGenre => subGenre.ParentId);
     }
 }

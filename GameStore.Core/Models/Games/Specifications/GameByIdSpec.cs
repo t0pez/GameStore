@@ -3,7 +3,7 @@ using Ardalis.Specification;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-public class GameByIdSpec : Specification<Game>
+internal sealed class GameByIdSpec : Specification<Game>
 {
     public GameByIdSpec(Guid id)
     {

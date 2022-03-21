@@ -16,13 +16,13 @@ internal class CommentConfiguration : IEntityTypeConfiguration<Comment>
         builder.Property(comment => comment.IsDeleted).IsRequired();
 
         builder.HasOne(comment => comment.Game)
-            .WithMany(game => game.Comments)
-            .HasForeignKey(comment => comment.GameId);
+               .WithMany(game => game.Comments)
+               .HasForeignKey(comment => comment.GameId);
         builder.HasOne(comment => comment.Parent)
-            .WithMany(comment => comment.Replies)
-            .HasForeignKey(reply => reply.ParentId);
+               .WithMany(comment => comment.Replies)
+               .HasForeignKey(reply => reply.ParentId);
         builder.HasMany(comment => comment.Replies)
-            .WithOne(reply => reply.Parent)
-            .HasForeignKey(reply => reply.ParentId);
+               .WithOne(reply => reply.Parent)
+               .HasForeignKey(reply => reply.ParentId);
     }
 }

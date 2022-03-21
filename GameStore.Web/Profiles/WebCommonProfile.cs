@@ -18,20 +18,11 @@ public class WebCommonProfile : Profile
         CreateMap<ReplyCreateRequestModel, ReplyCreateModel>().ReverseMap();
 
         CreateMap<Game, GameViewModel>();
-        CreateMap<Genre, GenreViewModel>();
-        CreateMap<PlatformType, PlatformTypeViewModel>();
         CreateMap<Comment, CommentViewModel>()
             .ForMember(model => model.GameKey,
                        expression => expression.MapFrom(comment => comment.Game.Key))
             .ForMember(model => model.AuthorName,
                        expression => expression.MapFrom(comment => comment.Name));
-
-        CreateMap<GameGenre, Genre>()
-            .ForSourceMember(gameGenre => gameGenre.Genre,
-                             expression => expression.DoNotValidate());
-        CreateMap<GamePlatformType, PlatformType>()
-            .ForSourceMember(gameGenre => gameGenre.Platform,
-                             expression => expression.DoNotValidate());
 
         CreateMap<GameGenre, GenreViewModel>()
             .ForMember(viewModel => viewModel.Id,

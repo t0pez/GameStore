@@ -5,14 +5,14 @@ using System.Linq;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-internal class GamesByPlatformTypesSpec : Specification<Game>
+internal sealed class GamesByPlatformTypesSpec : Specification<Game>
 {
     public GamesByPlatformTypesSpec(ICollection<Guid> platformTypesIds)
     {
         Query
             .Where(game => game.Platforms
-                            .Select(type => type.PlatformId)
-                            .All(x => platformTypesIds.Contains(x))
-                        && game.IsDeleted == false);
+                               .Select(type => type.PlatformId)
+                               .All(platformTypesIds.Contains)
+                           && game.IsDeleted == false);
     }
 }

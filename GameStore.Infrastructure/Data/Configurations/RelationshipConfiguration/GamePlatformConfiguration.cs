@@ -9,11 +9,11 @@ public class GamePlatformConfiguration : IEntityTypeConfiguration<GamePlatformTy
     public void Configure(EntityTypeBuilder<GamePlatformType> builder)
     {
         builder.HasKey(gamePlatform => new { gamePlatform.GameId, gamePlatform.PlatformId });
-        
+
         builder.HasOne(gamePlatform => gamePlatform.Game)
                .WithMany(game => game.Platforms)
                .HasForeignKey(platform => platform.GameId);
-        
+
         builder.HasOne(gamePlatform => gamePlatform.Platform)
                .WithMany(game => game.Games)
                .HasForeignKey(platform => platform.PlatformId);
