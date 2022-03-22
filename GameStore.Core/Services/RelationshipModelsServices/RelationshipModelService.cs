@@ -2,12 +2,11 @@
 using System.Threading.Tasks;
 using Ardalis.Specification;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
-using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 
 namespace GameStore.Core.Services.RelationshipModelsServices;
 
-public class RelationshipModelService<TModel> : IRelationshipModelService<TModel> where TModel : RelationshipModel
+public class RelationshipModelService<TModel> : IRelationshipModelService<TModel> where TModel : class
 {
     private readonly IUnitOfWork _unitOfWork;
 

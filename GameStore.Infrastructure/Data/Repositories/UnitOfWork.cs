@@ -1,5 +1,4 @@
 ﻿using GameStore.Infrastructure.Data.Context;
-using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using System;
 using System.Collections.Generic;
@@ -18,7 +17,7 @@ public class UnitOfWork : IUnitOfWork
         _repositories = new Dictionary<Type, object>();
     }
 
-    public IRepository<TModel> GetRepository<TModel>() where TModel : BaseEntity
+    public IRepository<TModel> GetRepository<TModel>() where TModel : class
     {
         var modelType = typeof(TModel);
 

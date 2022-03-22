@@ -4,6 +4,6 @@ namespace GameStore.SharedKernel.Interfaces.DataAccess;
 
 public interface IUnitOfWork
 {
-    IRepository<TModel> GetRepository<TModel>() where TModel : BaseEntity;
+    IRepository<TModel> GetRepository<TModel>() where TModel : class;
     Task<int> SaveChangesAsync();
 }

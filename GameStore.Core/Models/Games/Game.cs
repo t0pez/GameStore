@@ -1,5 +1,4 @@
 ﻿using System;
-using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces;
 using System.Collections.Generic;
 using GameStore.Core.Models.Comments;
@@ -7,7 +6,7 @@ using GameStore.Core.Models.RelationalModels;
 
 namespace GameStore.Core.Models.Games;
 
-public class Game : BaseEntity, ISafeDelete
+public class Game : ISafeDelete
 {
     public Game(string key, string name, string description, byte[] file)
     {

@@ -1,12 +1,11 @@
 ﻿using GameStore.Core.Models.Games;
-using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces;
 using System;
 using System.Collections.Generic;
 
 namespace GameStore.Core.Models.Comments;
 
-public class Comment : BaseEntity, ISafeDelete
+public class Comment : ISafeDelete
 {
     public Comment(string name, string body, Game game, Comment parent = null)
     {

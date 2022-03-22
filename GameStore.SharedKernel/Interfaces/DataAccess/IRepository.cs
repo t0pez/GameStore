@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace GameStore.SharedKernel.Interfaces.DataAccess;
 
-public interface IRepository<TModel> where TModel : BaseEntity
+public interface IRepository<TModel> where TModel : class
 {
     Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> spec = null);
     Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> spec);

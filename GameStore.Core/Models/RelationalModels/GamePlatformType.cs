@@ -1,10 +1,9 @@
 ﻿using System;
 using GameStore.Core.Models.Games;
-using GameStore.SharedKernel;
 
 namespace GameStore.Core.Models.RelationalModels;
 
-public class GamePlatformType : RelationshipModel
+public class GamePlatformType
 {
     public Guid GameId { get; set; }
     public Guid PlatformId { get; set; }

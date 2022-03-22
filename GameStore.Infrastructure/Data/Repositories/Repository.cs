@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace GameStore.Infrastructure.Data.Repositories;
 
-public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
+public class Repository<TModel> : IRepository<TModel> where TModel : class
 {
     private readonly ApplicationContext _context;
 
