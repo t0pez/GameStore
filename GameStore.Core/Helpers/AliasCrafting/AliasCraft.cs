@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.Generic;
+using System.Text;
 
 namespace GameStore.Core.Helpers.AliasCrafting;
 
@@ -26,9 +27,11 @@ public class AliasCraft : IAliasCraft
             ReplaceSymbolsInPairs(builder, pair);
     }
 
-    private static void ReplaceSymbolsInPairs(StringBuilder builder, ReplacingPair pair)
+    private static void ReplaceSymbolsInPairs(StringBuilder builder, KeyValuePair<List<string>, string> pair)
     {
-        foreach (var oldValue in pair.OldValues)
-            builder.Replace(oldValue, pair.NewValue);
+        var (oldValues, newValue) = pair;
+        
+        foreach (var oldValue in oldValues)
+            builder.Replace(oldValue, newValue);
     }
 }

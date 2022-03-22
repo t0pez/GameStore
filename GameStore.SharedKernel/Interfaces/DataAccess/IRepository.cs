@@ -12,5 +12,6 @@ public interface IRepository<TModel> where TModel : BaseEntity
     Task AddRangeAsync(IEnumerable<TModel> models);
     Task UpdateAsync(TModel updated);
     Task DeleteAsync(TModel model);
+    Task DeleteRangeAsync(IEnumerable<TModel> models);
     Task<bool> AnyAsync(ISpecification<TModel> spec);
 }

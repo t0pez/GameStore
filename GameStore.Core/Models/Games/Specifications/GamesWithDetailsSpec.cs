@@ -11,6 +11,7 @@ internal sealed class GamesWithDetailsSpec : Specification<Game>
             .Include(g => g.Comments)
             .Include(g => g.Genres)
             .ThenInclude(gameGenre => gameGenre.Genre)
+            .ThenInclude(genre => genre.SubGenres)
             .Include(g => g.Platforms)
             .ThenInclude(gamePlatform => gamePlatform.Platform);
     }

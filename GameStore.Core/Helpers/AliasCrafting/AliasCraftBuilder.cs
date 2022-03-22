@@ -1,4 +1,6 @@
-﻿namespace GameStore.Core.Helpers.AliasCrafting;
+﻿using System.Linq;
+
+namespace GameStore.Core.Helpers.AliasCrafting;
 
 internal class AliasCraftBuilder
 {
@@ -11,6 +13,6 @@ internal class AliasCraftBuilder
 
     public ReplacingPairBuilder Values(params string[] values)
     {
-        return new ReplacingPairBuilder(this, values);
+        return new ReplacingPairBuilder(this, values.ToList());
     }
 }

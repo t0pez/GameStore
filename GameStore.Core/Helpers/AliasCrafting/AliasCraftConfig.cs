@@ -4,5 +4,5 @@ namespace GameStore.Core.Helpers.AliasCrafting;
 
 public class AliasCraftConfig
 {
-    public List<ReplacingPair> ReplacingPairs { get; set; } = new();
+    public Dictionary<List<string>, string> ReplacingPairs { get; set; } = new();
 }

@@ -37,7 +37,6 @@ public class RelationshipModelService<TModel> : IRelationshipModelService<TModel
     {
         var specificationResult = await Repository.GetBySpecAsync(spec);
 
-        foreach (var model in specificationResult) 
-            await Repository.DeleteAsync(model);
+        await Repository.DeleteRangeAsync(specificationResult);
     }
 }

@@ -1,19 +1,22 @@
-﻿namespace GameStore.Core.Helpers.AliasCrafting;
+﻿using System.Collections.Generic;
+
+namespace GameStore.Core.Helpers.AliasCrafting;
 
 internal class ReplacingPairBuilder
 {
     private readonly AliasCraftBuilder _builder;
-    private readonly ReplacingPair _pair = new();
+    private readonly List<string> _oldValues;
+    private string _newValue;
 
-    public ReplacingPairBuilder(AliasCraftBuilder builder, string[] oldValues)
+    public ReplacingPairBuilder(AliasCraftBuilder builder, List<string> oldValues)
     {
         _builder = builder;
-        _pair.OldValues = oldValues;
+        _oldValues = oldValues;
     }
 
     public AliasCraftBuilder ReplaceWith(string newValue)
     {
-        _pair.NewValue = newValue;
+        _newValue = newValue;
         AddNewPairToConfig();
         
         return _builder;
@@ -26,7 +29,6 @@ internal class ReplacingPairBuilder
 
     private void AddNewPairToConfig()
     {
-        foreach (var oldValue in _pair.OldValues) 
-            _builder.Config.ReplacingPairs.Add(_pair);
+        _builder.Config.ReplacingPairs.Add(_oldValues, _newValue);
     }
 }

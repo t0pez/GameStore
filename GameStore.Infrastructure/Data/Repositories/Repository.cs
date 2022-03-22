@@ -57,6 +57,11 @@ public class Repository<TModel> : IRepository<TModel> where TModel : BaseEntity
     {
        return Task.Run(() => Set.Remove(model));
     }
+    
+    public Task DeleteRangeAsync(IEnumerable<TModel> models)
+    {
+       return Task.Run(() => Set.RemoveRange(models));
+    }
 
     public Task<bool> AnyAsync(ISpecification<TModel> spec)
     {
