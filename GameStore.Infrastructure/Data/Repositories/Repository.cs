@@ -1,7 +1,6 @@
 ﻿using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using GameStore.Infrastructure.Data.Context;
-using GameStore.SharedKernel;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;

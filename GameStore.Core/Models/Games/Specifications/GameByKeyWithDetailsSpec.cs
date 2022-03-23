@@ -2,7 +2,7 @@
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-internal sealed class GameByKeyWithDetailsSpec : Specification<Game>, ISingleResultSpecification
+public sealed class GameByKeyWithDetailsSpec : Specification<Game>, ISingleResultSpecification
 {
     public GameByKeyWithDetailsSpec(string gameKey)
     {
