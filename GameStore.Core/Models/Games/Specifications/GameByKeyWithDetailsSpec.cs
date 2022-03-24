@@ -6,6 +6,8 @@ public sealed class GameByKeyWithDetailsSpec : Specification<Game>, ISingleResul
 {
     public GameByKeyWithDetailsSpec(string gameKey)
     {
+        Key = gameKey;
+        
         Query
             .Where(g => g.Key == gameKey
                         && g.IsDeleted == false)
@@ -15,4 +17,6 @@ public sealed class GameByKeyWithDetailsSpec : Specification<Game>, ISingleResul
             .Include(g => g.Platforms)
             .ThenInclude(gamePlatform => gamePlatform.Platform);
     }
+    
+    public string Key { get; }
 }

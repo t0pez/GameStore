@@ -1,8 +1,6 @@
 ﻿using System;
 using Ardalis.Specification;
 using GameStore.Core.Models.Games;
-using GameStore.Core.Models.Games.Specifications;
-using GameStore.Core.Models.RelationalModels;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.Infrastructure.Tests.TestData.Repositories;
@@ -14,20 +12,12 @@ namespace GameStore.Infrastructure.Tests.Repositories;
 
 public class RepositoryTests
 {
-    private IRepository<Game> _gameRepository;
-    private ApplicationContext _context;
+    private readonly IRepository<Game> _gameRepository;
+    private readonly ApplicationContext _context;
 
     public RepositoryTests()
     {
-        SetUp();
-    }
-    
-    private void SetUp()
-    {
         var context = GetInMemoryContext();
-        
-        context.Database.EnsureDeleted();
-        context.Database.EnsureCreated();
         
         SetTestContextData(context);
         context.ChangeTracker.Clear();
@@ -145,38 +135,13 @@ public class RepositoryTests
         
         Assert.Equal(expectedCount, actualResultCount);
     }
-    
-    [Fact]
-    public async void DeleteAsync_NotExistingModel_ThrowsException()
-    {
-        
-    }
-    
-    [Fact]
-    public async void DeleteRangeAsync_ExistingModels()
-    {
-        
-    }
-    
-    [Fact]
-    public async void DeleteRangeAsync_NotExistingModels_ThrowsException()
-    {
-        
-    }
-    
-    [Fact]
-    public async void AnyAsync_ExistingModels()
-    {
-        
-    }
-    
+
     private ApplicationContext GetInMemoryContext()
     {
         var dbOptionBuilder = new DbContextOptionsBuilder<ApplicationContext>();
-        dbOptionBuilder.UseInMemoryDatabase("GameStoreDb")
+        dbOptionBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString())
                        .EnableDetailedErrors()
-                       .EnableSensitiveDataLogging()
-                       .UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+                       .EnableSensitiveDataLogging();
         
         var context = new ApplicationContext(dbOptionBuilder.Options);
 
