@@ -25,8 +25,8 @@ public class GameServiceTests
     private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<IRelationshipModelService<GameGenre>> _gameGenreServiceMock;
     private readonly Mock<IRelationshipModelService<GamePlatformType>> _gamePlatformServiceMock;
-    
-    
+
+
     public GameServiceTests()
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
@@ -37,8 +37,8 @@ public class GameServiceTests
         _gamePlatformServiceMock = new Mock<IRelationshipModelService<GamePlatformType>>();
 
         _unitOfWorkMock.Setup(unit => unit.GetRepository<Game>())
-                .Returns(_gameRepoMock.Object);
-        
+                       .Returns(_gameRepoMock.Object);
+
         _gameService = new GameService(_unitOfWorkMock.Object, _loggerMock.Object, _mapperMock.Object,
                                        _gameGenreServiceMock.Object, _gamePlatformServiceMock.Object);
     }
@@ -56,7 +56,7 @@ public class GameServiceTests
 
         Assert.Equal(expectedCount, actualCount);
     }
-    
+
     [Fact]
     public async void GetByKeyAsync_ExistingKey_ReturnsGames()
     {
@@ -69,7 +69,7 @@ public class GameServiceTests
         var actualResult = await _gameService.GetByKeyAsync(gameKey);
         var actualId = actualResult.Id;
         var actualGameKey = actualResult.Key;
-        
+
         Assert.Equal(gameId, actualId);
         Assert.Equal(gameKey, actualGameKey);
     }
@@ -78,10 +78,11 @@ public class GameServiceTests
     public async void GetByKeyAsync_NotExistingKey_ThrowsNotFoundException()
     {
         const string gameKey = "not-existing-game-key";
-        
+        Game gameByKey = null!;
+
         _gameRepoMock.Setup(repository => repository.GetSingleBySpecAsync(It.IsAny<GameByKeyWithDetailsSpec>()))
-                     .ReturnsAsync((Game)null!);
-        
+                     .ReturnsAsync(gameByKey);
+
         var operation = async () => await _gameService.GetByKeyAsync(gameKey);
 
         await Assert.ThrowsAsync<ItemNotFoundException>(operation);
@@ -95,19 +96,19 @@ public class GameServiceTests
         {
             Name = "Some name"
         };
-        
+
         _gameRepoMock.Setup(repository => repository.AnyAsync(It.IsAny<GameByKeySpec>()))
                      .ReturnsAsync(false);
         _mapperMock.Setup(mapper => mapper.Map<Game>(It.IsAny<GameCreateModel>()))
-                   .Returns(new Game {Id = expectedId });
+                   .Returns(new Game { Id = expectedId });
 
         var actualResult = await _gameService.CreateAsync(createModel);
-        
+
         Assert.Equal(expectedId, actualResult.Id);
         _gameRepoMock.Verify(repository => repository.AddAsync(It.IsAny<Game>()), Times.Once);
         _unitOfWorkMock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
     }
-    
+
     [Fact]
     public async void CreateAsync_WithExistingKey_GeneratesNewKey()
     {
@@ -118,16 +119,16 @@ public class GameServiceTests
         {
             Name = "Some name"
         };
-        
+
         _gameRepoMock.Setup(repository => repository.AnyAsync(It.Is<GameByKeySpec>(spec => spec.Key == existingKey)))
                      .ReturnsAsync(true);
         _gameRepoMock.Setup(repository => repository.AnyAsync(It.Is<GameByKeySpec>(spec => spec.Key == expectedKey)))
                      .ReturnsAsync(false);
         _mapperMock.Setup(mapper => mapper.Map<Game>(It.IsAny<GameCreateModel>()))
-                   .Returns(new Game {Id = expectedId });
+                   .Returns(new Game { Id = expectedId });
 
         var actualResult = await _gameService.CreateAsync(createModel);
-        
+
         Assert.Equal(expectedId, actualResult.Id);
         _gameRepoMock.Verify(repository => repository.AddAsync(It.IsAny<Game>()), Times.Once);
         _unitOfWorkMock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
@@ -138,9 +139,9 @@ public class GameServiceTests
     {
         _gameRepoMock.Setup(repository => repository.GetSingleBySpecAsync(It.IsAny<GameByIdSpec>()))
                      .ReturnsAsync(new Game());
-        
+
         await _gameService.DeleteAsync(Guid.NewGuid());
-        
+
         _gameRepoMock.Verify(repository => repository.UpdateAsync(It.IsAny<Game>()), Times.Once);
         _unitOfWorkMock.Verify(work => work.SaveChangesAsync(), Times.Once);
     }
@@ -148,9 +149,11 @@ public class GameServiceTests
     [Fact]
     public async void DeleteAsync_NotCorrectValues_ThrowsNotFoundException()
     {
+        Game gameByKey = null!;
+
         _gameRepoMock.Setup(repository => repository.GetSingleBySpecAsync(It.IsAny<GameByIdSpec>()))
-                     .ReturnsAsync((Game)null!);
-        
+                     .ReturnsAsync(gameByKey);
+
         var operation = async () => await _gameService.DeleteAsync(Guid.Empty);
 
         await Assert.ThrowsAsync<ItemNotFoundException>(operation);
@@ -166,7 +169,7 @@ public class GameServiceTests
                      .ReturnsAsync(new Game { File = expectedResult });
 
         var actualResult = await _gameService.GetFileAsync(gameKey);
-        
+
         Assert.Equal(expectedResult, actualResult);
     }
 
@@ -174,10 +177,11 @@ public class GameServiceTests
     public async void GetFileAsync_NotExistingKey_ThrowsNotFoundException()
     {
         const string gameKey = "existing-game-key";
+        Game gameByKey = null!;
 
         _gameRepoMock.Setup(repository => repository.GetSingleBySpecAsync(It.IsAny<GameByKeySpec>()))
-                     .ReturnsAsync((Game)null!);
-        
+                     .ReturnsAsync(gameByKey);
+
         var operation = async () => await _gameService.GetFileAsync(gameKey);
 
         await Assert.ThrowsAsync<ItemNotFoundException>(operation);
