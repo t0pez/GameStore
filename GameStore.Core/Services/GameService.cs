@@ -133,7 +133,7 @@ public class GameService : IGameService
 
     public async Task<byte[]> GetFileAsync(string gameKey)
     {
-        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeyWithDetailsSpec(gameKey));
+        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey));
 
         if (game is null)
         {
@@ -227,6 +227,6 @@ public class GameService : IGameService
 
     private async Task<bool> IsKeyUniqueAsync(string gameKey)
     {
-        return await GameRepository.AnyAsync(new GameByKeyWithDetailsSpec(gameKey)) == false;
+        return await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false;
     }
 }

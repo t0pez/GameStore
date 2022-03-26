@@ -110,16 +110,16 @@ public class RepositoryTests
     
     [Theory]
     [UpdateAsyncIncorrectModelData]
-    public async void UpdateAsync_NotExistingModel_ThrowsException(
+    public async void UpdateAsync_NotExistingModel_SaveChangesThrowsException(
         Game updated)
     {
-        var updateMethod = async () =>
+        await _gameRepository.UpdateAsync(updated);
+        var saveChangesAfterUpdateMethod = async () =>
                            {
-                               await _gameRepository.UpdateAsync(updated);
                                await _context.SaveChangesAsync();
                            };
         
-        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(updateMethod);
+        await Assert.ThrowsAsync<DbUpdateConcurrencyException>(saveChangesAfterUpdateMethod);
     }
 
     [Theory]

@@ -2,7 +2,6 @@
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace GameStore.Infrastructure.Data.Repositories;
@@ -22,12 +21,8 @@ public class UnitOfWork : IUnitOfWork
     {
         var modelType = typeof(TModel);
 
-        if (HasRepositoryOfModelType(modelType) == false) {
-            if (_context.Set<TModel>().ToList().Count != default)
-                throw new InvalidOperationException($"Context doesn't have DbSet of this type {modelType}");
-
+        if (HasRepositoryOfModelType(modelType) == false)
             _repositories.Add(modelType, new Repository<TModel>(_context));
-        }
 
         return (IRepository<TModel>)_repositories[modelType];
     }

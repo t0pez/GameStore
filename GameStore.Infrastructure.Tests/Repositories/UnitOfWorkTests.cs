@@ -46,14 +46,16 @@ public class UnitOfWorkTests
     }
 
     [Fact]
-    public void GetRepository_NotCorrectModel_ThrowsException()
+    public void GetRepository_NotCorrectModel_RepositoryMethodThrowsException()
     {
-        var function = () =>
+        var repository = _unitOfWork.GetRepository<NotExistingModel>();
+        
+        var function = async () =>
                        {
-                           _unitOfWork.GetRepository<NotExistingModel>();
+                           await repository.AnyAsync(null);
                        };
 
-        Assert.Throws<InvalidOperationException>(function);
+        Assert.ThrowsAsync<InvalidOperationException>(function);
     }
     
     private ApplicationContext GetInMemoryContext()
