@@ -59,11 +59,9 @@ public class GameControllerTests
                    .Returns(new GameViewModel { Id = expectedId });
 
         var actualResult = await _gameController.GetWithDetailsAsync(gameKey);
-        var actualObjectResult = actualResult.Result as OkObjectResult;
-        var actualResultModel = actualObjectResult?.Value as GameViewModel;
 
-        Assert.IsType<OkObjectResult>(actualResult.Result);
-        Assert.IsType<GameViewModel>(actualResultModel);
+        var actualObjectResult = Assert.IsType<OkObjectResult>(actualResult.Result);
+        var actualResultModel = Assert.IsType<GameViewModel>(actualObjectResult.Value);
         Assert.Equal(expectedId, actualResultModel.Id);
     }
     
@@ -120,13 +118,10 @@ public class GameControllerTests
         _gameServiceMock.Setup(service => service.CreateAsync(It.IsAny<GameCreateModel>()))
                         .ReturnsAsync(new Game { Id = expectedId });
         
-
         var actualResult = await _gameController.CreateAsync(createModel);
-        var actualObjectResult = actualResult.Result as OkObjectResult;
-        var actualResultModel = actualObjectResult?.Value as GameViewModel;
-
-        Assert.IsType<OkObjectResult>(actualResult.Result);
-        Assert.IsType<GameViewModel>(actualResultModel);
+        
+        var actualObjectResult = Assert.IsType<OkObjectResult>(actualResult.Result);
+        var actualResultModel = Assert.IsType<GameViewModel>(actualObjectResult.Value);
         Assert.Equal(expectedId, actualResultModel.Id);
     }
     
