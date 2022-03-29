@@ -74,8 +74,8 @@ public class CommentService : ICommentService
         
         if (await GameRepository.AnyAsync(new GameByIdSpec(createModel.GameId)) == false)
         {
-            throw new ItemNotFoundException("Parent comment with such id doesn't exists." +
-                                            $"{nameof(createModel.ParentId)} = {createModel.ParentId}");
+            throw new ItemNotFoundException("Game with such id doesn't exists." +
+                                            $"{nameof(createModel.GameId)} = {createModel.GameId}");
         }
 
         var reply = _mapper.Map<Comment>(createModel);

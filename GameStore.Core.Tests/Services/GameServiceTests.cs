@@ -113,8 +113,8 @@ public class GameServiceTests
     public async void CreateAsync_WithExistingKey_GeneratesNewKey()
     {
         var expectedId = Guid.NewGuid();
-        const string existingKey = "some-key";
-        const string expectedKey = "some-key--1";
+        const string existingKey = "some-name";
+        const string expectedKey = "some-name--1";
         var createModel = new GameCreateModel
         {
             Name = "Some name"
@@ -130,6 +130,7 @@ public class GameServiceTests
         var actualResult = await _gameService.CreateAsync(createModel);
 
         Assert.Equal(expectedId, actualResult.Id);
+        Assert.Equal(expectedKey, actualResult.Key);
         _gameRepoMock.Verify(repository => repository.AddAsync(It.IsAny<Game>()), Times.Once);
         _unitOfWorkMock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
     }

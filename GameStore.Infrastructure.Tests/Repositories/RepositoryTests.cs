@@ -88,24 +88,16 @@ public class RepositoryTests
     
     [Theory]
     [AddAsyncIncorrectModelData]
-    public async void AddAsync_ExistingModel_ThrowsException(
+    public async void AddAsync_ExistingModel_SaveChangesMethodThrowsException(
         Game model)
     {
-        var addMethod = async () =>
+        await _gameRepository.AddAsync(model);
+        var saveChangesAfterAddMethod = async () =>
                         {
-                            await _gameRepository.AddAsync(model);
                             await _context.SaveChangesAsync();
                         };
 
-        await Assert.ThrowsAsync<ArgumentException>(addMethod);
-    }
-    
-    [Theory]
-    [UpdateAsyncCorrectModelData]
-    public async void UpdateAsync_ExistingModel(
-        Game updated)
-    {
-        await _gameRepository.UpdateAsync(updated);
+        await Assert.ThrowsAsync<ArgumentException>(saveChangesAfterAddMethod);
     }
     
     [Theory]
