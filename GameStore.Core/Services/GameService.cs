@@ -195,6 +195,7 @@ public class GameService : IGameService
 
     private async Task<string> CreateUniqueGameKeyAsync(string source)
     {
+        _logger.LogDebug("Started creation game key for game with Name = {Name}", source);
         var gameKey = _gameKeyAliasCraft.CreateAlias(source);
 
         if (await IsKeyUniqueAsync(gameKey) == false)
@@ -215,6 +216,8 @@ public class GameService : IGameService
 
             if (await IsKeyUniqueAsync(gameKey))
             {
+                _logger.LogDebug("Ended creation game key for game with Name = {Name}, Result = {Key}", 
+                                 source, gameKey);
                 return gameKey;
             }
         } while (true);
