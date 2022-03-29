@@ -2,10 +2,12 @@
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-internal sealed class GameByKeyWithDetailsSpec : Specification<Game>, ISingleResultSpecification
+public sealed class GameByKeyWithDetailsSpec : Specification<Game>, ISingleResultSpecification
 {
     public GameByKeyWithDetailsSpec(string gameKey)
     {
+        Key = gameKey;
+        
         Query
             .Where(g => g.Key == gameKey
                         && g.IsDeleted == false)
@@ -15,4 +17,6 @@ internal sealed class GameByKeyWithDetailsSpec : Specification<Game>, ISingleRes
             .Include(g => g.Platforms)
             .ThenInclude(gamePlatform => gamePlatform.Platform);
     }
+    
+    public string Key { get; }
 }

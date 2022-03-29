@@ -3,7 +3,7 @@ using Ardalis.Specification;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-internal sealed class PlatformTypeByIdSpec : Specification<PlatformType>
+public sealed class PlatformTypeByIdSpec : Specification<PlatformType>
 {
     public PlatformTypeByIdSpec(Guid id)
     {

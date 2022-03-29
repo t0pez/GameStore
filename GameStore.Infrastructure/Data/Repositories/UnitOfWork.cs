@@ -21,12 +21,8 @@ public class UnitOfWork : IUnitOfWork
     {
         var modelType = typeof(TModel);
 
-        if (HasRepositoryOfModelType(modelType) == false) {
-            if (_context.Set<TModel>() is null)
-                throw new InvalidOperationException($"Context doesn't have DbSet of this type {modelType}");
-
+        if (HasRepositoryOfModelType(modelType) == false)
             _repositories.Add(modelType, new Repository<TModel>(_context));
-        }
 
         return (IRepository<TModel>)_repositories[modelType];
     }

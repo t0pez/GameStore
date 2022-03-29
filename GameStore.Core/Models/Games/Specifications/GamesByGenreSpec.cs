@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-internal sealed class GamesByGenreSpec : Specification<Game>
+public sealed class GamesByGenreSpec : Specification<Game>
 {
     public GamesByGenreSpec(Guid genreId)
     {

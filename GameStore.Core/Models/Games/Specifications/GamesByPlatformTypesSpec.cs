@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-internal sealed class GamesByPlatformTypesSpec : Specification<Game>
+public sealed class GamesByPlatformTypesSpec : Specification<Game>
 {
     public GamesByPlatformTypesSpec(ICollection<Guid> platformTypesIds)
     {
