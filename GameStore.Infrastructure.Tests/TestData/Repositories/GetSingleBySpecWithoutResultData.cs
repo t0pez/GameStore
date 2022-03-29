@@ -12,28 +12,28 @@ public class GetSingleBySpecWithoutResultData : DataAttribute
     {
          yield return new object[]
         {
-            new GameByIdSpec(Guid.Parse("6fd6d158-00fd-472a-b971-08da067d7601"))
+            new GameByIdSpec(Guid.NewGuid())
         };
         yield return new object[]
         {
-            new GameByIdSpec(Guid.Parse("6fd6d158-7f00-472a-b972-08da067d7601"))
+            new GameByIdSpec(Guid.NewGuid())
         };
         yield return new object[]
         {
-            new GameByIdSpec(Guid.Parse("6fd6d158-7ffd-472a-b974-00da067d7601"))
+            new GameByIdSpec(Guid.NewGuid())
         };
         
         yield return new object[]
         {
-            new GameByIdWithDetailsSpec(Guid.Parse("00d6d158-7ffd-472a-b971-08da067d7601"))
+            new GameByIdWithDetailsSpec(Guid.NewGuid())
         };
         yield return new object[]
         {
-            new GameByIdWithDetailsSpec(Guid.Parse("6fd6d100-7ffd-472a-b972-08da067d7601"))
+            new GameByIdWithDetailsSpec(Guid.NewGuid())
         };
         yield return new object[]
         {
-            new GameByIdWithDetailsSpec(Guid.Parse("6fd60058-7ffd-472a-b974-08da067d7601"))
+            new GameByIdWithDetailsSpec(Guid.NewGuid())
         };
         
         yield return new object[]

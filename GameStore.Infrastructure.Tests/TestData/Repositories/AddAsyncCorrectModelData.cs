@@ -14,22 +14,16 @@ public class AddAsyncCorrectModelData : DataAttribute
         {
             new Game
             {
-                Id = Guid.Parse("6fd60058-7ffd-472a-b97c-08d1067d8613"),
-                Name = "Some name",
-                Key = "some-name",
-                Description = "Some description",
-                File = new byte[] { 0, 0, 0, 0, 1 }
+                Id = Guid.NewGuid(),
+                Key = "key-1" // Alternative key must not be null
             }
         };
         yield return new object[]
         {
             new Game
             {
-                Id = Guid.Parse("6fd60058-7f44-472a-b97c-08d1067d8613"),
-                Name = "Some new name",
-                Key = "some-new-name",
-                Description = "Some new description",
-                File = new byte[] { 0, 0, 0, 0, 1 }
+                Id = Guid.NewGuid(),
+                Key = "key-2"
             }
         };
     }
