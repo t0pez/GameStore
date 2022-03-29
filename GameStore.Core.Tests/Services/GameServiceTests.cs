@@ -21,7 +21,6 @@ public class GameServiceTests
     private readonly IGameService _gameService;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IRepository<Game>> _gameRepoMock;
-    private readonly Mock<ILogger<GameService>> _loggerMock;
     private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<IRelationshipModelService<GameGenre>> _gameGenreServiceMock;
     private readonly Mock<IRelationshipModelService<GamePlatformType>> _gamePlatformServiceMock;
@@ -29,17 +28,17 @@ public class GameServiceTests
 
     public GameServiceTests()
     {
+        var loggerMock = new Mock<ILogger<GameService>>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _gameRepoMock = new Mock<IRepository<Game>>();
         _mapperMock = new Mock<IMapper>();
-        _loggerMock = new Mock<ILogger<GameService>>();
         _gameGenreServiceMock = new Mock<IRelationshipModelService<GameGenre>>();
         _gamePlatformServiceMock = new Mock<IRelationshipModelService<GamePlatformType>>();
 
         _unitOfWorkMock.Setup(unit => unit.GetRepository<Game>())
                        .Returns(_gameRepoMock.Object);
 
-        _gameService = new GameService(_unitOfWorkMock.Object, _loggerMock.Object, _mapperMock.Object,
+        _gameService = new GameService(_unitOfWorkMock.Object, loggerMock.Object, _mapperMock.Object,
                                        _gameGenreServiceMock.Object, _gamePlatformServiceMock.Object);
     }
 

@@ -22,16 +22,15 @@ public class CommentServiceTests
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IRepository<Game>> _gameRepoMock;
     private readonly Mock<IRepository<Comment>> _commentRepoMock;
-    private readonly Mock<ILogger<CommentService>> _loggerMock;
     private readonly Mock<IMapper> _mapperMock;
 
 
     public CommentServiceTests()
     {
+        var loggerMock = new Mock<ILogger<CommentService>>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _gameRepoMock = new Mock<IRepository<Game>>();
         _commentRepoMock = new Mock<IRepository<Comment>>();
-        _loggerMock = new Mock<ILogger<CommentService>>();
         _mapperMock = new Mock<IMapper>();
 
         _unitOfWorkMock.Setup(unit => unit.GetRepository<Game>())
@@ -39,7 +38,7 @@ public class CommentServiceTests
         _unitOfWorkMock.Setup(unit => unit.GetRepository<Comment>())
                        .Returns(_commentRepoMock.Object);
 
-        _commentService = new CommentService(_unitOfWorkMock.Object, _loggerMock.Object, _mapperMock.Object);
+        _commentService = new CommentService(_unitOfWorkMock.Object, loggerMock.Object, _mapperMock.Object);
     }
 
     [Fact]
