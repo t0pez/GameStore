@@ -30,6 +30,12 @@ public class GamesController : Controller
 
     [HttpGet]
     [ResponseCache(Duration = 60)]
+    public async Task<int> GetTotalGamesCount()
+    {
+        return await _gameService.GetTotalCountAsync();
+    }
+    
+    [HttpGet]
     public async Task<ICollection<GameViewModel>> GetAllAsync()
     {
         var games = await _gameService.GetAllAsync();
@@ -39,7 +45,6 @@ public class GamesController : Controller
     }
 
     [HttpGet("{gameKey}")]
-    [ResponseCache(Duration = 60)]
     public async Task<ActionResult<GameViewModel>> GetWithDetailsAsync([FromRoute] string gameKey)
     {
         var game = await _gameService.GetByKeyAsync(gameKey);
@@ -49,7 +54,6 @@ public class GamesController : Controller
     }
 
     [HttpGet("{gameKey}/download")]
-    [ResponseCache(Duration = 60)]
     public async Task<ActionResult<byte[]>> GetFileAsync([FromRoute] string gameKey)
     {
         var result = await _gameService.GetFileAsync(gameKey);

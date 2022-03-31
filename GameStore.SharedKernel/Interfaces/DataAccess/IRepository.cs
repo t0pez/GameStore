@@ -14,4 +14,5 @@ public interface IRepository<TModel> where TModel : class
     public Task DeleteAsync(TModel model);
     public Task DeleteRangeAsync(IEnumerable<TModel> models);
     public Task<bool> AnyAsync(ISpecification<TModel> spec);
+    public Task<int> Count(ISpecification<TModel> spec = null);
 }

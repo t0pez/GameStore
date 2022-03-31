@@ -8,6 +8,7 @@ namespace GameStore.Core.Interfaces;
 
 public interface IGameService
 {
+    public Task<int> GetTotalCountAsync();
     public Task<ICollection<Game>> GetAllAsync();
     public Task<ICollection<Game>> GetByGenreAsync(Guid genreId);
     public Task<ICollection<Game>> GetByPlatformTypesAsync(ICollection<Guid> platformTypesIds);
