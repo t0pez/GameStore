@@ -6,12 +6,12 @@ namespace GameStore.SharedKernel.Interfaces.DataAccess;
 
 public interface IRepository<TModel> where TModel : class
 {
-    Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> spec = null);
-    Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> spec);
-    Task AddAsync(TModel model);
-    Task AddRangeAsync(IEnumerable<TModel> models);
-    Task UpdateAsync(TModel updated);
-    Task DeleteAsync(TModel model);
-    Task DeleteRangeAsync(IEnumerable<TModel> models);
-    Task<bool> AnyAsync(ISpecification<TModel> spec);
+    public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> spec = null);
+    public Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> spec);
+    public Task AddAsync(TModel model);
+    public Task AddRangeAsync(IEnumerable<TModel> models);
+    public Task UpdateAsync(TModel updated);
+    public Task DeleteAsync(TModel model);
+    public Task DeleteRangeAsync(IEnumerable<TModel> models);
+    public Task<bool> AnyAsync(ISpecification<TModel> spec);
 }

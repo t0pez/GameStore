@@ -52,7 +52,7 @@ public class GameService : IGameService
 
         var game = _mapper.Map<Game>(model);
         game.Key = gameKey;
-        
+
         await GameRepository.AddAsync(game);
         await _unitOfWork.SaveChangesAsync();
 
@@ -148,7 +148,7 @@ public class GameService : IGameService
     {
         await AssertGenresExistsAsync(updateModel.GenresIds);
         await AssertPlatformsExistsAsync(updateModel.PlatformsIds);
-        
+
         await UpdateGameRelationshipModelsAsync(updateModel);
 
         game.Name = updateModel.Name;
@@ -162,7 +162,7 @@ public class GameService : IGameService
             if (await GenreRepository.AnyAsync(new GenreByIdSpec(genreId)) == false)
                 throw new ItemNotFoundException($"Genre not found. {nameof(genreId)} = {genreId}");
     }
-    
+
     private async Task AssertPlatformsExistsAsync(IEnumerable<Guid> platformsIds)
     {
         foreach (var platformId in platformsIds)
@@ -172,25 +172,14 @@ public class GameService : IGameService
 
     private async Task UpdateGameRelationshipModelsAsync(GameUpdateModel updateModel)
     {
-        await DeletePreviousGameRelationshipsAsync(updateModel.Id);
-        await AddNewGameRelationshipsAsync(updateModel);
-    }
-
-    private async Task AddNewGameRelationshipsAsync(GameUpdateModel updateModel)
-    {
         var newGameGenres =
             updateModel.GenresIds.Select(id => new GameGenre { GameId = updateModel.Id, GenreId = id });
         var newGamePlatforms =
             updateModel.PlatformsIds.Select(id => new GamePlatformType { GameId = updateModel.Id, PlatformId = id });
 
-        await _gameGenreService.AddRangeAsync(newGameGenres);
-        await _gamePlatformService.AddRangeAsync(newGamePlatforms);
-    }
-
-    private async Task DeletePreviousGameRelationshipsAsync(Guid gameId)
-    {
-        await _gameGenreService.DeleteBySpecAsync(new GameGenresByGameId(gameId));
-        await _gamePlatformService.DeleteBySpecAsync(new GamePlatformsByPlatformId(gameId));
+        await _gameGenreService.UpdateManyToManyAsync(newGameGenres, new GameGenresByGameId(updateModel.Id));
+        await _gamePlatformService.UpdateManyToManyAsync(newGamePlatforms,
+                                                         new GamePlatformsByPlatformId(updateModel.Id));
     }
 
     private async Task<string> CreateUniqueGameKeyAsync(string source)
@@ -216,7 +205,7 @@ public class GameService : IGameService
 
             if (await IsKeyUniqueAsync(gameKey))
             {
-                _logger.LogDebug("Ended creation game key for game with Name = {Name}, Result = {Key}", 
+                _logger.LogDebug("Ended creation game key for game with Name = {Name}, Result = {Key}",
                                  source, gameKey);
                 return gameKey;
             }
