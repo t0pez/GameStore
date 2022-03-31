@@ -8,6 +8,9 @@ public class GameEditRequestModel
     public Guid Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
+    public int UnitsInStock { get; set; }
+    public decimal Price { get; set; }
+    public bool Discounted { get; set; }
     public byte[] File { get; set; }
     public List<Guid> GenresIds { get; set; }
     public List<Guid> PlatformsIds { get; set; }

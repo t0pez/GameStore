@@ -8,15 +8,6 @@ namespace GameStore.Core.Models.Games;
 
 public class Game : ISafeDelete
 {
-    public Game(string key, string name, string description, byte[] file)
-    {
-        Key = key;
-        Name = name;
-        Description = description;
-        File = file;
-        IsDeleted = false;
-    }
-
     public Game()
     {
         
@@ -26,6 +17,9 @@ public class Game : ISafeDelete
     public string Key { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
+    public decimal Price { get; set; }
+    public bool Discontinued { get; set; }
+    public int UnitsInStock { get; set; }
     public byte[] File { get; set; }
 
     public ICollection<Comment> Comments { get; set; } = new List<Comment>();
