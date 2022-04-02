@@ -30,24 +30,28 @@ public class Startup
         services.AddMvc().AddHybridModelBinder();
 
         services.AddSwaggerGen();
-        services.AddControllers().AddJsonOptions(opt =>
-        {
-            opt.JsonSerializerOptions.Converters.Add(new ByteArrayJsonConverter());
-            opt.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        });
+        services.AddControllers()
+                .AddJsonOptions(options =>
+                                {
+                                    options.JsonSerializerOptions.Converters.Add(
+                                        new ByteArrayJsonConverter());
+                                    options.JsonSerializerOptions.ReferenceHandler =
+                                        ReferenceHandler.IgnoreCycles;
+                                });
 
         services.ConfigureDomainServices();
 
         services.AddScoped<WorkTimeTrackingFilter>();
-        
-        services.AddDbContext<ApplicationContext>(opt =>
-        {
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            opt.UseSqlServer(connectionString);
-        });
 
-        services.AddAutoMapper(cfg => cfg.AddProfiles(
-            new Profile[] { new WebCommonProfile(), new CoreCommonProfile() }));
+        services.AddDbContext<ApplicationContext>(options =>
+                                                  {
+                                                      var connectionString =
+                                                          Configuration.GetConnectionString("DefaultConnection");
+                                                      options.UseSqlServer(connectionString);
+                                                  });
+
+        services.AddAutoMapper(
+            configuration => configuration.AddProfiles(new Profile[] { new WebCommonProfile(), new CoreCommonProfile() }));
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationContext dbContext)
@@ -59,15 +63,12 @@ public class Startup
             app.UseSwaggerUI();
         }
 
+        app.UseHttpsRedirection();
+        app.UseRouting();
+        app.UseStaticFiles();
+
         app.UseMiddleware<ExceptionMiddleware>();
 
-        app.UseHttpsRedirection();
-
-        app.UseRouting();
-
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapControllers();
-        });
+        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
     }
 }
