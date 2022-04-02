@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GameStore.Web.ViewModels;
+namespace GameStore.Web.ViewModels.Games;
 
 public class GenreViewModel
 {

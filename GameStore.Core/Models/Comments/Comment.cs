@@ -7,15 +7,6 @@ namespace GameStore.Core.Models.Comments;
 
 public class Comment : ISafeDelete
 {
-    public Comment(string name, string body, Game game, Comment parent = null)
-    {
-        Name = name;
-        Body = body;
-        Game = game;
-        Parent = parent;
-        DateOfCreation = DateTime.UtcNow;
-    }
-
     public Comment()
     {
     }

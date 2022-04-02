@@ -1,10 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.ComponentModel.DataAnnotations;
+using Microsoft.AspNetCore.Mvc;
 
 namespace GameStore.Web.Models;
 
 public class CommentCreateRequestModel
 {
-    [FromRoute(Name = "gameKey")] public string GameKey { get; set; }
-    [FromBody] public string AuthorName { get; set; }
-    [FromBody] public string Message { get; set; }
+    [Required] [FromRoute(Name = "gameKey")] 
+    public string GameKey { get; set; }
+    [Required] [FromForm]
+    public string AuthorName { get; set; }
+    [Required] [FromForm]
+    public string Message { get; set; }
 }
