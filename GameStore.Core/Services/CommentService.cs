@@ -18,7 +18,7 @@ public class CommentService : ICommentService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<CommentService> _logger;
-    private readonly IMapper _mapper;   
+    private readonly IMapper _mapper;
 
     public CommentService(IUnitOfWork unitOfWork, ILogger<CommentService> logger, IMapper mapper)
     {
@@ -32,14 +32,9 @@ public class CommentService : ICommentService
 
     public async Task CommentGameAsync(CommentCreateModel model)
     {
-        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(model.GameKey));
-
-        if (game is null)
-        {
-            throw new ItemNotFoundException("Game with such key doesn't exist. " +
-                                            $"{nameof(model.GameKey)} = {model.GameKey}");
-        }
-
+        var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeySpec(model.GameKey))
+                   ?? throw new ItemNotFoundException(nameof(Game), nameof(model.GameKey), model.GameKey);
+        
         var comment = _mapper.Map<Comment>(model);
         comment.GameId = game.Id;
         comment.DateOfCreation = DateTime.UtcNow;
@@ -48,15 +43,15 @@ public class CommentService : ICommentService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Comment successfully added for game. " +
-                               $"{nameof(game.Id)} = {game.Id}, {nameof(comment.Id)} = {comment.Id}");
+                               "GameId = {GameId}, CommentId = {CommentId}",
+                               game.Id, comment.Id);
     }
 
     public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)
     {
         if (await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
         {
-            throw new ItemNotFoundException("Game not found. " +
-                                            $"{nameof(gameKey)} = {gameKey}");
+            throw new ItemNotFoundException(nameof(Game), nameof(gameKey), gameKey);
         }
 
         var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKeySpec(gameKey));
@@ -68,14 +63,14 @@ public class CommentService : ICommentService
     {
         if (await CommentRepository.AnyAsync(new CommentByIdSpec(createModel.ParentId)) == false)
         {
-            throw new ItemNotFoundException("Parent comment with such id doesn't exists." +
-                                            $"{nameof(createModel.ParentId)} = {createModel.ParentId}");
+            throw new ItemNotFoundException(nameof(Comment), nameof(createModel.ParentId),
+                                            createModel.ParentId.ToString());
         }
-        
+
         if (await GameRepository.AnyAsync(new GameByIdSpec(createModel.GameId)) == false)
         {
-            throw new ItemNotFoundException("Game with such id doesn't exists." +
-                                            $"{nameof(createModel.GameId)} = {createModel.GameId}");
+            throw new ItemNotFoundException(nameof(Game), nameof(createModel.GameId), 
+                                            createModel.GameId.ToString());
         }
 
         var reply = _mapper.Map<Comment>(createModel);
@@ -85,6 +80,7 @@ public class CommentService : ICommentService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Reply successfully added for comment. " +
-                               $"{nameof(reply.ParentId)} = {reply.ParentId}, {nameof(reply.Id)} = {reply.Id}");
+                               "ParentId = {ParentId}, ReplyId = {ReplyId}",
+                               reply.ParentId, reply.Id);
     }
 }

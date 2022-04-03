@@ -57,7 +57,7 @@ public class GameService : IGameService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Game created. " +
-                               $"{nameof(game.Id)} = {game.Id}");
+                               "GameId = {GameId}", game.Id);
 
         return game;
     }
@@ -83,11 +83,11 @@ public class GameService : IGameService
 
     public async Task<Game> GetByKeyAsync(string gameKey)
     {
-        var result = await GameRepository.GetSingleBySpecAsync(new GameByKeyWithDetailsSpec(gameKey));
+        var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeyWithDetailsSpec(gameKey));
 
         if (result is null)
         {
-            throw new ItemNotFoundException($"Game not found. {nameof(gameKey)} = {gameKey}");
+            throw new ItemNotFoundException(nameof(Game), nameof(gameKey), gameKey);
         }
 
         return result;
@@ -102,13 +102,9 @@ public class GameService : IGameService
 
     public async Task UpdateAsync(GameUpdateModel updateModel)
     {
-        var game = await GameRepository.GetSingleBySpecAsync(new GameByIdWithDetailsSpec(updateModel.Id));
+        var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdWithDetailsSpec(updateModel.Id))
+                   ?? throw new ItemNotFoundException(nameof(Game), nameof(updateModel.Id), updateModel.Id.ToString());
 
-        if (game is null)
-        {
-            throw new ItemNotFoundException("Game with such id doesnt exists." +
-                                            $"Id = {updateModel.Id}");
-        }
 
         await UpdateGameValues(game, updateModel);
 
@@ -116,35 +112,25 @@ public class GameService : IGameService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Game updated. " +
-                               $"{nameof(game.Id)} = {game.Id}");
+                               "GameId = {GameId}", game.Id);
     }
 
     public async Task DeleteAsync(Guid id)
     {
-        var game = await GameRepository.GetSingleBySpecAsync(new GameByIdSpec(id));
-
-        if (game is null)
-        {
-            throw new ItemNotFoundException("Game with such id doesnt exists." +
-                                            $"{nameof(game.Id)} = {id}");
-        }
-
+        var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdSpec(id))
+                   ?? throw new ItemNotFoundException(nameof(Game), nameof(id), id.ToString());
+        
         game.IsDeleted = true;
         await GameRepository.UpdateAsync(game);
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation($"Game deleted. {nameof(game.Id)} = {game.Id}");
+        _logger.LogInformation("Game marked as deleted. GameId = {GameId}", game.Id);
     }
 
     public async Task<byte[]> GetFileAsync(string gameKey)
     {
-        var game = await GameRepository.GetSingleBySpecAsync(new GameByKeySpec(gameKey));
-
-        if (game is null)
-        {
-            throw new ItemNotFoundException("Game with such key doesnt exists." +
-                                            $"{nameof(game.Key)} = {gameKey}");
-        }
+        var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeySpec(gameKey))
+                   ?? throw new ItemNotFoundException(nameof(Game), nameof(gameKey), gameKey);
 
         return game.File;
     }
@@ -165,14 +151,14 @@ public class GameService : IGameService
     {
         foreach (var genreId in genresIds)
             if (await GenreRepository.AnyAsync(new GenreByIdSpec(genreId)) == false)
-                throw new ItemNotFoundException($"Genre not found. {nameof(genreId)} = {genreId}");
+                throw new ItemNotFoundException(nameof(Genre), nameof(genreId), genreId.ToString());
     }
 
     private async Task AssertPlatformsExistsAsync(IEnumerable<Guid> platformsIds)
     {
         foreach (var platformId in platformsIds)
             if (await PlatformTypesRepository.AnyAsync(new PlatformTypeByIdSpec(platformId)) == false)
-                throw new ItemNotFoundException($"Platform not found. {nameof(platformId)} = {platformId}");
+                throw new ItemNotFoundException(nameof(PlatformType), nameof(platformId), platformId.ToString());
     }
 
     private async Task UpdateGameRelationshipModelsAsync(GameUpdateModel updateModel)
@@ -182,9 +168,9 @@ public class GameService : IGameService
         var newGamePlatforms =
             updateModel.PlatformsIds.Select(id => new GamePlatformType { GameId = updateModel.Id, PlatformId = id });
 
-        await _gameGenreService.UpdateManyToManyAsync(newGameGenres, new GameGenresByGameId(updateModel.Id));
+        await _gameGenreService.UpdateManyToManyAsync(newGameGenres, new GameGenresByGameIdSpec(updateModel.Id));
         await _gamePlatformService.UpdateManyToManyAsync(newGamePlatforms,
-                                                         new GamePlatformsByPlatformId(updateModel.Id));
+                                                         new GamePlatformsByPlatformIdSpec(updateModel.Id));
     }
 
     private async Task<string> CreateUniqueGameKeyAsync(string source)

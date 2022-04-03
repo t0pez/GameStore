@@ -3,9 +3,9 @@ using Ardalis.Specification;
 
 namespace GameStore.Core.Models.RelationalModels.Specifications;
 
-internal sealed class GamePlatformsByPlatformId : Specification<GamePlatformType>
+internal sealed class GamePlatformsByPlatformIdSpec : Specification<GamePlatformType>
 {
-    public GamePlatformsByPlatformId(Guid gameId)
+    public GamePlatformsByPlatformIdSpec(Guid gameId)
     {
         Query
             .Where(gamePlatform => gamePlatform.GameId == gameId);

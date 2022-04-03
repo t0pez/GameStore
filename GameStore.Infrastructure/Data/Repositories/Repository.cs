@@ -30,7 +30,7 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
         return specificationResult.ToListAsync();
     }
         
-    public Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> spec)
+    public Task<TModel> GetSingleOrDefaultBySpecAsync(ISpecification<TModel> spec)
     {
         var specificationResult = ApplySpecifications(spec);
 

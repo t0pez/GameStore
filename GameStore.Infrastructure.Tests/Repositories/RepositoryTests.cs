@@ -53,7 +53,7 @@ public class RepositoryTests
     public async void GetSingleBySpecAsync_ExistingModel_ReturnsCorrectModels(
         ISpecification<Game> spec, Guid expectedId)
     {
-        var actualResult = await _gameRepository.GetSingleBySpecAsync(spec);
+        var actualResult = await _gameRepository.GetSingleOrDefaultBySpecAsync(spec);
         var actualResultId = actualResult.Id;
         
         Assert.Equal(expectedId,actualResultId);
@@ -66,7 +66,7 @@ public class RepositoryTests
     {
         const Game expectedResult = null!;
 
-        var actualResult = await _gameRepository.GetSingleBySpecAsync(spec);
+        var actualResult = await _gameRepository.GetSingleOrDefaultBySpecAsync(spec);
         
         Assert.Same(expectedResult, actualResult);
     }

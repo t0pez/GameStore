@@ -2,17 +2,19 @@
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Records;
 using GameStore.Web.Models;
-using HybridModelBinding;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using GameStore.Web.Filters;
-using GameStore.Web.ViewModels;
+using GameStore.Web.ViewModels.Comments;
+using GameStore.Web.ViewModels.Games;
+using HybridModelBinding;
 
 namespace GameStore.Web.Controllers;
 
-[ApiController]
 [ServiceFilter(typeof(WorkTimeTrackingFilter))]
 [Route("games")]
 public class GamesController : Controller
@@ -28,20 +30,20 @@ public class GamesController : Controller
         _mapper = mapper;
     }
 
-    [HttpGet]
+    [HttpGet("count")]
     [ResponseCache(Duration = 60)]
     public async Task<int> GetTotalGamesCount()
     {
         return await _gameService.GetTotalCountAsync();
     }
-    
+
     [HttpGet]
-    public async Task<ICollection<GameViewModel>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<GameListViewModel>>> GetAllAsync()
     {
         var games = await _gameService.GetAllAsync();
-        var result = _mapper.Map<ICollection<GameViewModel>>(games);
+        var result = _mapper.Map<IEnumerable<GameListViewModel>>(games);
 
-        return result;
+        return View(result);
     }
 
     [HttpGet("{gameKey}")]
@@ -50,26 +52,39 @@ public class GamesController : Controller
         var game = await _gameService.GetByKeyAsync(gameKey);
         var result = _mapper.Map<GameViewModel>(game);
 
-        return Ok(result);
+        return View(result);
     }
 
     [HttpGet("{gameKey}/download")]
     public async Task<ActionResult<byte[]>> GetFileAsync([FromRoute] string gameKey)
     {
-        var result = await _gameService.GetFileAsync(gameKey);
+        var bytes = await _gameService.GetFileAsync(gameKey);
+        var fileName = gameKey;
 
-        return Ok(result);
+        return File(bytes, "application/force-download", fileName);
+    }
+
+    [HttpGet("new")]
+    public async Task<ActionResult> CreateAsync()
+    {
+        return View(new GameCreateRequestModel());
     }
 
     [HttpPost("new")]
-    public async Task<ActionResult<GameViewModel>> CreateAsync([FromBody] GameCreateRequestModel request)
+    public async Task<ActionResult> CreateAsync(GameCreateRequestModel request)
     {
+        if (ModelState.IsValid == false ||
+            HttpContext.Request.Form.Files.Count == 0)
+        {
+            return View("Error");
+        }
+        
         var createModel = _mapper.Map<GameCreateModel>(request);
+        createModel.File = await GetBytesFromFormFile();
 
         var game = await _gameService.CreateAsync(createModel);
-        var result = _mapper.Map<GameViewModel>(game);
 
-        return Ok(result);
+        return RedirectToAction("GetWithDetails", new { gameKey = game.Key });
     }
 
     [HttpPost("{gameKey}/newcomment")]
@@ -83,12 +98,12 @@ public class GamesController : Controller
     }
 
     [HttpGet("{gameKey}/comments")]
-    public async Task<ICollection<CommentViewModel>> GetCommentsAsync([FromRoute] string gameKey)
+    public async Task<ActionResult<ICollection<CommentViewModel>>> GetCommentsAsync([FromRoute] string gameKey)
     {
         var comments = await _commentService.GetCommentsByGameKeyAsync(gameKey);
         var result = _mapper.Map<ICollection<CommentViewModel>>(comments);
-        
-        return result;
+
+        return View(result);
     }
 
     [HttpPost("update")]
@@ -106,5 +121,19 @@ public class GamesController : Controller
         await _gameService.DeleteAsync(id);
 
         return Ok();
+    }
+    
+    private async Task<byte[]> GetBytesFromFormFile()
+    {
+        byte[] fileBytes;
+        var file = HttpContext.Request.Form.Files.FirstOrDefault();
+
+        await using (var bytes = new MemoryStream())
+        {
+            file.CopyTo(bytes);
+            fileBytes = bytes.ToArray();
+        }
+
+        return fileBytes;
     }
 }

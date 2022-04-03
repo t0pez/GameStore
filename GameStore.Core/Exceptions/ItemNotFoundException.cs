@@ -9,11 +9,21 @@ public class ItemNotFoundException : Exception
     {
     }
 
-    public ItemNotFoundException(string message) : base(message)
+    public ItemNotFoundException(string entity, string predicateProperty, string predicateValue)
     {
+        Entity = entity;
+        PredicateProperty = predicateProperty;
+        PredicateValue = predicateValue;
+        Message = CraftExceptionMessage();
     }
-        
-    public ItemNotFoundException(string message, Exception inner) : base(message, inner)
+
+    public override string Message { get; }
+    public string Entity { get; }
+    public string PredicateProperty { get; }
+    public string PredicateValue { get; }
+
+    private string CraftExceptionMessage()
     {
+        return $"Item of type {Entity} can not be found. {PredicateProperty} of value {PredicateValue} doesn't exists";
     }
 }

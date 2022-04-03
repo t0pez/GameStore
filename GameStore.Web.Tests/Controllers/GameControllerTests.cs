@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
@@ -8,6 +9,7 @@ using GameStore.Core.Models.Records;
 using GameStore.Web.Controllers;
 using GameStore.Web.Models;
 using GameStore.Web.ViewModels;
+using GameStore.Web.ViewModels.Games;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -42,7 +44,7 @@ public class GameControllerTests
                         .Returns(new List<GameViewModel>(new GameViewModel[expectedResultCount]));
         
         var actualResult = await _gameController.GetAllAsync();
-        var actualResultCount = actualResult.Count;
+        var actualResultCount = actualResult.Value.Count();
         
         Assert.Equal(expectedResultCount, actualResultCount);
     }
@@ -120,8 +122,8 @@ public class GameControllerTests
         
         var actualResult = await _gameController.CreateAsync(createModel);
         
-        var actualObjectResult = Assert.IsType<OkObjectResult>(actualResult.Result);
-        var actualResultModel = Assert.IsType<GameViewModel>(actualObjectResult.Value);
+        var actualObjectResult = Assert.IsType<ViewResult>(actualResult);
+        var actualResultModel = Assert.IsType<GameViewModel>(actualObjectResult.Model);
         Assert.Equal(expectedId, actualResultModel.Id);
     }
     

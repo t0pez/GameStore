@@ -77,7 +77,7 @@ public class CommentServiceTests
     {
         var creationModel = new CommentCreateModel();
 
-        _gameRepoMock.Setup(repository => repository.GetSingleBySpecAsync(It.IsAny<GameByKeySpec>()))
+        _gameRepoMock.Setup(repository => repository.GetSingleOrDefaultBySpecAsync(It.IsAny<GameByKeySpec>()))
                      .ReturnsAsync(new Game { Id = Guid.NewGuid() });
         _mapperMock.Setup(mapper => mapper.Map<Comment>(It.IsAny<CommentCreateModel>()))
                    .Returns(new Comment());
@@ -94,7 +94,7 @@ public class CommentServiceTests
         var creationModel = new CommentCreateModel();
         Game gameByKey = null!;
 
-        _gameRepoMock.Setup(repository => repository.GetSingleBySpecAsync(It.IsAny<GameByKeySpec>()))
+        _gameRepoMock.Setup(repository => repository.GetSingleOrDefaultBySpecAsync(It.IsAny<GameByKeySpec>()))
                      .ReturnsAsync(gameByKey);
 
         var operation = async () => await _commentService.CommentGameAsync(creationModel);
