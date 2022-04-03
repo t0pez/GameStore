@@ -39,6 +39,22 @@ public static class DataSeeder
             ParentId = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7601"),
             SubGenres = new List<Genre>()
         };
+        var shooterGenre = new Genre
+        {
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7603"),
+            Name = "Shooter",
+            IsDeleted = false,
+            Games = new List<GameGenre>(),
+            SubGenres = new List<Genre>()
+        };
+        var actionGenre = new Genre
+        {
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7603"),
+            Name = "Shooter",
+            IsDeleted = false,
+            Games = new List<GameGenre>(),
+            SubGenres = new List<Genre>()
+        };
 
         var pcPlatform = new PlatformType
         {
@@ -65,6 +81,8 @@ public static class DataSeeder
         context.Add(strategyGenre);
         context.Add(rtsGenre);
         context.Add(cityBuilderGenre);
+        context.Add(shooterGenre);
+        context.Add(actionGenre);
         context.SaveChanges();
         
         context.AddRange(pcPlatform, psPlatform, xboxPlatform);

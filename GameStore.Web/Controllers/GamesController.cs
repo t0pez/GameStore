@@ -78,7 +78,7 @@ public class GamesController : Controller
         {
             return View("Error");
         }
-        
+
         var createModel = _mapper.Map<GameCreateModel>(request);
         createModel.File = await GetBytesFromFormFile();
 
@@ -94,7 +94,7 @@ public class GamesController : Controller
 
         await _commentService.CommentGameAsync(createModel);
 
-        return Ok();
+        return RedirectToAction("GetComments", new { request.GameKey });
     }
 
     [HttpGet("{gameKey}/comments")]
@@ -122,17 +122,15 @@ public class GamesController : Controller
 
         return Ok();
     }
-    
+
     private async Task<byte[]> GetBytesFromFormFile()
     {
-        byte[] fileBytes;
-        var file = HttpContext.Request.Form.Files.FirstOrDefault();
+        var file = HttpContext.Request.Form.Files.FirstOrDefault()
+                   ?? throw new ArgumentException("Form file must be added");
 
-        await using (var bytes = new MemoryStream())
-        {
-            file.CopyTo(bytes);
-            fileBytes = bytes.ToArray();
-        }
+        await using var bytes = new MemoryStream();
+        await file.CopyToAsync(bytes);
+        var fileBytes = bytes.ToArray();
 
         return fileBytes;
     }
