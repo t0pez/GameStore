@@ -66,6 +66,7 @@ public class Startup
         app.UseHttpsRedirection();
         app.UseRouting();
         app.UseStaticFiles();
+        app.UseCookiePolicy();
 
         app.UseMiddleware<ExceptionMiddleware>();
 

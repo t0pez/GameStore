@@ -1,0 +1,36 @@
+﻿@model GameStore.Web.ViewModels.Publisher.PublisherViewModel
+
+@{
+    ViewBag.Title = Model.Name;
+    Layout = "_Layout";
+}
+
+<h2>@Model.Name</h2>
+
+
+<div>
+
+    <hr />
+
+    <div class="row">
+
+        <div class="col-6">
+
+            <div class="mb-3">
+                <div>
+                    @Html.LabelFor(model => model.Name, "Name:", new { @class = "form-label fw-bolder" })
+                    @Html.DisplayFor(model => model.Name)
+                </div>
+
+                <div>
+                    @Html.LabelFor(model => model.Description, "Description:", new { @class = "form-label fw-bolder" })
+                    @Html.DisplayFor(model => model.Description)
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+    
+</div>

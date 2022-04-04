@@ -9,9 +9,12 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GameStore.Web.Filters;
+using GameStore.Web.ViewModels.Baskets;
 using GameStore.Web.ViewModels.Comments;
 using GameStore.Web.ViewModels.Games;
 using HybridModelBinding;
+using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace GameStore.Web.Controllers;
 
@@ -19,6 +22,7 @@ namespace GameStore.Web.Controllers;
 [Route("games")]
 public class GamesController : Controller
 {
+    private const string BasketCookieName = "_basket"; 
     private readonly IGameService _gameService;
     private readonly ICommentService _commentService;
     private readonly IMapper _mapper;
@@ -61,7 +65,7 @@ public class GamesController : Controller
         var bytes = await _gameService.GetFileAsync(gameKey);
         var fileName = gameKey;
 
-        return File(bytes, "application/force-download", fileName);
+        return File(bytes, "application/force-download", fileName); // TODO: Check for alternative ways to download file (replace force-download)
     }
 
     [HttpGet("new")]
@@ -121,6 +125,51 @@ public class GamesController : Controller
         await _gameService.DeleteAsync(id);
 
         return Ok();
+    }
+
+    [HttpPost("buy")]
+    public async Task<ActionResult> AddToBasketAsync(Guid gameId, int quantity)
+    {
+        if (HttpContext.Request.Cookies.TryGetValue(BasketCookieName, out var basketJson))
+        {
+            var basket = JsonConvert.DeserializeObject<BasketViewModel>(basketJson);
+            var itemViewModel = new BasketItemViewModel
+            {
+                GameId = gameId,
+                Quantity = quantity
+            };
+
+            if (basket.Items.Any(model => model.GameId == itemViewModel.GameId))
+            {
+                basket.Items.First(model => model.GameId == itemViewModel.GameId).Quantity += itemViewModel.Quantity;
+            }
+            else
+            {
+                basket.Items.Add(itemViewModel);                
+            }
+            
+            basketJson = JsonConvert.SerializeObject(basket);
+        }
+        else
+        {
+            var basket = new BasketViewModel();
+            var itemViewModel = new BasketItemViewModel
+            {
+                GameId = gameId,
+                Quantity = quantity
+            };
+            
+            basket.Items.Add(itemViewModel);
+            
+            basketJson = JsonConvert.SerializeObject(basket);
+        }
+        
+        HttpContext.Response.Cookies.Append(BasketCookieName, basketJson, new CookieOptions
+        {
+            Expires = DateTimeOffset.UtcNow.AddDays(7)
+        });
+
+        return RedirectToAction("GetAll");
     }
 
     private async Task<byte[]> GetBytesFromFormFile()
