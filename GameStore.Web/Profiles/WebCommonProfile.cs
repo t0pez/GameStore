@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.Records;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Web.Models;
-using GameStore.Web.ViewModels;
+using GameStore.Web.ViewModels.Comments;
+using GameStore.Web.ViewModels.Games;
+using GameStore.Web.ViewModels.Publisher;
 
 namespace GameStore.Web.Profiles;
 
@@ -16,9 +19,12 @@ public class WebCommonProfile : Profile
         CreateMap<GameEditRequestModel, GameUpdateModel>().ReverseMap();
         CreateMap<CommentCreateRequestModel, CommentCreateModel>().ReverseMap();
         CreateMap<ReplyCreateRequestModel, ReplyCreateModel>().ReverseMap();
+        CreateMap<PublisherCreateRequestModel, PublisherCreateModel>().ReverseMap();
 
         CreateMap<Game, GameViewModel>();
+        CreateMap<Game, GameListViewModel>();
         CreateMap<Genre, GenreViewModel>();
+        CreateMap<Publisher, PublisherViewModel>();
         CreateMap<Comment, CommentViewModel>()
             .ForMember(model => model.GameKey,
                        expression => expression.MapFrom(comment => comment.Game.Key))
