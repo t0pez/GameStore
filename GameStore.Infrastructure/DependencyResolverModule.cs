@@ -15,6 +15,7 @@ public static class DependencyResolverModule
         services.AddScoped<IUnitOfWork, UnitOfWork>()
             .AddScoped<IGameService, GameService>()
             .AddScoped<ICommentService, CommentService>()
+            .AddScoped<IPublisherService, PublisherService>()
             .AddScoped(typeof(IRelationshipModelService<>), typeof(RelationshipModelService<>)); 
     }
 }
