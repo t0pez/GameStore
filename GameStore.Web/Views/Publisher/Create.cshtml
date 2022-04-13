@@ -34,12 +34,10 @@
                         @Html.ValidationMessageFor(model => model.HomePage, "", new {@class = "text-danger"})
                     </div>
                 </div>
-                <div class="col-8">
-                    <div class="form-floating mb-3">
-                        @Html.TextAreaFor(model => model.Description, new {@class = "form-control", @placeholder = "Some placeholder", @style = "min-width: 100%; height: 100%"})
-                        @Html.LabelFor(model => model.Description, new {@class = "ps-4"})
-                        @Html.ValidationMessageFor(model => model.Description, "", new {@class = "text-danger"})
-                    </div>
+                <div class="form-floating mb-3 col-8">
+                    @Html.TextAreaFor(model => model.Description, new {@class = "form-control", @placeholder = "Some placeholder", @style = "min-width: 100%; height: 100%"})
+                    @Html.LabelFor(model => model.Description, new {@class = "ps-4"})
+                    @Html.ValidationMessageFor(model => model.Description, "", new {@class = "text-danger"})
                 </div>
             </div>
         

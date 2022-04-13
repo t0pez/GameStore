@@ -30,6 +30,9 @@ else
                 @Html.LabelFor(model => item.Quantity, "Quantity:", new { @class = "form-label fw-bolder" })
                 @Html.DisplayFor(model => item.Quantity)
             </div>
+            <div>
+                @Html.ActionLink("Checkout", "GetWithDetails", "Games", new { gameKey = item.Game.Key }, new { @class = "btn btn-secondary" })
+            </div>
         </div>
     }
 }

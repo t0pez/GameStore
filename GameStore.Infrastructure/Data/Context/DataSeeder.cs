@@ -6,9 +6,9 @@ using GameStore.Core.Models.RelationalModels;
 
 namespace GameStore.Infrastructure.Data.Context;
 
-public static class DataSeeder
+internal static class DataSeeder
 {
-    public static void SeedData(this ApplicationContext context)
+    internal static void SeedData(this ApplicationContext context)
     {
         if(context.Set<Genre>().Any() || context.Set<PlatformType>().Any())
             return;
