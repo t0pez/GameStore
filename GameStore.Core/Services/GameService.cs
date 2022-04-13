@@ -83,13 +83,17 @@ public class GameService : IGameService
 
     public async Task<Game> GetByKeyAsync(string gameKey)
     {
-        var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeyWithDetailsSpec(gameKey));
+        var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeyWithDetailsSpec(gameKey))
+                     ?? throw new ItemNotFoundException(nameof(Game), nameof(gameKey), gameKey);
+        
+        return result;
+    }
 
-        if (result is null)
-        {
-            throw new ItemNotFoundException(nameof(Game), nameof(gameKey), gameKey);
-        }
-
+    public async Task<Game> GetByIdAsync(Guid id)
+    {
+        var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdSpec(id))
+                     ?? throw new ItemNotFoundException(nameof(Game), nameof(id), id.ToString());
+        
         return result;
     }
 
@@ -104,8 +108,7 @@ public class GameService : IGameService
     {
         var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdWithDetailsSpec(updateModel.Id))
                    ?? throw new ItemNotFoundException(nameof(Game), nameof(updateModel.Id), updateModel.Id.ToString());
-
-
+        
         await UpdateGameValues(game, updateModel);
 
         await GameRepository.UpdateAsync(game);

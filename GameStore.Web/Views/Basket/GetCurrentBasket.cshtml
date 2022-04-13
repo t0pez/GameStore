@@ -1,4 +1,4 @@
-﻿@model GameStore.Web.ViewModels.Baskets.BasketViewModel
+﻿@model GameStore.Web.ViewModels.Basket.BasketViewModel
 
 @{
     ViewBag.Title = "Basket";
@@ -19,8 +19,12 @@ else
     {
         <div class="mb-3">
             <div>
-                @Html.LabelFor(model => item.GameId, "GameId:", new { @class = "form-label fw-bolder" })
-                @Html.DisplayFor(model => item.GameId)
+                @Html.LabelFor(model => item.Game.Id, "Game Id:", new { @class = "form-label fw-bolder" })
+                @Html.DisplayFor(model => item.Game.Id)
+            </div>
+            <div>
+                @Html.LabelFor(model => item.Game.Name, "Game Name:", new { @class = "form-label fw-bolder" })
+                @Html.DisplayFor(model => item.Game.Name)
             </div>
             <div>
                 @Html.LabelFor(model => item.Quantity, "Quantity:", new { @class = "form-label fw-bolder" })
