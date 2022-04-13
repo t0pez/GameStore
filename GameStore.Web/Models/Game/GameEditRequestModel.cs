@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace GameStore.Web.Models;
+namespace GameStore.Web.Models.Game;
 
 public class GameEditRequestModel
 {

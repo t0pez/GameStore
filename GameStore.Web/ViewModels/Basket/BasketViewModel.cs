@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace GameStore.Web.ViewModels.Baskets;
+namespace GameStore.Web.ViewModels.Basket;
 
 public class BasketViewModel
 {

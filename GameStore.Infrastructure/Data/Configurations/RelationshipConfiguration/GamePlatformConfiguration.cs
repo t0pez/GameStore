@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GameStore.Infrastructure.Data.Configurations.RelationshipConfiguration;
 
-public class GamePlatformConfiguration : IEntityTypeConfiguration<GamePlatformType>
+internal class GamePlatformConfiguration : IEntityTypeConfiguration<GamePlatformType>
 {
     public void Configure(EntityTypeBuilder<GamePlatformType> builder)
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GameStore.Core.Models.Orders;
+namespace GameStore.Core.Models.Baskets;
 
 public class Basket
 {

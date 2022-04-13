@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GameStore.Infrastructure.Data.Configurations.RelationshipConfiguration;
 
-public class GameGenreConfiguration : IEntityTypeConfiguration<GameGenre>
+internal class GameGenreConfiguration : IEntityTypeConfiguration<GameGenre>
 {
     public void Configure(EntityTypeBuilder<GameGenre> builder)
     {

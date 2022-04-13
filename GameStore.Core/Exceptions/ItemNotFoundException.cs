@@ -9,7 +9,8 @@ public class ItemNotFoundException : Exception
     {
     }
 
-    public ItemNotFoundException(string entity, string predicateProperty, string predicateValue)
+    public ItemNotFoundException(string entity, string predicateProperty,
+                                 string predicateValue) // TODO: create overload with object to call ToString in ctor
     {
         Entity = entity;
         PredicateProperty = predicateProperty;

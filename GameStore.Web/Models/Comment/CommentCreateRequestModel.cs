@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 
-namespace GameStore.Web.Models;
+namespace GameStore.Web.Models.Comment;
 
 public class CommentCreateRequestModel
 {
