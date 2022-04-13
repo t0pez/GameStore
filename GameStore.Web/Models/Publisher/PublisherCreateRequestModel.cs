@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GameStore.Web.Models;
+namespace GameStore.Web.Models.Publisher;
 
 public class PublisherCreateRequestModel
 {

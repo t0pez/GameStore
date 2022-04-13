@@ -13,6 +13,7 @@ public interface IGameService
     public Task<ICollection<Game>> GetByGenreAsync(Guid genreId);
     public Task<ICollection<Game>> GetByPlatformTypesAsync(ICollection<Guid> platformTypesIds);
     public Task<Game> GetByKeyAsync(string key);
+    public Task<Game> GetByIdAsync(Guid id);
     public Task<Game> CreateAsync(GameCreateModel createModel);
     public Task UpdateAsync(GameUpdateModel updateModel);
     public Task DeleteAsync(Guid id);

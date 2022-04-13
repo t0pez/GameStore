@@ -3,6 +3,7 @@ using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Records;
 using GameStore.Web.Models;
+using GameStore.Web.Models.Publisher;
 using GameStore.Web.ViewModels.Publisher;
 using Microsoft.AspNetCore.Mvc;
 
