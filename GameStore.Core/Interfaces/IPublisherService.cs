@@ -8,8 +8,8 @@ namespace GameStore.Core.Interfaces;
 
 public interface IPublisherService
 {
-    public Task<ICollection<Publisher>> GetAll();
-    public Task<Publisher> GetByCompanyName(string companyName);
+    public Task<ICollection<Publisher>> GetAllAsync();
+    public Task<Publisher> GetByCompanyNameAsync(string companyName);
     public Task<Publisher> CreateAsync(PublisherCreateModel createModel);
     public Task UpdateAsync(PublisherUpdateModel updateModel);
     public Task DeleteAsync(Guid id);

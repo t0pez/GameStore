@@ -29,7 +29,7 @@ public class BasketService : IBasketService
 
     public void AddToBasket(Basket basket, Guid gameId, int quantity)
     {
-        if (BasketContainsGame(basket, gameId))
+        if (IsBasketContainGame(basket, gameId))
         {
             IncreaseQuantity(basket, gameId, quantity); // TODO: Can be changed by PO
         }
@@ -50,13 +50,13 @@ public class BasketService : IBasketService
         basket.Items.Add(item);
     }
 
-    private static void IncreaseQuantity(Basket basket, Guid gameId, int quantity)
+    private void IncreaseQuantity(Basket basket, Guid gameId, int quantity)
     {
         var existingGame = basket.Items.First(model => model.Game.Id == gameId);
         existingGame.Quantity += quantity;
     }
 
-    private static bool BasketContainsGame(Basket basket, Guid gameId)
+    private bool IsBasketContainGame(Basket basket, Guid gameId)
     {
         return basket.Items.Any(model => model.Game.Id == gameId);
     }

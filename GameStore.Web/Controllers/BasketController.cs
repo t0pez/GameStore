@@ -24,7 +24,7 @@ public class BasketController : Controller
         _mapper = mapper;
     }
 
-    [HttpGet("basket/")]
+    [HttpGet("basket")]
     public async Task<ActionResult> GetCurrentBasketAsync()
     {
         var basketCookieModel = HttpContext.Request.Cookies.TryGetValue(BasketCookieName, out var basketJson)

@@ -24,7 +24,7 @@ public class PublisherController : Controller
     [HttpGet("{companyName}")]
     public async Task<ActionResult<PublisherViewModel>> GetWithDetailsAsync([FromRoute] string companyName)
     {
-        var publisher = await _publisherService.GetByCompanyName(companyName);
+        var publisher = await _publisherService.GetByCompanyNameAsync(companyName);
         var result = _mapper.Map<PublisherViewModel>(publisher);
         
         return View(result);

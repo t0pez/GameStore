@@ -27,14 +27,14 @@ public class PublisherService : IPublisherService
 
     private IRepository<Publisher> Repository => _unitOfWork.GetRepository<Publisher>();
 
-    public async Task<ICollection<Publisher>> GetAll()
+    public async Task<ICollection<Publisher>> GetAllAsync()
     {
         var result = await Repository.GetBySpecAsync();
 
         return result;
     }
 
-    public async Task<Publisher> GetByCompanyName(string companyName)
+    public async Task<Publisher> GetByCompanyNameAsync(string companyName)
     {
         var result = await Repository.GetSingleOrDefaultBySpecAsync(new PublisherByCompanyName(companyName))
                      ?? throw new ItemNotFoundException(typeof(Publisher), companyName);
