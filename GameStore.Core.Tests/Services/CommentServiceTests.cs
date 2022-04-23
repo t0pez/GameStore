@@ -7,7 +7,7 @@ using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Comments.Specifications;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
-using GameStore.Core.Models.Records;
+using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Core.Services;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;

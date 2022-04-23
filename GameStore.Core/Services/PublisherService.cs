@@ -6,7 +6,7 @@ using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.Publishers.Specifications;
-using GameStore.Core.Models.Records;
+using GameStore.Core.Models.ServiceModels.Publishers;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 

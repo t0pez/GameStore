@@ -3,7 +3,6 @@ using GameStore.Core.Helpers.AliasCrafting;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
-using GameStore.Core.Models.Records;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,8 +11,10 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
+using GameStore.Core.Models.PlatformTypes.Specifications;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Core.Models.RelationalModels.Specifications;
+using GameStore.Core.Models.ServiceModels.Games;
 
 namespace GameStore.Core.Services;
 

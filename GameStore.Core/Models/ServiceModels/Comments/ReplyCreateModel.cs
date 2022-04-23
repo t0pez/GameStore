@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameStore.Core.Models.Records;
+namespace GameStore.Core.Models.ServiceModels.Comments;
 
 public class ReplyCreateModel
 {

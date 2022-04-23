@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using GameStore.Core.Models.Publishers;
-using GameStore.Core.Models.Records;
+using GameStore.Core.Models.ServiceModels.Publishers;
 
 namespace GameStore.Core.Interfaces;
 

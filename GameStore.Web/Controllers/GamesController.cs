@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using GameStore.Core.Interfaces;
-using GameStore.Core.Models.Records;
 using GameStore.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -8,6 +7,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GameStore.Core.Models.ServiceModels.Comments;
+using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.Web.Filters;
 using GameStore.Web.Models.Comment;
 using GameStore.Web.Models.Game;

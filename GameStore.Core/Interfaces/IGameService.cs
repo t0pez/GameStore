@@ -1,8 +1,8 @@
 ﻿using GameStore.Core.Models.Games;
-using GameStore.Core.Models.Records;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GameStore.Core.Models.ServiceModels.Games;
 
 namespace GameStore.Core.Interfaces;
 

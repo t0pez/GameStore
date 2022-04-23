@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
-using GameStore.Core.Models.Records;
+using GameStore.Core.Models.ServiceModels.Comments;
+using GameStore.Core.Models.ServiceModels.Games;
 
 namespace GameStore.Core.Profiles;
 

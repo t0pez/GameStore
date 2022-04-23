@@ -1,4 +1,4 @@
-﻿namespace GameStore.Core.Models.Records;
+﻿namespace GameStore.Core.Models.ServiceModels.Games;
 
 public class GameCreateModel
 {

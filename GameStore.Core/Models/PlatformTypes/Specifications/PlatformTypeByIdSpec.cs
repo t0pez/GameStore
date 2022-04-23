@@ -1,7 +1,8 @@
 ﻿using System;
 using Ardalis.Specification;
+using GameStore.Core.Models.Games;
 
-namespace GameStore.Core.Models.Games.Specifications;
+namespace GameStore.Core.Models.PlatformTypes.Specifications;
 
 public sealed class PlatformTypeByIdSpec : Specification<PlatformType>
 {

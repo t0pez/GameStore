@@ -5,12 +5,12 @@ using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Comments.Specifications;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
-using GameStore.Core.Models.Records;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using GameStore.Core.Models.ServiceModels.Comments;
 
 namespace GameStore.Core.Services;
 

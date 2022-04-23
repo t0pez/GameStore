@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace GameStore.Core.Models.Records;
+namespace GameStore.Core.Models.ServiceModels.Games;
 
 public class GameUpdateModel
 {
