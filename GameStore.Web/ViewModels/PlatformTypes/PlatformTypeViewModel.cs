@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameStore.Web.ViewModels.Games;
+namespace GameStore.Web.ViewModels.PlatformTypes;
 
 public class PlatformTypeViewModel
 {

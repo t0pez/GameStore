@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameStore.Web.ViewModels.Genres;
+using GameStore.Web.ViewModels.PlatformTypes;
 
 namespace GameStore.Web.ViewModels.Games;
 

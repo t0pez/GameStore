@@ -23,16 +23,55 @@
     
             <div class="collapse navbar-collapse">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <li class="nav-item">
-                        @Html.ActionLink("Create Game", "Create", "Games", new {area = ""}, new {@class = "nav-link active"})
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" href="#">
+                            Games
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                @Html.ActionLink("View all", "GetAll", "Games", new { area = "" }, new { @class = "dropdown-item" })
+                            </li>
+                            <li>
+                                @Html.ActionLink("Create", "Create", "Games", new { area = "" }, new { @class = "dropdown-item" })
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" href="#">
+                            Genres
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                @Html.ActionLink("View all", "GetAll", "Genres", new { area = "" }, new { @class = "dropdown-item" })
+                            </li>
+                            <li>
+                                @Html.ActionLink("Create", "Create", "Genres", new { area = "" }, new { @class = "dropdown-item" })
+                            </li>
+                        </ul>
+                    </li>
+                    
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" href="#">
+                            Platform types
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                @Html.ActionLink("View all", "GetAll", "PlatformTypes", new { area = "" }, new { @class = "dropdown-item" })
+                            </li>
+                            <li>
+                                @Html.ActionLink("Create", "Create", "PlatformTypes", new { area = "" }, new { @class = "dropdown-item" })
+                            </li>
+                        </ul>
                     </li>
                     
                     <li class="nav-item">
-                        @Html.ActionLink("Create Publisher", "Create", "Publisher", new {area = ""}, new {@class = "nav-link active"})
+                        @Html.ActionLink("Create Publisher", "Create", "Publisher", new { area = "" }, new { @class = "nav-link active" })
                     </li>
-                    
+
                     <li class="nav-item">
-                        @Html.ActionLink("Basket", "GetCurrentBasket", "Basket", new {area = ""}, new {@class = "nav-link active"})
+                        @Html.ActionLink("Basket", "GetCurrentBasket", "Basket", new { area = "" }, new { @class = "nav-link active" })
                     </li>
                 </ul>
             </div>
