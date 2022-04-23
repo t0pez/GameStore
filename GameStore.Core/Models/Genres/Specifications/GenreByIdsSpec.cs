@@ -1,7 +1,8 @@
 ﻿using System;
 using Ardalis.Specification;
+using GameStore.Core.Models.Games;
 
-namespace GameStore.Core.Models.Games.Specifications;
+namespace GameStore.Core.Models.Genres.Specifications;
 
 public sealed class GenreByIdSpec : Specification<Genre>
 {

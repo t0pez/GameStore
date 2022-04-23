@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
+using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.PlatformTypes.Specifications;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Core.Models.RelationalModels.Specifications;

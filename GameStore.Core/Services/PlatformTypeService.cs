@@ -63,8 +63,9 @@ public class PlatformTypeService : IPlatformTypeService
     {
         var platformType = await Repository.GetSingleOrDefaultBySpecAsync(new PlatformTypeByIdSpec(id))
                            ?? throw new ItemNotFoundException(typeof(PlatformType), id);
-        
-        await Repository.DeleteAsync(platformType);
+
+        platformType.IsDeleted = true;
+        await Repository.UpdateAsync(platformType);
         await _unitOfWork.SaveChangesAsync();
     }
 
