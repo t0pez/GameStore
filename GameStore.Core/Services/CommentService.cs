@@ -33,7 +33,7 @@ public class CommentService : ICommentService
     public async Task CommentGameAsync(CommentCreateModel model)
     {
         var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeySpec(model.GameKey))
-                   ?? throw new ItemNotFoundException(nameof(Game), nameof(model.GameKey), model.GameKey);
+                   ?? throw new ItemNotFoundException(typeof(Game), model.GameKey, nameof(model.GameKey));
         
         var comment = _mapper.Map<Comment>(model);
         comment.GameId = game.Id;
@@ -51,7 +51,7 @@ public class CommentService : ICommentService
     {
         if (await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false)
         {
-            throw new ItemNotFoundException(nameof(Game), nameof(gameKey), gameKey);
+            throw new ItemNotFoundException(typeof(Game), gameKey);
         }
 
         var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKeySpec(gameKey));
@@ -63,14 +63,12 @@ public class CommentService : ICommentService
     {
         if (await CommentRepository.AnyAsync(new CommentByIdSpec(createModel.ParentId)) == false)
         {
-            throw new ItemNotFoundException(nameof(Comment), nameof(createModel.ParentId),
-                                            createModel.ParentId.ToString());
+            throw new ItemNotFoundException(typeof(Comment), createModel.ParentId, nameof(createModel.ParentId));
         }
 
         if (await GameRepository.AnyAsync(new GameByIdSpec(createModel.GameId)) == false)
         {
-            throw new ItemNotFoundException(nameof(Game), nameof(createModel.GameId), 
-                                            createModel.GameId.ToString());
+            throw new ItemNotFoundException(typeof(Game), createModel.GameId, nameof(createModel.GameId));
         }
 
         var reply = _mapper.Map<Comment>(createModel);

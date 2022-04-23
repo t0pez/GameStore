@@ -37,7 +37,7 @@ public class PublisherService : IPublisherService
     public async Task<Publisher> GetByCompanyName(string companyName)
     {
         var result = await Repository.GetSingleOrDefaultBySpecAsync(new PublisherByCompanyName(companyName))
-                     ?? throw new ItemNotFoundException(nameof(Publisher), nameof(companyName), companyName);
+                     ?? throw new ItemNotFoundException(typeof(Publisher), companyName);
 
         return result;
     }
@@ -55,7 +55,7 @@ public class PublisherService : IPublisherService
     public async Task UpdateAsync(PublisherUpdateModel updateModel)
     {
         var publisher = await Repository.GetSingleOrDefaultBySpecAsync(new PublisherByIdWithDetailsSpec(updateModel.Id))
-                        ?? throw new ItemNotFoundException(nameof(Publisher), nameof(updateModel.Id), updateModel.Id.ToString());
+                        ?? throw new ItemNotFoundException(typeof(Publisher), updateModel.Id, nameof(updateModel.Id));
 
         await UpdatePublisherValues(publisher, updateModel);
 
@@ -66,7 +66,7 @@ public class PublisherService : IPublisherService
     public async Task DeleteAsync(Guid id)
     {
         var publisher = await Repository.GetSingleOrDefaultBySpecAsync(new PublisherByIdSpec(id))
-                        ?? throw new ItemNotFoundException(nameof(Publisher), nameof(id), id.ToString());
+                        ?? throw new ItemNotFoundException(typeof(Publisher), id);
 
         publisher.IsDeleted = true;
 

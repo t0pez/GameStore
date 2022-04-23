@@ -84,7 +84,7 @@ public class GameService : IGameService
     public async Task<Game> GetByKeyAsync(string gameKey)
     {
         var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeyWithDetailsSpec(gameKey))
-                     ?? throw new ItemNotFoundException(nameof(Game), nameof(gameKey), gameKey);
+                     ?? throw new ItemNotFoundException(typeof(Game), gameKey);
         
         return result;
     }
@@ -92,7 +92,7 @@ public class GameService : IGameService
     public async Task<Game> GetByIdAsync(Guid id)
     {
         var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdSpec(id))
-                     ?? throw new ItemNotFoundException(nameof(Game), nameof(id), id.ToString());
+                     ?? throw new ItemNotFoundException(typeof(Game), id);
         
         return result;
     }
@@ -107,7 +107,7 @@ public class GameService : IGameService
     public async Task UpdateAsync(GameUpdateModel updateModel)
     {
         var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdWithDetailsSpec(updateModel.Id))
-                   ?? throw new ItemNotFoundException(nameof(Game), nameof(updateModel.Id), updateModel.Id.ToString());
+                   ?? throw new ItemNotFoundException(typeof(Game), updateModel.Id, nameof(updateModel.Id));
         
         await UpdateGameValues(game, updateModel);
 
@@ -121,7 +121,7 @@ public class GameService : IGameService
     public async Task DeleteAsync(Guid id)
     {
         var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdSpec(id))
-                   ?? throw new ItemNotFoundException(nameof(Game), nameof(id), id.ToString());
+                   ?? throw new ItemNotFoundException(typeof(Game), id);
         
         game.IsDeleted = true;
         await GameRepository.UpdateAsync(game);
@@ -133,7 +133,7 @@ public class GameService : IGameService
     public async Task<byte[]> GetFileAsync(string gameKey)
     {
         var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeySpec(gameKey))
-                   ?? throw new ItemNotFoundException(nameof(Game), nameof(gameKey), gameKey);
+                   ?? throw new ItemNotFoundException(typeof(Game), gameKey);
 
         return game.File;
     }
@@ -154,14 +154,14 @@ public class GameService : IGameService
     {
         foreach (var genreId in genresIds)
             if (await GenreRepository.AnyAsync(new GenreByIdSpec(genreId)) == false)
-                throw new ItemNotFoundException(nameof(Genre), nameof(genreId), genreId.ToString());
+                throw new ItemNotFoundException(typeof(Genre), genreId);
     }
 
     private async Task AssertPlatformsExistsAsync(IEnumerable<Guid> platformsIds)
     {
         foreach (var platformId in platformsIds)
             if (await PlatformTypesRepository.AnyAsync(new PlatformTypeByIdSpec(platformId)) == false)
-                throw new ItemNotFoundException(nameof(PlatformType), nameof(platformId), platformId.ToString());
+                throw new ItemNotFoundException(typeof(PlatformType), platformId);
     }
 
     private async Task UpdateGameRelationshipModelsAsync(GameUpdateModel updateModel)

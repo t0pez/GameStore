@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace GameStore.Core.Exceptions;
 
@@ -9,12 +10,13 @@ public class ItemNotFoundException : Exception
     {
     }
 
-    public ItemNotFoundException(string entity, string predicateProperty,
-                                 string predicateValue) // TODO: create overload with object to call ToString in ctor
+    public ItemNotFoundException(Type entity, object predicateProperty,
+                                 [CallerArgumentExpression("predicateProperty")]
+                                 string propertyName = "")
     {
-        Entity = entity;
-        PredicateProperty = predicateProperty;
-        PredicateValue = predicateValue;
+        Entity = entity.Name;
+        PredicateProperty = propertyName;
+        PredicateValue = predicateProperty.ToString();
         Message = CraftExceptionMessage();
     }
 
