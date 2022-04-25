@@ -6,14 +6,20 @@ using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Core.Models.ServiceModels.Games;
+using GameStore.Core.Models.ServiceModels.Genres;
+using GameStore.Core.Models.ServiceModels.PlatformTypes;
 using GameStore.Core.Models.ServiceModels.Publishers;
 using GameStore.Web.Models.Basket;
 using GameStore.Web.Models.Comment;
 using GameStore.Web.Models.Game;
+using GameStore.Web.Models.Genre;
+using GameStore.Web.Models.PlatformType;
 using GameStore.Web.Models.Publisher;
 using GameStore.Web.ViewModels.Basket;
 using GameStore.Web.ViewModels.Comments;
 using GameStore.Web.ViewModels.Games;
+using GameStore.Web.ViewModels.Genres;
+using GameStore.Web.ViewModels.PlatformTypes;
 using GameStore.Web.ViewModels.Publisher;
 
 namespace GameStore.Web.Profiles;
@@ -29,6 +35,12 @@ public class WebCommonProfile : Profile
         CreateMap<ReplyCreateRequestModel, ReplyCreateModel>().ReverseMap();
 
         CreateMap<PublisherCreateRequestModel, PublisherCreateModel>().ReverseMap();
+        
+        CreateMap<GenreCreateRequestModel, GenreCreateModel>().ReverseMap();
+        CreateMap<GenreUpdateRequestModel, GenreUpdateModel>().ReverseMap();
+        
+        CreateMap<PlatformTypeCreateRequestModel, PlatformTypeCreateModel>().ReverseMap();
+        CreateMap<PlatformTypeUpdateRequestModel, PlatformTypeUpdateModel>().ReverseMap();
 
         CreateMap<Basket, BasketViewModel>();
         CreateMap<Basket, BasketCookieModel>().ReverseMap();
@@ -38,6 +50,12 @@ public class WebCommonProfile : Profile
         CreateMap<Game, GameInBasketViewModel>();
 
         CreateMap<Genre, GenreViewModel>();
+        CreateMap<Genre, GenreListViewModel>();
+        
+        CreateMap<PlatformType, PlatformTypeViewModel>();
+        CreateMap<PlatformType, PlatformTypeListViewModel>();
+        
+        
         CreateMap<Publisher, PublisherViewModel>();
 
         CreateMap<BasketItem, BasketItemViewModel>();

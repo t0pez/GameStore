@@ -70,8 +70,8 @@ public class PlatformTypesController : Controller
         return RedirectToAction("GetAll", "PlatformTypes");
     }
 
-    [HttpPost("delete/{id:guid}")]
-    public async Task<ActionResult> DeleteAsync([FromRoute] Guid id)
+    [HttpPost("delete")]
+    public async Task<ActionResult> DeleteAsync(Guid id)
     {
         await _platformTypeService.DeleteAsync(id);
 
