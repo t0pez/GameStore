@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.RelationalModels;
 
 namespace GameStore.Infrastructure.Data.Context;
@@ -41,7 +42,7 @@ internal static class DataSeeder
         };
         var shooterGenre = new Genre
         {
-            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7603"),
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7604"),
             Name = "Shooter",
             IsDeleted = false,
             Games = new List<GameGenre>(),
@@ -49,7 +50,7 @@ internal static class DataSeeder
         };
         var actionGenre = new Genre
         {
-            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7603"),
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7605"),
             Name = "Shooter",
             IsDeleted = false,
             Games = new List<GameGenre>(),

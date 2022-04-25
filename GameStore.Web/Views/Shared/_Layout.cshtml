@@ -66,8 +66,18 @@
                         </ul>
                     </li>
                     
-                    <li class="nav-item">
-                        @Html.ActionLink("Create Publisher", "Create", "Publisher", new { area = "" }, new { @class = "nav-link active" })
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown" href="#">
+                            Publishers
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li>
+                                @Html.ActionLink("View all", "GetAll", "Publisher", new { area = "" }, new { @class = "dropdown-item" })
+                            </li>
+                            <li>
+                                @Html.ActionLink("Create", "Create", "Publisher", new { area = "" }, new { @class = "dropdown-item" })
+                            </li>
+                        </ul>
                     </li>
 
                     <li class="nav-item">

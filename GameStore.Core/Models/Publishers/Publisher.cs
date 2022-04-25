@@ -12,7 +12,7 @@ public class Publisher : ISafeDelete
     public string Description { get; set; }
     public string HomePage { get; set; }
 
-    public ICollection<Game> Games { get; set; } // TODO: change to GamePublisher or smth
+    public ICollection<Game> Games { get; set; }
     
     public bool IsDeleted { get; set; }
 }

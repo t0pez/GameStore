@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
@@ -29,7 +29,7 @@ public class PublisherService : IPublisherService
 
     public async Task<ICollection<Publisher>> GetAllAsync()
     {
-        var result = await Repository.GetBySpecAsync();
+        var result = await Repository.GetBySpecAsync(new PublishersWithDetailsSpec());
 
         return result;
     }

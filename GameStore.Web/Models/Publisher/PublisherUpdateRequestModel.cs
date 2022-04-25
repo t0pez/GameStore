@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace GameStore.Web.Models.Publisher;
 
-public class PublisherEditRequestModel
+public class PublisherUpdateRequestModel
 {
     [Required]
     public Guid Id { get; set; }

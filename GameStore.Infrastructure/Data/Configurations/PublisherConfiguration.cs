@@ -14,6 +14,8 @@ internal class PublisherConfiguration : IEntityTypeConfiguration<Publisher>
         builder.Property(publisher => publisher.Description).IsRequired();
         builder.Property(publisher => publisher.HomePage).IsRequired();
 
-        // TODO: need to configure relations with game
+        builder.HasMany(publisher => publisher.Games)
+               .WithOne(game => game.Publisher)
+               .HasForeignKey(game => game.PublisherId);
     }
 }

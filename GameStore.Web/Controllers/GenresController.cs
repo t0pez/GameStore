@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
+using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.ServiceModels.Genres;
 using GameStore.Web.Models.Genre;
 using GameStore.Web.ViewModels.Genres;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GameStore.Web.Controllers;
 
@@ -43,6 +45,10 @@ public class GenresController : Controller
     [HttpGet("new")]
     public async Task<ActionResult> CreateAsync()
     {
+        var genres = await _genreService.GetAllAsync();
+        var genresSelectList = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
+        ViewData["Genres"] = genresSelectList;
+        
         return View(new GenreCreateRequestModel());
     }
 
@@ -70,8 +76,8 @@ public class GenresController : Controller
         return RedirectToAction("GetAll", "Genres");
     }
 
-    [HttpPost("delete/{id:guid}")]
-    public async Task<ActionResult> DeleteAsync([FromRoute] Guid id)
+    [HttpPost("delete")]
+    public async Task<ActionResult> DeleteAsync(Guid id)
     {
         await _genreService.DeleteAsync(id);
 

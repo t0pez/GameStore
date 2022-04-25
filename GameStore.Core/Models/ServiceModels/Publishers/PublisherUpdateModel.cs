@@ -10,6 +10,4 @@ public class PublisherUpdateModel
     public string Name { get; set; }
     public string Description { get; set; }
     public string HomePage { get; set; }
-
-    public ICollection<Game> Games { get; set; }
 }

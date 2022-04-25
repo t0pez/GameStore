@@ -1,8 +1,9 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.ServiceModels.Publishers;
-using GameStore.Web.Models;
 using GameStore.Web.Models.Publisher;
 using GameStore.Web.ViewModels.Publisher;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,15 @@ public class PublisherController : Controller
         _mapper = mapper;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<IEnumerable<PublisherListViewModel>>> GetAllAsync()
+    {
+        var publishers = await _publisherService.GetAllAsync();
+        var result = _mapper.Map<IEnumerable<PublisherListViewModel>>(publishers);
+
+        return View(result);
+    }
+    
     [HttpGet("{companyName}")]
     public async Task<ActionResult<PublisherViewModel>> GetWithDetailsAsync([FromRoute] string companyName)
     {
@@ -49,5 +59,31 @@ public class PublisherController : Controller
         var publisher = await _publisherService.CreateAsync(createModel);
 
         return RedirectToAction("GetWithDetails", "Publisher", new { companyName = publisher.Name });
+    }
+
+    [HttpGet("update/{companyName}")]
+    public async Task<ActionResult<PublisherUpdateRequestModel>> UpdateAsync([FromRoute] string companyName)
+    {
+        var publisherToUpdate = await _publisherService.GetByCompanyNameAsync(companyName);
+        var mapped = _mapper.Map<PublisherUpdateRequestModel>(publisherToUpdate);
+
+        return View(mapped);
+    }
+    
+    [HttpPost("update/{companyName}")]
+    public async Task<ActionResult> UpdateAsync(PublisherUpdateRequestModel request)
+    {
+        var updateModel = _mapper.Map<PublisherUpdateModel>(request);
+        await _publisherService.UpdateAsync(updateModel);
+
+        return RedirectToAction("GetWithDetails", "Publisher", new { companyName = request.Name });
+    }
+    
+    [HttpPost("delete")]
+    public async Task<ActionResult> DeleteAsync(Guid id)
+    {
+        await _publisherService.DeleteAsync(id);
+
+        return RedirectToAction("GetAll", "Publisher");
     }
 }

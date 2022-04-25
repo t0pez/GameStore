@@ -36,6 +36,7 @@ public class WebCommonProfile : Profile
         CreateMap<ReplyCreateRequestModel, ReplyCreateModel>().ReverseMap();
 
         CreateMap<PublisherCreateRequestModel, PublisherCreateModel>().ReverseMap();
+        CreateMap<PublisherUpdateRequestModel, PublisherUpdateModel>().ReverseMap();
         
         CreateMap<GenreCreateRequestModel, GenreCreateModel>().ReverseMap();
         CreateMap<GenreUpdateRequestModel, GenreUpdateModel>().ReverseMap();
@@ -58,6 +59,8 @@ public class WebCommonProfile : Profile
         
         
         CreateMap<Publisher, PublisherViewModel>();
+        CreateMap<Publisher, PublisherListViewModel>();
+        CreateMap<Publisher, PublisherUpdateRequestModel>();
 
         CreateMap<BasketItem, BasketItemViewModel>();
         CreateMap<BasketItem, BasketItemCookieModel>()

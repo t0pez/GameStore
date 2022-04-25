@@ -19,5 +19,9 @@ internal class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.HasMany(game => game.Comments)
                .WithOne(comment => comment.Game)
                .HasForeignKey(comment => comment.GameId);
+
+        builder.HasOne(game => game.Publisher)
+               .WithMany(publisher => publisher.Games)
+               .HasForeignKey(game => game.PublisherId);
     }
 }

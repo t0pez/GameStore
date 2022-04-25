@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
-using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.ServiceModels.Genres;
 using GameStore.SharedKernel.Interfaces.DataAccess;
@@ -33,7 +33,7 @@ public class GenreService : IGenreService
 
     public async Task<Genre> GetByIdAsync(Guid id)
     {
-        var result = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdSpec(id))
+        var result = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdWithDetailsSpec(id))
                      ?? throw new ItemNotFoundException(typeof(Genre), id);
 
         return result;
@@ -58,7 +58,7 @@ public class GenreService : IGenreService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(Guid id) // TODO: think about children
     {
         var genre = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdSpec(id))
                                  ?? throw new ItemNotFoundException(typeof(Genre), id);

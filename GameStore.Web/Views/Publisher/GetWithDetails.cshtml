@@ -20,14 +20,30 @@
                     @Html.LabelFor(model => model.Name, "Name:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Name)
                 </div>
+                
+                <div>
+                    @Html.LabelFor(model => model.HomePage, "Home page:", new { @class = "form-label fw-bolder" })
+                    @Html.DisplayFor(model => model.HomePage)
+                </div>
 
                 <div>
                     @Html.LabelFor(model => model.Description, "Description:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Description)
                 </div>
-
             </div>
 
+        </div>
+        
+        <div class="col-6">
+            <div class="mb-3">
+                @Html.ActionLink("Edit", "Update", new { companyName = Model.Name }, new { @class = "btn btn-info" })
+            </div>
+            <div>
+                <form method="post" asp-controller="Publisher" asp-action="Delete">
+                    <input type="hidden" name="id" id="id" value="@Model.Id"/>
+                    <button type="submit" class="btn btn-warning">Delete</button>
+                </form>
+            </div>
         </div>
 
     </div>
