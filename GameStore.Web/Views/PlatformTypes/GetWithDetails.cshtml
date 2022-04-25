@@ -20,10 +20,8 @@
     </div>
 
     <div class="col-6">
-        <div>
-            <p>
-                @Html.ActionLink("Edit", "Update", new { id = Model.Id }, new { @class = "btn btn-info" })
-            </p>
+        <div class="mb-3">
+            @Html.ActionLink("Edit", "Update", new { id = Model.Id }, new { @class = "btn btn-info" })
         </div>
         <div>
             <form method="post" asp-controller="PlatformTypes" asp-action="Delete">

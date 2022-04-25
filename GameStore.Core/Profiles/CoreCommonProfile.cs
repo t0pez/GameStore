@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Core.Models.ServiceModels.Games;

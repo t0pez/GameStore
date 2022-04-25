@@ -1,9 +1,9 @@
 ﻿using System;
-using GameStore.SharedKernel.Interfaces;
 using System.Collections.Generic;
 using GameStore.Core.Models.RelationalModels;
+using GameStore.SharedKernel.Interfaces;
 
-namespace GameStore.Core.Models.Games;
+namespace GameStore.Core.Models.Genres;
 
 public class Genre : ISafeDelete
 {

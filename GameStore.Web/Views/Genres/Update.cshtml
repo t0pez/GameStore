@@ -1,11 +1,11 @@
-﻿@model GameStore.Web.Models.Genre.GenreCreateRequestModel
+﻿@model GameStore.Web.Models.Genre.GenreUpdateRequestModel
 
 @{
-    ViewBag.Title = "Create";
+    ViewBag.Title = "Update";
     Layout = "_Layout";
 }
 
-<h2>Create</h2>
+<h2>Update</h2>
 
 <form method="post">
     
@@ -31,7 +31,7 @@
             @Html.ActionLink("Back to List", "GetAll", new { area = "" }, new { @class = "btn btn-outline-secondary" })
 
             <button type="submit" class="btn btn-primary">
-                Create
+                Update
             </button>
         </div>
     </div>
