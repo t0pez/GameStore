@@ -15,7 +15,8 @@ public sealed class GameByKeyWithDetailsSpec : Specification<Game>, ISingleResul
             .Include(g => g.Genres)
             .ThenInclude(gameGenre => gameGenre.Genre)
             .Include(g => g.Platforms)
-            .ThenInclude(gamePlatform => gamePlatform.Platform);
+            .ThenInclude(gamePlatform => gamePlatform.Platform)
+            .Include(game => game.Publisher);
     }
     
     public string Key { get; }

@@ -2,7 +2,7 @@
 
 namespace GameStore.Core.Helpers.AliasCrafting;
 
-internal class AliasCraftBuilder
+public class AliasCraftBuilder
 {
     public AliasCraftConfig Config { get; set; } = new();
     

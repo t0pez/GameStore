@@ -1,11 +1,11 @@
-﻿@model GameStore.Web.Models.Game.GameCreateRequestModel
+﻿@model GameStore.Web.Models.Game.GameUpdateRequestModel
 
 @{
-    ViewBag.Title = "Create game";
+    ViewBag.Title = "Update";
     Layout = "_Layout";
 }
 
-<h2 class="mt-5">Create</h2>
+<h2>Update</h2>
 
 <form method="post" enctype="multipart/form-data">
 
@@ -17,7 +17,7 @@
 
         @Html.ValidationSummary(true, "", new {@class = "text-danger"})
         <div class="row">
-
+            <input type="hidden" name="id" value="@Model.Id">
             <div class="col-4">
                 <div class="form-floating mb-3">
                     @Html.EditorFor(model => model.Name, new {htmlAttributes = new {@class = "form-control", @placeholder = "Name", @style = "min-width: 100%"}})
@@ -30,9 +30,7 @@
                         @Html.LabelFor(model => model.Key, new { @class = "ps-4" })
                         @Html.ValidationMessageFor(model => model.Key, "", new { @class = "text-danger" })
                     </div>
-                    <div class="col-4">
-                        <button type="button" class="btn btn-info" onclick="generateKey()" style="min-height: 100%">Generate key</button>
-                    </div>
+                    <button type="button" class="btn btn-info col-4">Generate</button>
                 </div>               
                 <div class="form-floating col-md mb-3">
                     @Html.EditorFor(model => model.Price, new {htmlAttributes = new {@class = "form-control", @placeholder = "Name", @style = "min-width: 100%"}})
@@ -72,7 +70,7 @@
             @Html.ActionLink("Back to List", "GetAll", new {area = ""}, new {@class = "btn btn-outline-secondary"})
 
             <button type="submit" class="btn btn-primary">
-                Create
+                Update
             </button>
         </div>
     </div>

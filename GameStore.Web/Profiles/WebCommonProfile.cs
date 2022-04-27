@@ -30,7 +30,7 @@ public class WebCommonProfile : Profile
     public WebCommonProfile()
     {
         CreateMap<GameCreateRequestModel, GameCreateModel>().ReverseMap();
-        CreateMap<GameEditRequestModel, GameUpdateModel>().ReverseMap();
+        CreateMap<GameUpdateRequestModel, GameUpdateModel>().ReverseMap();
 
         CreateMap<CommentCreateRequestModel, CommentCreateModel>().ReverseMap();
         CreateMap<ReplyCreateRequestModel, ReplyCreateModel>().ReverseMap();
@@ -50,6 +50,7 @@ public class WebCommonProfile : Profile
         CreateMap<Game, GameViewModel>();
         CreateMap<Game, GameListViewModel>();
         CreateMap<Game, GameInBasketViewModel>();
+        CreateMap<Game, GameUpdateRequestModel>();
 
         CreateMap<Genre, GenreViewModel>();
         CreateMap<Genre, GenreListViewModel>();
@@ -60,6 +61,7 @@ public class WebCommonProfile : Profile
         
         CreateMap<Publisher, PublisherViewModel>();
         CreateMap<Publisher, PublisherListViewModel>();
+        CreateMap<Publisher, PublisherInGameViewModel>();
         CreateMap<Publisher, PublisherUpdateRequestModel>();
 
         CreateMap<BasketItem, BasketItemViewModel>();

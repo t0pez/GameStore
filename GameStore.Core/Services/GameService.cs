@@ -1,4 +1,4 @@
-﻿using GameStore.Core.Exceptions;
+using GameStore.Core.Exceptions;
 using GameStore.Core.Helpers.AliasCrafting;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Games;
@@ -11,6 +11,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
+using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.PlatformTypes.Specifications;
 using GameStore.Core.Models.RelationalModels;
@@ -23,7 +24,6 @@ public class GameService : IGameService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GameService> _logger;
-    private readonly IAliasCraft _gameKeyAliasCraft;
     private readonly IMapper _mapper;
     private readonly IRelationshipModelService<GameGenre> _gameGenreService;
     private readonly IRelationshipModelService<GamePlatformType> _gamePlatformService;
@@ -37,11 +37,7 @@ public class GameService : IGameService
         _mapper = mapper;
         _gameGenreService = gameGenreService;
         _gamePlatformService = gamePlatformService;
-        _gameKeyAliasCraft =
-            new AliasCraftBuilder()
-                .Values("_", " ").ReplaceWith("-")
-                .Values(",", ".", ":", "?").Delete()
-                .Build();
+       
     }
 
     private IRepository<Game> GameRepository => _unitOfWork.GetRepository<Game>();
@@ -50,10 +46,7 @@ public class GameService : IGameService
 
     public async Task<Game> CreateAsync(GameCreateModel model)
     {
-        var gameKey = await CreateUniqueGameKeyAsync(model.Name);
-
         var game = _mapper.Map<Game>(model);
-        game.Key = gameKey;
 
         await GameRepository.AddAsync(game);
         await _unitOfWork.SaveChangesAsync();
@@ -148,8 +141,11 @@ public class GameService : IGameService
         await UpdateGameRelationshipModelsAsync(updateModel);
 
         game.Name = updateModel.Name;
+        game.Key = updateModel.Key;
         game.Description = updateModel.Description;
+        game.Price = updateModel.Price;
         game.File = updateModel.File;
+        game.PublisherId = updateModel.PublisherId;
     }
 
     private async Task AssertGenresExistsAsync(IEnumerable<Guid> genresIds)
@@ -176,45 +172,5 @@ public class GameService : IGameService
         await _gameGenreService.UpdateManyToManyAsync(newGameGenres, new GameGenresByGameIdSpec(updateModel.Id));
         await _gamePlatformService.UpdateManyToManyAsync(newGamePlatforms,
                                                          new GamePlatformsByPlatformIdSpec(updateModel.Id));
-    }
-
-    private async Task<string> CreateUniqueGameKeyAsync(string source)
-    {
-        _logger.LogDebug("Started creation game key for game with Name = {Name}", source);
-        var gameKey = _gameKeyAliasCraft.CreateAlias(source);
-
-        if (await IsKeyUniqueAsync(gameKey) == false)
-        {
-            return await CreateGameKeyWithCodeAsync(source);
-        }
-
-        return gameKey;
-    }
-
-    private async Task<string> CreateGameKeyWithCodeAsync(string source)
-    {
-        var attemptCode = 1;
-
-        do
-        {
-            var gameKey = CreateAliasWithCode(source, attemptCode++);
-
-            if (await IsKeyUniqueAsync(gameKey))
-            {
-                _logger.LogDebug("Ended creation game key for game with Name = {Name}, Result = {Key}",
-                                 source, gameKey);
-                return gameKey;
-            }
-        } while (true);
-    }
-
-    private string CreateAliasWithCode(string source, int code)
-    {
-        return _gameKeyAliasCraft.CreateAlias(source + "--" + code);
-    }
-
-    private async Task<bool> IsKeyUniqueAsync(string gameKey)
-    {
-        return await GameRepository.AnyAsync(new GameByKeySpec(gameKey)) == false;
     }
 }

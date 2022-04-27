@@ -30,63 +30,98 @@
                     @Html.LabelFor(model => model.Price, "Price:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Price)
                 </div>
+                
+                <div>
+                    <label class="form-label">Genres: </label>
+                    <table class="table">
+                        @foreach (var item in Model.Genres)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+
+                                <td>
+                                    @Html.ActionLink("Checkout", "GetWithDetails", new { id = item.Id })
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+                <div>
+                    <label class="form-label">Platfroms: </label>
+                    <table class="table">
+                        @foreach (var item in Model.Platforms)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </td>
+
+                                <td>
+                                    @Html.ActionLink("Checkout", "GetWithDetails", new { id = item.Id })
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
             </div>
         </div>
 
         <div class="col-6">
-            <div>
+            <div class="mb-3">
+                @Html.ActionLink("Edit", "Update", new { gameKey = Model.Key }, new { @class = "btn btn-info" })
+            </div>
+            <div class="mb-3">
+                <form method="post" asp-action="Delete" class="mb-3">
+                    <input type="hidden" name="@nameof(Model.Id)" value="@Model.Id">
+                    <button class="btn btn-warning">Delete</button>
+                </form>
+            </div>
+            <div class="mb-3">
+                @Html.ActionLink("Download", "GetFile", new { gameKey = Model.Key }, new { @class = "btn btn-outline-secondary" })
+            </div>
+            <div class="mb-3">
+                @Html.ActionLink("View comments", "GetComments", new { gameKey = Model.Key }, new{ @class="btn btn-outline-secondary" })
+            </div>
+            <div class="mb-3">
+                <label>Publisher:</label>
                 <p>
-                    @Html.ActionLink("Download", "GetFile", new { gameKey = Model.Key }, new { @class = "btn btn-outline-secondary" })
+                    @Html.ActionLink(Model.Publisher.Name, "GetWithDetails", "Publisher", new { companyName = Model.Publisher.Name })
                 </p>
             </div>
-            <div>
-                <p>
-                    @Html.ActionLink("View comments", "GetComments", new { gameKey = Model.Key }, new{ @class="btn btn-outline-secondary" })
-                </p>
-            </div>
-            <div>
-                <p>
-                    Here will be link for publisher(s)
-                </p>
-            </div>
-            <div>
+            <div class="mb-3">
                 <form method="post" asp-controller="Basket" asp-action="AddToBasket">
-                
                     <script src="~/lib/jquery/dist/jquery.js"></script>
                     <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
                     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
                 
                     <div class="">
-                
-                
-                        <h4>Add to basket</h4>
-                
-                        <hr/>
-                
-                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
                         
-                
+                        <h4>Add to basket</h4>
+                        
+                        <hr/>
+
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
                         <div class="form-floating mb-3 col-4">
                             <input class="d-none" id="gameId" name="gameId" value="@Model.Id"/>
-                            
+
                             <input class="form-control form-control-lg" placeholder="Author"
                                    id="quantity" name="quantity" type="number" required/>
-
                             <label class="ps-4" for="quantity">Count:</label>
 
                             @Html.ValidationMessage("quantity", "", new { @class = "text-danger" })
                         </div>
-                
+
                         <div class="mb-3">
                             <input type="submit" class="btn btn-primary" content="Leave comment"/>
                         </div>
-                
                     </div>
                 </form>
             </div>
         </div>
     </div>
-    
 </div>
 <p>
     @Html.ActionLink("Back to List", "GetAll", new {}, new{ @class="btn btn-outline-secondary" })

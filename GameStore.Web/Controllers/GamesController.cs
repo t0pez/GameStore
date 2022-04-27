@@ -1,12 +1,15 @@
 ﻿using AutoMapper;
 using GameStore.Core.Interfaces;
-using GameStore.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using GameStore.Core.Helpers.AliasCrafting;
+using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Genres;
+using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.Web.Filters;
@@ -15,6 +18,7 @@ using GameStore.Web.Models.Game;
 using GameStore.Web.ViewModels.Comments;
 using GameStore.Web.ViewModels.Games;
 using HybridModelBinding;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GameStore.Web.Controllers;
 
@@ -24,13 +28,25 @@ public class GamesController : Controller
 {
     private readonly IGameService _gameService;
     private readonly ICommentService _commentService;
+    private readonly IPublisherService _publisherService;
+    private readonly IGenreService _genreService;
+    private readonly IPlatformTypeService _platformTypeService;
+    private readonly IAliasCraft _gameKeyAliasCraft;
     private readonly IMapper _mapper;
 
-    public GamesController(IGameService gameService, ICommentService commentService, IMapper mapper)
+    public GamesController(IGameService gameService, ICommentService commentService, IMapper mapper, IPublisherService publisherService, IGenreService genreService, IPlatformTypeService platformTypeService)
     {
         _gameService = gameService;
         _commentService = commentService;
         _mapper = mapper;
+        _publisherService = publisherService;
+        _genreService = genreService;
+        _platformTypeService = platformTypeService;
+        _gameKeyAliasCraft =
+            new AliasCraftBuilder()
+                .Values("_", " ").ReplaceWith("-")
+                .Values(",", ".", ":", "?").Delete()
+                .Build();
     }
 
     [HttpGet("count")]
@@ -70,6 +86,8 @@ public class GamesController : Controller
     [HttpGet("new")]
     public async Task<ActionResult> CreateAsync()
     {
+        await FillViewData();
+
         return View(new GameCreateRequestModel());
     }
 
@@ -109,21 +127,38 @@ public class GamesController : Controller
         return View(result);
     }
 
-    [HttpPost("update")]
-    public async Task<ActionResult> UpdateAsync([FromBody] GameEditRequestModel request)
+    [HttpGet("{gameKey}/update")]
+    public async Task<ActionResult> UpdateAsync([FromRoute] string gameKey)
+    {
+        await FillViewData();
+
+        var gameToUpdate = await _gameService.GetByKeyAsync(gameKey);
+        var mapped = _mapper.Map<GameUpdateRequestModel>(gameToUpdate);
+        
+        return View(mapped);
+    }
+
+    [HttpPost("{gameKey}/update")]
+    public async Task<ActionResult> UpdateAsync(GameUpdateRequestModel request)
     {
         var game = _mapper.Map<GameUpdateModel>(request);
         await _gameService.UpdateAsync(game);
 
-        return Ok();
+        return RedirectToAction("GetWithDetails", "Games", new { gameKey = request.Key });
     }
 
     [HttpPost("remove")]
-    public async Task<ActionResult> DeleteAsync([FromBody] Guid id)
+    public async Task<ActionResult> DeleteAsync(Guid id)
     {
         await _gameService.DeleteAsync(id);
 
-        return Ok();
+        return RedirectToAction("GetAll", "Games");
+    }
+
+    [HttpPost("key/{name}")]
+    public async Task<ActionResult> GenerateKeyAsync([FromRoute] string name)
+    {
+        return new JsonResult(new { key = _gameKeyAliasCraft.CreateAlias(name) });
     }
 
     private async Task<byte[]> GetBytesFromFormFile()
@@ -136,5 +171,20 @@ public class GamesController : Controller
         var fileBytes = bytes.ToArray();
 
         return fileBytes;
+    }
+
+    private async Task FillViewData()
+    {
+        var publishers = await _publisherService.GetAllAsync();
+        var publishersSelectList = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
+        ViewData["Publishers"] = publishersSelectList;
+
+        var genres = await _genreService.GetAllAsync();
+        var genresSelectList = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
+        ViewData["Genres"] = genresSelectList;
+
+        var platforms = await _platformTypeService.GetAllAsync();
+        var platformsSelectList = new SelectList(platforms, nameof(PlatformType.Id), nameof(PlatformType.Name));
+        ViewData["Platforms"] = platformsSelectList;
     }
 }

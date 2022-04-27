@@ -2,7 +2,7 @@
 
 namespace GameStore.Core.Helpers.AliasCrafting;
 
-internal class ReplacingPairBuilder
+public class ReplacingPairBuilder
 {
     private readonly AliasCraftBuilder _builder;
     private readonly List<string> _oldValues;
