@@ -11,6 +11,7 @@ public sealed class GenreByIdWithDetailsSpec : Specification<Genre>, ISingleResu
         Query
             .Where(genre => genre.Id == id &&
                             genre.IsDeleted == false)
+            .Include(genre => genre.Parent)
             .Include(genre => genre.SubGenres.Where(subGenre => subGenre.IsDeleted == false));
     }
 }

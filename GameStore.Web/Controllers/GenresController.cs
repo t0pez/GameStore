@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
@@ -64,6 +65,21 @@ public class GenresController : Controller
     [HttpGet("update/{id:guid}")]
     public async Task<ActionResult<GenreUpdateRequestModel>> UpdateAsync([FromRoute] Guid id)
     {
+        var genres = await _genreService.GetAllAsync();
+        var currentGenre = genres.FirstOrDefault(genre => genre.Id == id);
+
+        if (currentGenre is null)
+        {
+            return BadRequest();
+        }
+        
+        var genresSelectList = genres.Except(new[] { currentGenre })
+                                     .Select(genre => new SelectListItem(genre.Name, genre.Id.ToString()))
+                                     .ToList();
+        genresSelectList.Add(new SelectListItem("Empty", Guid.Empty.ToString()));
+        
+        ViewData["Genres"] = genresSelectList;
+
         return View(new GenreUpdateRequestModel { Id = id });
     }
 

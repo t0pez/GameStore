@@ -71,6 +71,6 @@ public class GenreService : IGenreService
     private void UpdateValues(GenreUpdateModel updateModel, Genre genre)
     {
         genre.Name = updateModel.Name;
-        genre.ParentId = updateModel.ParentId;
+        genre.ParentId = updateModel.ParentId != Guid.Empty ? updateModel.ParentId : null;
     }
 }

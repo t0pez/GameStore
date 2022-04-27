@@ -16,29 +16,30 @@
                 @Html.LabelFor(model => model.Name, "Name:", new { @class = "form-label fw-bolder" })
                 @Html.DisplayFor(model => model.Name)
             </div>
+            
+            @if (Model.Parent is not null)
+            {
+                <div>
+                    @Html.Label("ParentName", "Parent:", new { @class = "form-label fw-bolder" })
+                    @Html.ActionLink(Model.Parent.Name, "GetWithDetails", new { id = Model.Parent.Id })
+                </div>
+            }
 
             <div>
+                <label class="form-label fw-bolder">Sub genres:</label>
                 <table class="table">
-                    <tr>
-                        <th>
-                            @Html.DisplayNameFor(model => model.Name)
-                        </th> 
-                    
-                        <th></th>
-                    </tr>
-            
-                    @foreach (var item in Model.SubGenres) {
+                    @foreach (var item in Model.SubGenres)
+                    {
                         <tr>
                             <td>
                                 @Html.DisplayFor(modelItem => item.Name)
                             </td>
-                    
+
                             <td>
                                 @Html.ActionLink("Checkout", "GetWithDetails", new { id = item.Id })
                             </td>
                         </tr>
                     }
-            
                 </table>
             </div>
         </div>
