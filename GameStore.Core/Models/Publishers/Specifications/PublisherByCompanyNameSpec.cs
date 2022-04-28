@@ -2,12 +2,16 @@
 
 namespace GameStore.Core.Models.Publishers.Specifications;
 
-public class PublisherByCompanyName : Specification<Publisher>
+public sealed class PublisherByCompanyNameSpec : Specification<Publisher>
 {
-    public PublisherByCompanyName(string companyName)
+    public PublisherByCompanyNameSpec(string companyName)
     {
+        Name = companyName;
+        
         Query
             .Where(publisher => publisher.Name == companyName &&
                                 publisher.IsDeleted == false);
     }
+
+    public string Name { get; }
 }

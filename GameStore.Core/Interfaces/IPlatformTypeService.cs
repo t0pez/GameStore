@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using GameStore.Core.Models.Games;
+using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
 
 namespace GameStore.Core.Interfaces;

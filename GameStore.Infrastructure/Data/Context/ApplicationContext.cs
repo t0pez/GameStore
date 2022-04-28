@@ -1,6 +1,7 @@
 ﻿using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Genres;
+using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Infrastructure.Data.Configurations;

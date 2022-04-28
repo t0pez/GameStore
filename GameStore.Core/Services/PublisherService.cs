@@ -36,7 +36,7 @@ public class PublisherService : IPublisherService
 
     public async Task<Publisher> GetByCompanyNameAsync(string companyName)
     {
-        var result = await Repository.GetSingleOrDefaultBySpecAsync(new PublisherByCompanyName(companyName))
+        var result = await Repository.GetSingleOrDefaultBySpecAsync(new PublisherByCompanyNameSpec(companyName))
                      ?? throw new ItemNotFoundException(typeof(Publisher), companyName);
 
         return result;

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
-using GameStore.Core.Models.Games;
+using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.PlatformTypes.Specifications;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
 using GameStore.SharedKernel.Interfaces.DataAccess;
@@ -26,7 +26,7 @@ public class PlatformTypeService : IPlatformTypeService
 
     public async Task<ICollection<PlatformType>> GetAllAsync()
     {
-        var result = await Repository.GetBySpecAsync(new PlatformTypesWithDetails());
+        var result = await Repository.GetBySpecAsync(new PlatformTypesWithDetailsSpec());
 
         return result;
     }

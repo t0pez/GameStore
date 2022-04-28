@@ -7,10 +7,14 @@ public sealed class GameByIdWithDetailsSpec : Specification<Game>, ISingleResult
 {
     public GameByIdWithDetailsSpec(Guid id)
     {
+        Id = id;
+        
         Query
             .Where(game => game.Id == id
                            && game.IsDeleted == false)
             .Include(game => game.Genres)
             .Include(game => game.Platforms);
     }
+
+    public Guid Id { get; }
 }

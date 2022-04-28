@@ -2,7 +2,7 @@
 
 namespace GameStore.Core.Models.Publishers.Specifications;
 
-public class PublishersWithDetailsSpec : Specification<Publisher>
+public sealed class PublishersWithDetailsSpec : Specification<Publisher>
 {
     public PublishersWithDetailsSpec()
     {

@@ -7,7 +7,11 @@ internal sealed class GamePlatformsByPlatformIdSpec : Specification<GamePlatform
 {
     public GamePlatformsByPlatformIdSpec(Guid gameId)
     {
+        GameId = gameId;
+        
         Query
             .Where(gamePlatform => gamePlatform.GameId == gameId);
     }
+
+    public Guid GameId { get; }
 }

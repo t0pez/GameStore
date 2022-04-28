@@ -3,9 +3,9 @@ using GameStore.Core.Models.Games;
 
 namespace GameStore.Core.Models.PlatformTypes.Specifications;
 
-public class PlatformTypesWithDetails : Specification<PlatformType>
+public sealed class PlatformTypesWithDetailsSpec : Specification<PlatformType>
 {
-    public PlatformTypesWithDetails()
+    public PlatformTypesWithDetailsSpec()
     {
         Query
             .Where(type => type.IsDeleted == false);

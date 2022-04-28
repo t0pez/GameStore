@@ -7,8 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GameStore.Core.Helpers.AliasCrafting;
-using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Genres;
+using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Core.Models.ServiceModels.Games;
@@ -75,7 +75,7 @@ public class GamesController : Controller
     }
 
     [HttpGet("{gameKey}/download")]
-    public async Task<ActionResult<byte[]>> GetFileAsync([FromRoute] string gameKey)
+    public async Task<FileContentResult> GetFileAsync([FromRoute] string gameKey)
     {
         var bytes = await _gameService.GetFileAsync(gameKey);
         var fileName = gameKey;

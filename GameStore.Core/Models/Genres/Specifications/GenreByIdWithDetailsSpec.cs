@@ -8,10 +8,14 @@ public sealed class GenreByIdWithDetailsSpec : Specification<Genre>, ISingleResu
 {
     public GenreByIdWithDetailsSpec(Guid id)
     {
+        Id = id;
+        
         Query
             .Where(genre => genre.Id == id &&
                             genre.IsDeleted == false)
             .Include(genre => genre.Parent)
             .Include(genre => genre.SubGenres.Where(subGenre => subGenre.IsDeleted == false));
     }
+
+    public Guid Id { get; set; }
 }

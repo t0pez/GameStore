@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Genres;
+using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.RelationalModels;
 
 namespace GameStore.Infrastructure.Data.Context;
