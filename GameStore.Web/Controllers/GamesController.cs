@@ -80,7 +80,7 @@ public class GamesController : Controller
         var bytes = await _gameService.GetFileAsync(gameKey);
         var fileName = gameKey;
 
-        return File(bytes, "application/force-download", fileName); // TODO: Check for alternative ways to download file (replace force-download)
+        return File(bytes, "application/force-download", fileName);
     }
 
     [HttpGet("new")]

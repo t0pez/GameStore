@@ -1,5 +1,4 @@
 using GameStore.Core.Exceptions;
-using GameStore.Core.Helpers.AliasCrafting;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
@@ -65,7 +64,7 @@ public class GameService : IGameService
 
     public async Task<ICollection<Game>> GetAllAsync()
     {
-        var result = await GameRepository.GetBySpecAsync(new GamesWithDetailsSpec());
+        var result = await GameRepository.GetBySpecAsync(new GamesListSpec());
 
         return result;
     }

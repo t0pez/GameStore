@@ -44,7 +44,7 @@ public class PublisherService : IPublisherService
 
     public async Task<Publisher> CreateAsync(PublisherCreateModel createModel)
     {
-        var publisher = _mapper.Map<Publisher>(createModel); // TODO: add map
+        var publisher = _mapper.Map<Publisher>(createModel);
 
         await Repository.AddAsync(publisher);
         await _unitOfWork.SaveChangesAsync();
@@ -79,6 +79,5 @@ public class PublisherService : IPublisherService
         publisher.Name = updateModel.Name;
         publisher.Description = updateModel.Description;
         publisher.HomePage = updateModel.HomePage;
-        // TODO: update relationships
     }
 }

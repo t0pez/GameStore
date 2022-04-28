@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Baskets;
 using GameStore.Core.Models.Games;
@@ -15,23 +17,31 @@ public class BasketService : IBasketService
     {
         _gameService = gameService;
     }
-
-// TODO: In this methods exception can be thrown.
-// It means that all times when trying to invoke this ExceptionMiddleware will catch it and basket would be broken until cookie alive
+    
     public async Task FillWithDetailsAsync(Basket basket)
     {
+        var itemsToDelete = new List<BasketItem>();
         foreach (var basketItem in basket.Items)
         {
-            var game = await _gameService.GetByIdAsync(basketItem.Game.Id);
-            basketItem.Game = game;
+            var currentGameId = basketItem.Game.Id;
+            try
+            {
+                var game = await _gameService.GetByIdAsync(currentGameId);
+                basketItem.Game = game;
+            }
+            catch (ItemNotFoundException)
+            {
+                itemsToDelete.Add(basketItem);
+            }
         }
+        basket.Items = basket.Items.Except(itemsToDelete).ToList();
     }
 
     public void AddToBasket(Basket basket, Guid gameId, int quantity)
     {
         if (IsBasketContainGame(basket, gameId))
         {
-            IncreaseQuantity(basket, gameId, quantity); // TODO: Can be changed by PO
+            IncreaseQuantity(basket, gameId, quantity);
         }
         else
         {

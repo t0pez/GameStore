@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using GameStore.Core.Models.Games;
 
 namespace GameStore.Core.Models.ServiceModels.Publishers;
 

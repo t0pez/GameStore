@@ -26,7 +26,7 @@ public class GenreService : IGenreService
     
     public async Task<ICollection<Genre>> GetAllAsync()
     {
-        var result = await Repository.GetBySpecAsync(new GenresWithDetailsSpec());
+        var result = await Repository.GetBySpecAsync(new GenresListSpec());
 
         return result;
     }
