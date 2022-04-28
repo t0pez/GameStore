@@ -52,7 +52,7 @@ public class GameService : IGameService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Game created. " +
-                               "GameId = {GameId}", game.Id);
+                               $"{nameof(game.Id)} = + {game.Id}");
 
         return game;
     }
@@ -110,7 +110,7 @@ public class GameService : IGameService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Game updated. " +
-                               "GameId = {GameId}", game.Id);
+                               $"{nameof(game.Id)} = + {game.Id}");
     }
 
     public async Task DeleteAsync(Guid id)
@@ -122,7 +122,8 @@ public class GameService : IGameService
         await GameRepository.UpdateAsync(game);
         await _unitOfWork.SaveChangesAsync();
 
-        _logger.LogInformation("Game marked as deleted. GameId = {GameId}", game.Id);
+        _logger.LogInformation("Game marked as deleted. " +
+                               $"{nameof(game.Id)} = {game.Id}");
     }
 
     public async Task<byte[]> GetFileAsync(string gameKey)
