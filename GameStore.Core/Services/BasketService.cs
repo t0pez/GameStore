@@ -49,7 +49,7 @@ public class BasketService : IBasketService
         }
     }
 
-    private static void AddNewGame(Basket basket, Guid gameId, int quantity)
+    private void AddNewGame(Basket basket, Guid gameId, int quantity)
     {
         var item = new BasketItem
         {

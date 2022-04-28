@@ -46,7 +46,7 @@ public class GameServiceTests
     {
         const int expectedCount = 4;
 
-        _gameRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<GamesWithDetailsSpec>()))
+        _gameRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<GamesListSpec>()))
                      .ReturnsAsync(new List<Game>(new Game[expectedCount]));
 
         var actualResult = await _gameService.GetAllAsync();

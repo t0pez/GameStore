@@ -35,7 +35,7 @@ public class GenreServiceTests
     {
         const int expectedCount = 4;
 
-        _genreRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<GenresWithDetailsSpec>()))
+        _genreRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<GenresListSpec>()))
                       .ReturnsAsync(new List<Genre>(new Genre[expectedCount]));
 
         var actualResult = await _genreService.GetAllAsync();
