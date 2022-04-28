@@ -59,7 +59,7 @@ public class GameService : IGameService
 
     public Task<int> GetTotalCountAsync()
     {
-        return GameRepository.Count();
+        return GameRepository.Count(new GamesListSpec());
     }
 
     public async Task<ICollection<Game>> GetAllAsync()
