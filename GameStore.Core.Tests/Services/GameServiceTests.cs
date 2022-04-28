@@ -25,7 +25,6 @@ public class GameServiceTests
     private readonly Mock<IRelationshipModelService<GameGenre>> _gameGenreServiceMock;
     private readonly Mock<IRelationshipModelService<GamePlatformType>> _gamePlatformServiceMock;
 
-
     public GameServiceTests()
     {
         var loggerMock = new Mock<ILogger<GameService>>();
@@ -62,7 +61,9 @@ public class GameServiceTests
         const string gameKey = "existing-game-key";
         var gameId = Guid.NewGuid();
 
-        _gameRepoMock.Setup(repository => repository.GetSingleOrDefaultBySpecAsync(It.IsAny<GameByKeyWithDetailsSpec>()))
+        _gameRepoMock.Setup(repository =>
+                                repository.GetSingleOrDefaultBySpecAsync(
+                                    It.Is<GameByKeyWithDetailsSpec>(spec => spec.Key == gameKey)))
                      .ReturnsAsync(new Game { Id = gameId, Key = gameKey });
 
         var actualResult = await _gameService.GetByKeyAsync(gameKey);
@@ -79,8 +80,11 @@ public class GameServiceTests
         const string gameKey = "not-existing-game-key";
         Game gameByKey = null!;
 
-        _gameRepoMock.Setup(repository => repository.GetSingleOrDefaultBySpecAsync(It.IsAny<GameByKeyWithDetailsSpec>()))
-                     .ReturnsAsync(gameByKey);
+        _gameRepoMock
+            .Setup(repository =>
+                       repository.GetSingleOrDefaultBySpecAsync(
+                           It.Is<GameByKeyWithDetailsSpec>(spec => spec.Key == gameKey)))
+            .ReturnsAsync(gameByKey);
 
         var operation = async () => await _gameService.GetByKeyAsync(gameKey);
 
@@ -93,43 +97,19 @@ public class GameServiceTests
         var expectedId = Guid.NewGuid();
         var createModel = new GameCreateModel
         {
-            Name = "Some name"
+            Name = "Some name",
+            Key = "some-name"
         };
 
-        _gameRepoMock.Setup(repository => repository.AnyAsync(It.IsAny<GameByKeySpec>()))
-                     .ReturnsAsync(false);
+        _gameRepoMock
+            .Setup(repository => repository.AnyAsync(It.Is<GameByKeySpec>(spec => spec.Key == createModel.Key)))
+            .ReturnsAsync(false);
         _mapperMock.Setup(mapper => mapper.Map<Game>(It.IsAny<GameCreateModel>()))
                    .Returns(new Game { Id = expectedId });
 
         var actualResult = await _gameService.CreateAsync(createModel);
 
         Assert.Equal(expectedId, actualResult.Id);
-        _gameRepoMock.Verify(repository => repository.AddAsync(It.IsAny<Game>()), Times.Once);
-        _unitOfWorkMock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
-    }
-
-    [Fact]
-    public async void CreateAsync_WithExistingKey_GeneratesNewKey()
-    {
-        var expectedId = Guid.NewGuid();
-        const string existingKey = "some-name";
-        const string expectedKey = "some-name--1";
-        var createModel = new GameCreateModel
-        {
-            Name = "Some name"
-        };
-
-        _gameRepoMock.Setup(repository => repository.AnyAsync(It.Is<GameByKeySpec>(spec => spec.Key == existingKey)))
-                     .ReturnsAsync(true);
-        _gameRepoMock.Setup(repository => repository.AnyAsync(It.Is<GameByKeySpec>(spec => spec.Key == expectedKey)))
-                     .ReturnsAsync(false);
-        _mapperMock.Setup(mapper => mapper.Map<Game>(It.IsAny<GameCreateModel>()))
-                   .Returns(new Game { Id = expectedId });
-
-        var actualResult = await _gameService.CreateAsync(createModel);
-
-        Assert.Equal(expectedId, actualResult.Id);
-        Assert.Equal(expectedKey, actualResult.Key);
         _gameRepoMock.Verify(repository => repository.AddAsync(It.IsAny<Game>()), Times.Once);
         _unitOfWorkMock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
     }
@@ -137,10 +117,13 @@ public class GameServiceTests
     [Fact]
     public async void DeleteAsync_CorrectValues_GameSoftDeleted()
     {
-        _gameRepoMock.Setup(repository => repository.GetSingleOrDefaultBySpecAsync(It.IsAny<GameByIdSpec>()))
+        var expectedId = Guid.NewGuid();
+        _gameRepoMock.Setup(repository =>
+                                repository.GetSingleOrDefaultBySpecAsync(
+                                    It.Is<GameByIdSpec>(spec => spec.Id == expectedId)))
                      .ReturnsAsync(new Game());
 
-        await _gameService.DeleteAsync(Guid.NewGuid());
+        await _gameService.DeleteAsync(expectedId);
 
         _gameRepoMock.Verify(repository => repository.UpdateAsync(It.IsAny<Game>()), Times.Once);
         _unitOfWorkMock.Verify(work => work.SaveChangesAsync(), Times.Once);
@@ -151,7 +134,9 @@ public class GameServiceTests
     {
         Game gameByKey = null!;
 
-        _gameRepoMock.Setup(repository => repository.GetSingleOrDefaultBySpecAsync(It.IsAny<GameByIdSpec>()))
+        _gameRepoMock.Setup(repository =>
+                                repository.GetSingleOrDefaultBySpecAsync(
+                                    It.Is<GameByIdSpec>(spec => spec.Id == Guid.Empty)))
                      .ReturnsAsync(gameByKey);
 
         var operation = async () => await _gameService.DeleteAsync(Guid.Empty);
@@ -165,7 +150,9 @@ public class GameServiceTests
         const string gameKey = "existing-game-key";
         var expectedResult = new byte[] { 0, 0, 0, 0 };
 
-        _gameRepoMock.Setup(repository => repository.GetSingleOrDefaultBySpecAsync(It.IsAny<GameByKeySpec>()))
+        _gameRepoMock.Setup(repository =>
+                                repository.GetSingleOrDefaultBySpecAsync(
+                                    It.Is<GameByKeySpec>(spec => spec.Key == gameKey)))
                      .ReturnsAsync(new Game { File = expectedResult });
 
         var actualResult = await _gameService.GetFileAsync(gameKey);
@@ -179,7 +166,9 @@ public class GameServiceTests
         const string gameKey = "existing-game-key";
         Game gameByKey = null!;
 
-        _gameRepoMock.Setup(repository => repository.GetSingleOrDefaultBySpecAsync(It.IsAny<GameByKeySpec>()))
+        _gameRepoMock.Setup(repository =>
+                                repository.GetSingleOrDefaultBySpecAsync(
+                                    It.Is<GameByKeySpec>(spec => spec.Key == gameKey)))
                      .ReturnsAsync(gameByKey);
 
         var operation = async () => await _gameService.GetFileAsync(gameKey);
