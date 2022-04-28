@@ -5,10 +5,7 @@ namespace GameStore.Web.Models.Comment;
 
 public class CommentCreateRequestModel
 {
-    [Required] [FromRoute(Name = "gameKey")] 
-    public string GameKey { get; set; }
-    [Required] [FromForm]
-    public string AuthorName { get; set; }
-    [Required] [FromForm]
-    public string Message { get; set; }
+    [FromRoute(Name = "gameKey")] public string GameKey { get; set; }
+    [Required] [FromForm] public string AuthorName { get; set; }
+    [Required] [FromForm] public string Message { get; set; }
 }

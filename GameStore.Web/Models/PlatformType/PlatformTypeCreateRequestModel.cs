@@ -1,6 +1,8 @@
-﻿namespace GameStore.Web.Models.PlatformType;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GameStore.Web.Models.PlatformType;
 
 public class PlatformTypeCreateRequestModel
 {
-    public string Name { get; set; }
+    [Required] public string Name { get; set; }
 }
