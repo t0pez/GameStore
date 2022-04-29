@@ -14,7 +14,7 @@ namespace GameStore.Web.Controllers;
 public class BasketController : Controller
 {
     private const string BasketCookieName = "_basket";
-    private static readonly CookieOptions BasketCookieOptions = new() { Expires = DateTimeOffset.UtcNow.AddDays(7) };
+    private readonly CookieOptions _basketCookieOptions = new() { Expires = DateTimeOffset.UtcNow.AddDays(7) };
     private readonly IBasketService _basketService;
     private readonly IMapper _mapper;
 
@@ -39,7 +39,7 @@ public class BasketController : Controller
         return View(basketViewModel);
     }
     
-    [HttpPost("games/buy")]
+    [HttpPost("games/{gameKey}/buy")]
     public async Task<ActionResult> AddToBasketAsync(Guid gameId, int quantity)
     {
         var basketCookieModel = HttpContext.Request.Cookies.TryGetValue(BasketCookieName, out var basketJson)
@@ -52,7 +52,7 @@ public class BasketController : Controller
         basketCookieModel = _mapper.Map<BasketCookieModel>(basket);
         basketJson = JsonConvert.SerializeObject(basketCookieModel);
         
-        HttpContext.Response.Cookies.Append(BasketCookieName, basketJson, BasketCookieOptions);
+        HttpContext.Response.Cookies.Append(BasketCookieName, basketJson, _basketCookieOptions);
 
         return RedirectToAction("GetAll", "Games");
     }

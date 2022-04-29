@@ -4,5 +4,5 @@ public class ErrorViewModel
 {
     public string? RequestId { get; set; }
 
-    public bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+    public bool IsShowRequestId => string.IsNullOrEmpty(RequestId) == false;
 }

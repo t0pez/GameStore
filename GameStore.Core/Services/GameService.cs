@@ -52,14 +52,14 @@ public class GameService : IGameService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Game created. " +
-                               $"{nameof(game.Id)} = + {game.Id}");
+                               $"{nameof(game.Id)} = {game.Id}");
 
         return game;
     }
 
     public Task<int> GetTotalCountAsync()
     {
-        return GameRepository.Count(new GamesListSpec());
+        return GameRepository.CountAsync(new GamesListSpec());
     }
 
     public async Task<ICollection<Game>> GetAllAsync()
@@ -110,7 +110,7 @@ public class GameService : IGameService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Game updated. " +
-                               $"{nameof(game.Id)} = + {game.Id}");
+                               $"{nameof(game.Id)} = {game.Id}");
     }
 
     public async Task DeleteAsync(Guid id)

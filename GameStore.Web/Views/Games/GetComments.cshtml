@@ -19,13 +19,11 @@
                 <div>
                     <label>Author:</label>
                     @comment.AuthorName
-
                 </div>
                 <div class="mb-3">
                     <label>Message:</label>
                     @comment.Body
                 </div>
-                
                 <div class="mb-3">
                     @if (comment.Replies.Count != 0)
                     {
@@ -33,7 +31,6 @@
                         { RenderReplies(comment); }
                     }
                 </div>
-                
             </div>
         </div>
     }
@@ -75,8 +72,7 @@
             <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
             <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 
-            <div class="">
-
+            <div>
 
                 <h4>Leave your comment</h4>
 

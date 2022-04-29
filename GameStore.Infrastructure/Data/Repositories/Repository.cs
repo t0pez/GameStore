@@ -69,7 +69,7 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
         return specResult.AnyAsync();
     }
 
-    public Task<int> Count(ISpecification<TModel> spec = null)
+    public Task<int> CountAsync(ISpecification<TModel> spec = null)
     {
         if (spec is null)
             return Set.CountAsync();

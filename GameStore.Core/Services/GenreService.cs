@@ -58,7 +58,7 @@ public class GenreService : IGenreService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task DeleteAsync(Guid id) // TODO: think about children
+    public async Task DeleteAsync(Guid id)
     {
         var genre = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdSpec(id))
                                  ?? throw new ItemNotFoundException(typeof(Genre), id);

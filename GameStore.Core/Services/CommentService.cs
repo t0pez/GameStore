@@ -43,8 +43,7 @@ public class CommentService : ICommentService
         await _unitOfWork.SaveChangesAsync();
 
         _logger.LogInformation("Comment successfully added for game. " +
-                               "GameId = {GameId}, CommentId = {CommentId}",
-                               game.Id, comment.Id);
+                               $"{nameof(game.Id)} = {game.Id}, CommentId = {comment.Id}");
     }
 
     public async Task<ICollection<Comment>> GetCommentsByGameKeyAsync(string gameKey)

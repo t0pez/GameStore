@@ -25,7 +25,7 @@ public class GenresController : Controller
         _mapper = mapper;
     }
 
-    [HttpGet("")]
+    [HttpGet]
     public async Task<ActionResult<IEnumerable<GenreListViewModel>>> GetAllAsync()
     {
         var genres = await _genreService.GetAllAsync();
@@ -34,7 +34,7 @@ public class GenresController : Controller
         return View(result);
     }
 
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<GenreViewModel>> GetWithDetailsAsync([FromRoute] Guid id)
     {
         var genre = await _genreService.GetByIdAsync(id);
@@ -62,7 +62,7 @@ public class GenresController : Controller
         return RedirectToAction("GetAll", "Genres");
     }
 
-    [HttpGet("update/{id:guid}")]
+    [HttpGet("update/{id}")]
     public async Task<ActionResult<GenreUpdateRequestModel>> UpdateAsync([FromRoute] Guid id)
     {
         var genres = await _genreService.GetAllAsync();
@@ -83,7 +83,7 @@ public class GenresController : Controller
         return View(new GenreUpdateRequestModel { Id = id });
     }
 
-    [HttpPost("update/{id:guid}")]
+    [HttpPost("update/{id}")]
     public async Task<ActionResult> UpdateAsync(GenreUpdateRequestModel model)
     {
         var updateModel = _mapper.Map<GenreUpdateModel>(model);

@@ -91,12 +91,12 @@
                 </p>
             </div>
             <div class="mb-3">
-                <form method="post" asp-controller="Basket" asp-action="AddToBasket">
+                <form method="post" asp-controller="Basket" asp-action="AddToBasket" asp-route-gameKey="@Model.Key">
                     <script src="~/lib/jquery/dist/jquery.js"></script>
                     <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
                     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
                 
-                    <div class="">
+                    <div>
                         
                         <h4>Add to basket</h4>
                         

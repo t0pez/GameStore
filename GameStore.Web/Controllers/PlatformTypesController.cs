@@ -22,7 +22,7 @@ public class PlatformTypesController : Controller
         _mapper = mapper;
     }
 
-    [HttpGet("")]
+    [HttpGet]
     public async Task<ActionResult<IEnumerable<PlatformTypeListViewModel>>> GetAllAsync()
     {
         var platforms = await _platformTypeService.GetAllAsync();
@@ -31,7 +31,7 @@ public class PlatformTypesController : Controller
         return View(result);
     }
     
-    [HttpGet("{id:guid}")]
+    [HttpGet("{id}")]
     public async Task<ActionResult<PlatformTypeViewModel>> GetWithDetailsAsync([FromRoute] Guid id)
     {
         var platform = await _platformTypeService.GetByIdAsync(id);
@@ -55,13 +55,13 @@ public class PlatformTypesController : Controller
         return RedirectToAction("GetAll", "PlatformTypes");
     }
 
-    [HttpGet("update/{id:guid}")]
+    [HttpGet("update/{id}")]
     public async Task<ActionResult<PlatformTypeUpdateRequestModel>> UpdateAsync([FromRoute] Guid id)
     {
         return View(new PlatformTypeUpdateRequestModel { Id = id });
     }
 
-    [HttpPost("update/{id:guid}")]
+    [HttpPost("update/{id}")]
     public async Task<ActionResult> UpdateAsync(PlatformTypeUpdateRequestModel model)
     {
         var updateModel = _mapper.Map<PlatformTypeUpdateModel>(model);
