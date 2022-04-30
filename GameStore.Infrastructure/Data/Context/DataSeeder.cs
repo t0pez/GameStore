@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Genres;
+using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.RelationalModels;
 
 namespace GameStore.Infrastructure.Data.Context;
 
-public static class DataSeeder
+internal static class DataSeeder
 {
-    public static void SeedData(this ApplicationContext context)
+    internal static void SeedData(this ApplicationContext context)
     {
         if(context.Set<Genre>().Any() || context.Set<PlatformType>().Any())
             return;
@@ -39,6 +40,22 @@ public static class DataSeeder
             ParentId = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7601"),
             SubGenres = new List<Genre>()
         };
+        var shooterGenre = new Genre
+        {
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7604"),
+            Name = "Shooter",
+            IsDeleted = false,
+            Games = new List<GameGenre>(),
+            SubGenres = new List<Genre>()
+        };
+        var actionGenre = new Genre
+        {
+            Id = Guid.Parse("6fd6d158-7ffd-472a-b97c-08da067d7605"),
+            Name = "Shooter",
+            IsDeleted = false,
+            Games = new List<GameGenre>(),
+            SubGenres = new List<Genre>()
+        };
 
         var pcPlatform = new PlatformType
         {
@@ -65,6 +82,8 @@ public static class DataSeeder
         context.Add(strategyGenre);
         context.Add(rtsGenre);
         context.Add(cityBuilderGenre);
+        context.Add(shooterGenre);
+        context.Add(actionGenre);
         context.SaveChanges();
         
         context.AddRange(pcPlatform, psPlatform, xboxPlatform);

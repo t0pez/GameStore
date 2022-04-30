@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
+using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
-using GameStore.Core.Models.Records;
+using GameStore.Core.Models.ServiceModels.Comments;
+using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.Web.Controllers;
-using GameStore.Web.Models;
-using GameStore.Web.ViewModels;
+using GameStore.Web.Models.Comment;
+using GameStore.Web.Models.Game;
+using GameStore.Web.ViewModels.Comments;
+using GameStore.Web.ViewModels.Games;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
@@ -19,16 +23,23 @@ public class GameControllerTests
     private readonly GamesController _gameController;
     private readonly Mock<IGameService> _gameServiceMock;
     private readonly Mock<ICommentService> _commentServiceMock;
+    private readonly Mock<IPublisherService> _publisherServiceMock;
+    private readonly Mock<IGenreService> _genreServiceMock;
+    private readonly Mock<IPlatformTypeService> _platformServiceMock;
     private readonly Mock<IMapper> _mapperMock;
 
     public GameControllerTests()
     {
         _gameServiceMock = new Mock<IGameService>();
         _commentServiceMock = new Mock<ICommentService>();
+        _publisherServiceMock = new Mock<IPublisherService>();
+        _genreServiceMock = new Mock<IGenreService>();
+        _platformServiceMock = new Mock<IPlatformTypeService>();
         _mapperMock = new Mock<IMapper>();
 
         _gameController = new GamesController(_gameServiceMock.Object, _commentServiceMock.Object,
-                                              _mapperMock.Object);
+                                              _mapperMock.Object, _publisherServiceMock.Object,
+                                              _genreServiceMock.Object, _platformServiceMock.Object);
     }
 
     [Fact]
@@ -38,17 +49,50 @@ public class GameControllerTests
 
         _gameServiceMock.Setup(service => service.GetAllAsync())
                         .ReturnsAsync(new List<Game>(new Game[expectedResultCount]));
-        _mapperMock.Setup(service => service.Map<ICollection<GameViewModel>>(It.IsAny<ICollection<Game>>()))
-                        .Returns(new List<GameViewModel>(new GameViewModel[expectedResultCount]));
+        _mapperMock.Setup(service => service.Map<ICollection<GameListViewModel>>(It.IsAny<ICollection<Game>>()))
+                        .Returns(new List<GameListViewModel>(new GameListViewModel[expectedResultCount]));
         
         var actualResult = await _gameController.GetAllAsync();
-        var actualResultCount = actualResult.Count;
-        
-        Assert.Equal(expectedResultCount, actualResultCount);
+        Assert.IsType<ActionResult<IEnumerable<GameListViewModel>>>(actualResult);
+    }
+
+    [Fact]
+    public async void GetTotalGamesCountAsync_NoParameters_ReturnsCorrectValue()
+    {
+        const int expectedGamesCount = 5;
+
+        _gameServiceMock.Setup(service => service.GetTotalCountAsync())
+                        .ReturnsAsync(5);
+
+        var actualResult = await _gameController.GetTotalGamesCount();
+        Assert.Equal(expectedGamesCount, actualResult);
+    }
+
+    [Fact]
+    public async void GetCommentsAsync_ExistingGameKey_ReturnsCommentsView()
+    {
+        const int expectedCommentsCount = 5;
+
+        _commentServiceMock.Setup(service => service.GetCommentsByGameKeyAsync(It.IsAny<string>()))
+                           .ReturnsAsync(new List<Comment>(new Comment[expectedCommentsCount]));
+
+        var actualResult = await _gameController.GetCommentsAsync("");
+        Assert.IsType<ActionResult<ICollection<CommentViewModel>>>(actualResult);
+    }
+
+    [Theory]
+    [InlineData("Some name", "{ key = some-name }")]
+    [InlineData("First game. Part 2", "{ key = first-game-part-2 }")]
+    public async void GenerateKeyAsync_GameKeyAsParameter_GeneratesCorrectKeys(string name, string expectedJsonValue)
+    {
+        var actualResult = await _gameController.GenerateKeyAsync(name);
+
+        var actualJsonResult = Assert.IsType<JsonResult>(actualResult);
+        Assert.Equal(expectedJsonValue, actualJsonResult.Value.ToString());
     }
     
     [Fact]
-    public async void GetWithDetailsAsync_ExistingKey_ReturnsGame()
+    public async void GetWithDetailsAsync_ExistingKey_ReturnsGameView()
     {
         var expectedId = Guid.NewGuid();
         const string gameKey = "existing-game-key";
@@ -60,8 +104,8 @@ public class GameControllerTests
 
         var actualResult = await _gameController.GetWithDetailsAsync(gameKey);
 
-        var actualObjectResult = Assert.IsType<OkObjectResult>(actualResult.Result);
-        var actualResultModel = Assert.IsType<GameViewModel>(actualObjectResult.Value);
+        var actualViewResult = Assert.IsType<ViewResult>(actualResult.Result);
+        var actualResultModel = Assert.IsType<GameViewModel>(actualViewResult.Model);
         Assert.Equal(expectedId, actualResultModel.Id);
     }
     
@@ -79,7 +123,7 @@ public class GameControllerTests
     }
     
     [Fact]
-    public async void GetFileAsync_ExistingKey_ReturnsGame()
+    public async void GetFileAsync_ExistingKey_ReturnsFile()
     {
         var expectedResult = new byte[] { 0, 0, 0, 0 };
         const string gameKey = "existing-game-key";
@@ -88,8 +132,8 @@ public class GameControllerTests
                         .ReturnsAsync(expectedResult);
         
         var actualResult = await _gameController.GetFileAsync(gameKey);
-        
-        Assert.Equal(expectedResult, (actualResult.Result as OkObjectResult)?.Value);
+        var actualFileResult = Assert.IsType<FileContentResult>(actualResult);
+        Assert.Equal(expectedResult, actualFileResult.FileContents);
     }
     
     [Fact]
@@ -104,29 +148,9 @@ public class GameControllerTests
 
         await Assert.ThrowsAsync<ItemNotFoundException>(operation);
     }
-
-    [Fact]
-    public async void CreateAsync_CorrectValue_ReturnsModel()
-    {
-        var expectedId = Guid.NewGuid();
-        var createModel = new GameCreateRequestModel();
-
-        _mapperMock.Setup(mapper => mapper.Map<GameCreateModel>(It.IsAny<GameCreateRequestModel>()))
-                   .Returns(new GameCreateModel());
-        _mapperMock.Setup(mapper => mapper.Map<GameViewModel>(It.Is<Game>(game => game.Id == expectedId)))
-                   .Returns(new GameViewModel { Id = expectedId });
-        _gameServiceMock.Setup(service => service.CreateAsync(It.IsAny<GameCreateModel>()))
-                        .ReturnsAsync(new Game { Id = expectedId });
-        
-        var actualResult = await _gameController.CreateAsync(createModel);
-        
-        var actualObjectResult = Assert.IsType<OkObjectResult>(actualResult.Result);
-        var actualResultModel = Assert.IsType<GameViewModel>(actualObjectResult.Value);
-        Assert.Equal(expectedId, actualResultModel.Id);
-    }
     
     [Fact]
-    public async void CommentGameAsync_CorrectValue()
+    public async void CommentGameAsync_CorrectValue_ReturnsRedirect()
     {
         var createModel = new CommentCreateRequestModel();
 
@@ -135,32 +159,32 @@ public class GameControllerTests
         
         var actualResult = await _gameController.CommentGameAsync(createModel);
 
-        Assert.IsType<OkResult>(actualResult);
+        Assert.IsType<RedirectToActionResult>(actualResult);
         _commentServiceMock.Verify(service => service.CommentGameAsync(It.IsAny<CommentCreateModel>()), Times.Once);
     }
 
     [Fact]
-    public async void UpdateAsync_CorrectValues()
+    public async void UpdateAsync_CorrectValues_ReturnsRedirect()
     {
-        var editModel = new GameEditRequestModel();
+        var updateRequestModel = new GameUpdateRequestModel();
 
-        _mapperMock.Setup(mapper => mapper.Map<GameUpdateModel>(It.IsAny<GameEditRequestModel>()))
+        _mapperMock.Setup(mapper => mapper.Map<GameUpdateModel>(It.IsAny<GameUpdateRequestModel>()))
                    .Returns(new GameUpdateModel());
 
-        var actualResult = await _gameController.UpdateAsync(editModel);
+        var actualResult = await _gameController.UpdateAsync(updateRequestModel);
 
-        Assert.IsType<OkResult>(actualResult);
+        Assert.IsType<RedirectToActionResult>(actualResult);
         _gameServiceMock.Verify(service => service.UpdateAsync(It.IsAny<GameUpdateModel>()), Times.Once);
     }
 
     [Fact]
-    public async void DeleteAsync_CorrectValues()
+    public async void DeleteAsync_CorrectValues_ReturnsRedirect()
     {
         var id = Guid.NewGuid();
         
         var actualResult = await _gameController.DeleteAsync(id);
 
-        Assert.IsType<OkResult>(actualResult);
+        Assert.IsType<RedirectToActionResult>(actualResult);
         _gameServiceMock.Verify(service => service.DeleteAsync(id));
     }
 }

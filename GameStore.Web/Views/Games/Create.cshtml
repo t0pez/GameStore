@@ -1,0 +1,78 @@
+﻿@model GameStore.Web.Models.Game.GameCreateRequestModel
+
+@{
+    ViewBag.Title = "Create game";
+    Layout = "_Layout";
+}
+
+<h2 class="mt-5">Create</h2>
+
+<form method="post" enctype="multipart/form-data">
+
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+    <div>
+        @Html.ValidationSummary(true, "", new {@class = "text-danger"})
+        <div class="row">
+
+            <div class="col-4">
+                <div class="form-floating mb-3">
+                    @Html.EditorFor(model => model.Name, new {htmlAttributes = new {@class = "form-control", @placeholder = "Name", @style = "min-width: 100%"}})
+                    @Html.LabelFor(model => model.Name, new {@class = "ps-4"})
+                    @Html.ValidationMessageFor(model => model.Name, "", new {@class = "text-danger"})
+                </div>
+                <div class="row mb-3">
+                    <div class="form-floating col-8">
+                        @Html.EditorFor(model => model.Key, new { htmlAttributes = new { @class = "form-control", @placeholder = "Name", @style = "min-width: 100%" } })
+                        @Html.LabelFor(model => model.Key, new { @class = "ps-4" })
+                        @Html.ValidationMessageFor(model => model.Key, "", new { @class = "text-danger" })
+                    </div>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-info" onclick="generateKey()" style="min-height: 100%">Generate key</button>
+                    </div>
+                </div>               
+                <div class="form-floating col-md mb-3">
+                    @Html.EditorFor(model => model.Price, new {htmlAttributes = new {@class = "form-control", @placeholder = "Name", @style = "min-width: 100%"}})
+                    @Html.LabelFor(model => model.Price, new {@class = "ps-4"})
+                    @Html.ValidationMessageFor(model => model.Price, "", new {@class = "text-danger"})
+                </div>
+                <div class="form-floating mb-3">
+                    @Html.DropDownListFor(model => model.PublisherId, ViewData["Publishers"] as IEnumerable<SelectListItem>, new{@class="form-select from-select-lg"})
+                    @Html.LabelFor(model => model.PublisherId, "Publisher", new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.PublisherId, "", new { @class = "text-danger" })
+                </div>
+                <div class="mb-3">
+                    <label for="File" class="form-label">Game file:</label>
+                    <input class="form-control form-control-lg" id="File" name="File" type="file" required>
+                </div>
+            </div>
+            <div class="form-floating mb-3 col-8">
+                @Html.TextAreaFor(model => model.Description, new {@class = "form-control", @placeholder = "Some placeholder", @style = "min-width: 100%; height: 100%"})
+                @Html.LabelFor(model => model.Description, new {@class = "ps-4"})
+                @Html.ValidationMessageFor(model => model.Description, "", new {@class = "text-danger"})
+            </div>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="form-floating input-group col-6">
+                <label class="ps-4" for="genres">Genres</label>
+                <select id="genres" class="form-select form-select-lg" asp-for="GenresIds" asp-items="@(ViewData["Genres"] as IEnumerable<SelectListItem>)" style="height: 100%"></select>
+            </div>
+            
+            <div class="form-floating input-group col-6">
+                <label class="ps-4" for="platforms">Platforms</label>
+                <select id="platforms" class="form-select form-select-lg" asp-for="PlatformsIds" asp-items="@(ViewData["Platforms"] as IEnumerable<SelectListItem>)" style="height: 100%"></select>
+            </div>
+        </div>
+        
+        <div class="mb-3">
+            @Html.ActionLink("Back to List", "GetAll", new {area = ""}, new {@class = "btn btn-outline-secondary"})
+
+            <button type="submit" class="btn btn-primary">
+                Create
+            </button>
+        </div>
+    </div>
+</form>

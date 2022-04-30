@@ -1,5 +1,6 @@
 ﻿using System;
 using GameStore.Core.Models.Games;
+using GameStore.Core.Models.PlatformTypes;
 
 namespace GameStore.Core.Models.RelationalModels;
 

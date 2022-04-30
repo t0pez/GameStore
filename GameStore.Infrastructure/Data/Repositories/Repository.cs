@@ -30,7 +30,7 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
         return specificationResult.ToListAsync();
     }
         
-    public Task<TModel> GetSingleBySpecAsync(ISpecification<TModel> spec)
+    public Task<TModel> GetSingleOrDefaultBySpecAsync(ISpecification<TModel> spec)
     {
         var specificationResult = ApplySpecifications(spec);
 
@@ -67,6 +67,15 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
         var specResult = ApplySpecifications(spec);
 
         return specResult.AnyAsync();
+    }
+
+    public Task<int> CountAsync(ISpecification<TModel> spec = null)
+    {
+        if (spec is null)
+            return Set.CountAsync();
+        
+        var specResult = ApplySpecifications(spec);
+        return specResult.CountAsync();
     }
 
     private IQueryable<TModel> ApplySpecifications(ISpecification<TModel> specification)

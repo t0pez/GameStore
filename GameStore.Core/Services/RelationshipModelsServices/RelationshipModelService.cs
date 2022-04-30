@@ -17,22 +17,18 @@ public class RelationshipModelService<TModel> : IRelationshipModelService<TModel
 
     private IRepository<TModel> Repository => _unitOfWork.GetRepository<TModel>();
     
-    public Task AddAsync(TModel model)
+    public async Task UpdateManyToManyAsync(IEnumerable<TModel> newModels, ISpecification<TModel> deleteSpec)
     {
-        return Repository.AddAsync(model);
+        await DeleteByPreviousRelationshipsAsync(deleteSpec);
+        await AddNewRelationshipsAsync(newModels);
     }
 
-    public Task AddRangeAsync(IEnumerable<TModel> models)
+    private Task AddNewRelationshipsAsync(IEnumerable<TModel> models)
     {
         return Repository.AddRangeAsync(models);
     }
 
-    public Task DeleteAsync(TModel model)
-    {
-        return Repository.DeleteAsync(model);
-    }
-
-    public async Task DeleteBySpecAsync(ISpecification<TModel> spec)
+    private async Task DeleteByPreviousRelationshipsAsync(ISpecification<TModel> spec)
     {
         var specificationResult = await Repository.GetBySpecAsync(spec);
 

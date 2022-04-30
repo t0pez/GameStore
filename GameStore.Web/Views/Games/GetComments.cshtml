@@ -1,0 +1,111 @@
+﻿@using GameStore.Web.ViewModels.Comments
+@using Microsoft.AspNetCore.Routing
+@using GameStore.Web.Models.Comment
+@model ICollection<CommentViewModel>
+
+
+@{
+    ViewBag.Title = "Comments";
+    Layout = "_Layout";
+}
+
+<h2 class="mt-5">Comments</h2>
+@functions
+{
+    void RenderComment(CommentViewModel comment)
+    {
+        <div>
+            <div class="mb-3">
+                <div>
+                    <label>Author:</label>
+                    @comment.AuthorName
+                </div>
+                <div class="mb-3">
+                    <label>Message:</label>
+                    @comment.Body
+                </div>
+                <div class="mb-3">
+                    @if (comment.Replies.Count != 0)
+                    {
+                        <text>Replies:</text>
+                        { RenderReplies(comment); }
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    
+    void RenderReplies(CommentViewModel parentComment)
+    {
+        foreach (var reply in parentComment.Replies)
+        {
+            RenderComment(reply);
+        }
+    }
+}
+
+
+<div>
+    <div>
+        @if (Model.Count == 0)
+        {
+            <text>No comments</text>
+        }
+        else
+        {
+            foreach (var comment in Model)
+            {
+                RenderComment(comment);
+            }
+        }
+    </div>
+    
+    <div>
+        @{
+            var requestModel = new CommentCreateRequestModel();
+            var routeData = Context.GetRouteData();
+            var gameKey = routeData.Values["gameKey"].ToString();
+        }
+        <form method="post" asp-action="CommentGame" asp-route-gameKey="@gameKey">
+
+            <script src="~/lib/jquery/dist/jquery.js"></script>
+            <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+            <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
+
+            <div>
+
+                <h4>Leave your comment</h4>
+
+                <hr/>
+
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                <div class="row">
+
+                    <div class="form-floating mb-3 col-4">
+                        <input class="form-control form-control-lg" placeholder="Author"
+                               id="AuthorName" name="AuthorName" type="text" required />
+                        
+                        <label class="ps-4" for="AuthorName">Your name:</label>
+                        
+                        @Html.ValidationMessage(nameof(requestModel.AuthorName), "", new { @class = "text-danger" })
+                    </div>
+                    
+                    <div class="form-floating mb-3 col-4">
+                        <textarea class="form-control" style="min-width: 100%" placeholder="Author"
+                               id="Message" name="Message" type="text" required></textarea>
+                        
+                        <label class="ps-4" for="Message">Review:</label>
+                        
+                        @Html.ValidationMessage(nameof(requestModel.Message), "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <input type="submit" class="btn btn-primary" content="Leave comment"/>
+                </div>
+
+            </div>
+        </form>
+
+    </div>
+</div>

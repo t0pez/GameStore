@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace GameStore.Infrastructure.Data.Configurations;
 
-public class GameConfiguration : IEntityTypeConfiguration<Game>
+internal class GameConfiguration : IEntityTypeConfiguration<Game>
 {
     public void Configure(EntityTypeBuilder<Game> builder)
     {
@@ -19,5 +19,9 @@ public class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.HasMany(game => game.Comments)
                .WithOne(comment => comment.Game)
                .HasForeignKey(comment => comment.GameId);
+
+        builder.HasOne(game => game.Publisher)
+               .WithMany(publisher => publisher.Games)
+               .HasForeignKey(game => game.PublisherId);
     }
 }

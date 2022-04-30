@@ -1,7 +1,7 @@
 ﻿using GameStore.Core.Models.Comments;
-using GameStore.Core.Models.Records;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GameStore.Core.Models.ServiceModels.Comments;
 
 namespace GameStore.Core.Interfaces;
 

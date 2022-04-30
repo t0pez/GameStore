@@ -13,8 +13,12 @@ public static class DependencyResolverModule
     public static void ConfigureDomainServices(this IServiceCollection services)
     {
         services.AddScoped<IUnitOfWork, UnitOfWork>()
-            .AddScoped<IGameService, GameService>()
-            .AddScoped<ICommentService, CommentService>()
-            .AddScoped(typeof(IRelationshipModelService<>), typeof(RelationshipModelService<>)); 
+                .AddScoped<IGameService, GameService>()
+                .AddScoped<ICommentService, CommentService>()
+                .AddScoped<IPublisherService, PublisherService>()
+                .AddScoped<IBasketService, BasketService>()
+                .AddScoped<IGenreService, GenreService>()
+                .AddScoped<IPlatformTypeService, PlatformTypeService>()
+                .AddScoped(typeof(IRelationshipModelService<>), typeof(RelationshipModelService<>));
     }
 }

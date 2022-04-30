@@ -9,8 +9,9 @@ public sealed class CommentsByGameKeySpec : Specification<Comment>
         GameKey = gameKey;
 
         Query
-            .Where(comment => comment.Game.Key == gameKey
-                              && comment.IsDeleted == false)
+            .Where(comment => comment.Game.Key == gameKey &&
+                              comment.ParentId == null &&
+                              comment.IsDeleted == false)
             .Include(comment => comment.Replies)
             .Include(comment => comment.Game);
     }

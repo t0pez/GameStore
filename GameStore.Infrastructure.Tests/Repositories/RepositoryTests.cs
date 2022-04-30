@@ -1,6 +1,7 @@
 ﻿using System;
 using Ardalis.Specification;
 using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Publishers;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.Infrastructure.Tests.TestData.Repositories;
@@ -53,7 +54,7 @@ public class RepositoryTests
     public async void GetSingleBySpecAsync_ExistingModel_ReturnsCorrectModels(
         ISpecification<Game> spec, Guid expectedId)
     {
-        var actualResult = await _gameRepository.GetSingleBySpecAsync(spec);
+        var actualResult = await _gameRepository.GetSingleOrDefaultBySpecAsync(spec);
         var actualResultId = actualResult.Id;
         
         Assert.Equal(expectedId,actualResultId);
@@ -66,7 +67,7 @@ public class RepositoryTests
     {
         const Game expectedResult = null!;
 
-        var actualResult = await _gameRepository.GetSingleBySpecAsync(spec);
+        var actualResult = await _gameRepository.GetSingleOrDefaultBySpecAsync(spec);
         
         Assert.Same(expectedResult, actualResult);
     }
@@ -148,8 +149,10 @@ public class RepositoryTests
             Name = "First game",
             Key = "first-game",
             Description = "First description",
-            File = new byte[] { 0, 0, 0, 1 }, 
-            IsDeleted = false
+            File = new byte[] { 0, 0, 0, 1 },
+            IsDeleted = false,
+            PublisherId = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7111"),
+            Publisher = new Publisher { Id = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7111") }
         };
         var game2 = new Game
         {
@@ -158,7 +161,9 @@ public class RepositoryTests
             Key = "second-game",
             Description = "Second description",
             File = new byte[] { 0, 0, 0, 2 }, 
-            IsDeleted = false
+            IsDeleted = false,
+            PublisherId = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7222"),
+            Publisher = new Publisher { Id = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7222") }
         };
         var game3 = new Game
         {
@@ -167,7 +172,9 @@ public class RepositoryTests
             Key = "Third-game",
             Description = "Third description",
             File = new byte[] { 0, 0, 0, 3 }, 
-            IsDeleted = false
+            IsDeleted = false,
+            PublisherId = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7333"),
+            Publisher = new Publisher { Id = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7333") }
         };
         var game4 = new Game
         {
@@ -176,7 +183,9 @@ public class RepositoryTests
             Key = "fourth-game",
             Description = "Fourth description",
             File = new byte[] { 0, 0, 0, 4 }, 
-            IsDeleted = false
+            IsDeleted = false,
+            PublisherId = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7111"),
+            Publisher = new Publisher { Id = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7444") }
         };
 
         context.AddRange(game1, game2, game3, game4);
