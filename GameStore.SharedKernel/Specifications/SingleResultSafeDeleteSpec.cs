@@ -6,13 +6,14 @@ namespace GameStore.SharedKernel.Specifications;
 public class SingleResultSafeDeleteSpec<TModel>
     : SingleResultDomainSpec<TModel> where TModel : ISafeDelete
 {
-    public SingleResultSafeDeleteSpec()
+    protected SingleResultSafeDeleteSpec()
     {
         Query
-            .Where(model => model.IsDeleted == IsEnabledDeleted ||
-                            model.IsDeleted == !IsEnabledNotDeleted);
+            .Where(model => model.IsDeleted == IsIncludedDeleted ||
+                            model.IsDeleted == IsExcludedNotDeleted);
     }
 
-    public bool IsEnabledDeleted { get; set; }
-    public bool IsEnabledNotDeleted { get; set; } = true;
+    public bool IsIncludedDeleted { get; set; }
+
+    public bool IsExcludedNotDeleted { get; set; }
 }

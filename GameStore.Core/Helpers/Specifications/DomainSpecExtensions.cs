@@ -8,30 +8,30 @@ public static class DomainSpecExtensions
     public static SingleResultSafeDeleteSpec<T> IncludeDeleted<T>(this SingleResultSafeDeleteSpec<T> spec,
                                                                   bool isEnabledDeleted = true) where T : ISafeDelete
     {
-        spec.IsEnabledDeleted = isEnabledDeleted;
+        spec.IsIncludedDeleted = isEnabledDeleted;
         return spec;
     }
 
     public static MultipleResultSafeDeleteSpec<T> IncludeDeleted<T>(this MultipleResultSafeDeleteSpec<T> spec,
                                                                     bool isEnabledDeleted = true) where T : ISafeDelete
     {
-        spec.IsEnabledDeleted = isEnabledDeleted;
+        spec.IsIncludedDeleted = isEnabledDeleted;
         return spec;
     }
 
     public static SingleResultSafeDeleteSpec<T> ExcludeNotDeleted<T>(this SingleResultSafeDeleteSpec<T> spec,
-                                                                     bool isEnabledNotDeleted = false)
+                                                                     bool isExcludeNotDeleted = true)
         where T : ISafeDelete
     {
-        spec.IsEnabledNotDeleted = isEnabledNotDeleted;
+        spec.IsExcludedNotDeleted = isExcludeNotDeleted;
         return spec;
     }
 
     public static MultipleResultSafeDeleteSpec<T> ExcludeNotDeleted<T>(this MultipleResultSafeDeleteSpec<T> spec,
-                                                                       bool isEnabledNotDeleted = false)
+                                                                       bool isExcludeNotDeleted = true)
         where T : ISafeDelete
     {
-        spec.IsEnabledNotDeleted = isEnabledNotDeleted;
+        spec.IsExcludedNotDeleted = isExcludeNotDeleted;
         return spec;
     }
 }
