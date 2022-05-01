@@ -10,9 +10,9 @@ public class MultipleResultSafeDeleteSpec<TModel>
     {
         Query
             .Where(model => model.IsDeleted == IsEnabledDeleted ||
-                            model.IsDeleted == IsEnabledNotDeleted);
+                            model.IsDeleted == !IsEnabledNotDeleted);
     }
 
-    public bool IsEnabledNotDeleted { get; set; }
     public bool IsEnabledDeleted { get; set; }
+    public bool IsEnabledNotDeleted { get; set; } = true;
 }
