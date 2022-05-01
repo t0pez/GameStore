@@ -35,7 +35,7 @@ public class PlatformTypeServiceTests
     {
         const int expectedCount = 4;
 
-        _platformRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<PlatformTypesWithDetailsSpec>()))
+        _platformRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<PlatformTypesListSpec>()))
                          .ReturnsAsync(new List<PlatformType>(new PlatformType[expectedCount]));
 
         var actualResult = await _platformService.GetAllAsync();

@@ -1,17 +1,17 @@
 ﻿using System;
 using Ardalis.Specification;
+using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Publishers.Specifications;
 
-public sealed class PublisherByIdSpec : Specification<Publisher>, ISingleResultSpecification
+public class PublisherByIdSpec : SingleResultSafeDeleteSpec<Publisher>
 {
     public PublisherByIdSpec(Guid id)
     {
         Id = id;
-        
+
         Query
-            .Where(publisher => publisher.Id == id &&
-                                publisher.IsDeleted == false);
+            .Where(publisher => publisher.Id == id);
     }
 
     public Guid Id { get; }

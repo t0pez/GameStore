@@ -1,18 +1,18 @@
 ﻿using System;
 using Ardalis.Specification;
+using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Genres.Specifications;
 
-public sealed class GenreByIdSpec : Specification<Genre>
+public class GenreByIdSpec : SingleResultSafeDeleteSpec<Genre>
 {
     public GenreByIdSpec(Guid id)
     {
         Id = id;
-        
+
         Query
-            .Where(genre => genre.Id == id &&
-                            genre.IsDeleted == false);
+            .Where(genre => genre.Id == id);
     }
 
-    public Guid Id { get; set; }
+    public Guid Id { get; }
 }

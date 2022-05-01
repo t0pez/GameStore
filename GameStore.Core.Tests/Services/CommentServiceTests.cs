@@ -51,7 +51,7 @@ public class CommentServiceTests
                      .ReturnsAsync(true);
         _commentRepoMock.Setup(repository =>
                                    repository.GetBySpecAsync(
-                                       It.Is<CommentsByGameKeySpec>(spec => spec.GameKey == gameKey)))
+                                       It.Is<CommentsWithoutParentByGameKeySpec>(spec => spec.GameKey == gameKey)))
                         .ReturnsAsync(new List<Comment>(new Comment[expectedResultCount]));
 
         var actualResult = await _commentService.GetCommentsByGameKeyAsync(gameKey);

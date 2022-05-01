@@ -53,7 +53,7 @@ public class CommentService : ICommentService
             throw new ItemNotFoundException(typeof(Game), gameKey);
         }
 
-        var result = await CommentRepository.GetBySpecAsync(new CommentsByGameKeySpec(gameKey));
+        var result = await CommentRepository.GetBySpecAsync(new CommentsWithoutParentByGameKeySpec(gameKey));
 
         return result;
     }

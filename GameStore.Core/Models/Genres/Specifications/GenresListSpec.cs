@@ -1,12 +1,7 @@
-﻿using Ardalis.Specification;
+﻿using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Genres.Specifications;
 
-public sealed class GenresListSpec : Specification<Genre>
+public sealed class GenresListSpec : MultipleResultSafeDeleteSpec<Genre>
 {
-    public GenresListSpec()
-    {
-        Query
-            .Where(genre => genre.IsDeleted == false);
-    }
 }

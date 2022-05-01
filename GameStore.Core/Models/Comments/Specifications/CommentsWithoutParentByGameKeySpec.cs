@@ -1,20 +1,20 @@
 ﻿using Ardalis.Specification;
+using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Comments.Specifications;
 
-public sealed class CommentsByGameKeySpec : Specification<Comment>
+public sealed class CommentsWithoutParentByGameKeySpec : MultipleResultSafeDeleteSpec<Comment>
 {
-    public CommentsByGameKeySpec(string gameKey)
+    public CommentsWithoutParentByGameKeySpec(string gameKey)
     {
         GameKey = gameKey;
 
         Query
             .Where(comment => comment.Game.Key == gameKey &&
-                              comment.ParentId == null &&
-                              comment.IsDeleted == false)
+                              comment.ParentId == null)
             .Include(comment => comment.Replies)
             .Include(comment => comment.Game);
     }
 
-    public string GameKey { get; set; }
+    public string GameKey { get; }
 }

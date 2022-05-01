@@ -26,7 +26,7 @@ public class PlatformTypeService : IPlatformTypeService
 
     public async Task<ICollection<PlatformType>> GetAllAsync()
     {
-        var result = await Repository.GetBySpecAsync(new PlatformTypesWithDetailsSpec());
+        var result = await Repository.GetBySpecAsync(new PlatformTypesListSpec());
 
         return result;
     }

@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Ardalis.Specification;
+using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Interfaces.RelationshipModelsServices;
 
 public interface IRelationshipModelService<TModel> where TModel : class
 {
-   public Task UpdateManyToManyAsync(IEnumerable<TModel> newModels, ISpecification<TModel> deleteSpec);
+   public Task UpdateManyToManyAsync(IEnumerable<TModel> newModels, MultipleResultDomainSpec<TModel> deleteSpec);
 }

@@ -1,12 +1,7 @@
-﻿using Ardalis.Specification;
+﻿using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-public sealed class GamesListSpec : Specification<Game>
+public sealed class GamesListSpec : MultipleResultSafeDeleteSpec<Game>
 {
-    public GamesListSpec()
-    {
-        Query
-            .Where(game => game.IsDeleted == false);
-    }
 }

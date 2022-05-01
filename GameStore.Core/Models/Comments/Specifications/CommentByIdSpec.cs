@@ -1,17 +1,17 @@
 ﻿using System;
 using Ardalis.Specification;
+using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Comments.Specifications;
 
-public sealed class CommentByIdSpec : Specification<Comment>
+public sealed class CommentByIdSpec : SingleResultSafeDeleteSpec<Comment>
 {
     public CommentByIdSpec(Guid id)
     {
         Id = id;
-        
+
         Query
-            .Where(comment => comment.Id == id
-                              && comment.IsDeleted == false);
+            .Where(comment => comment.Id == id);
     }
 
     public Guid Id { get; }

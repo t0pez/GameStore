@@ -1,17 +1,17 @@
 ﻿using System;
 using Ardalis.Specification;
+using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-public sealed class GameByIdSpec : Specification<Game>
+public class GameByIdSpec : SingleResultSafeDeleteSpec<Game>
 {
     public GameByIdSpec(Guid id)
     {
-        Id = id; 
-        
+        Id = id;
+
         Query
-            .Where(game => game.Id == id
-                           && game.IsDeleted == false);
+            .Where(game => game.Id == id);
     }
 
     public Guid Id { get; }

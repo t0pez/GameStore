@@ -1,17 +1,17 @@
 ﻿using System;
 using Ardalis.Specification;
+using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.PlatformTypes.Specifications;
 
-public sealed class PlatformTypeByIdSpec : Specification<PlatformType>
+public class PlatformTypeByIdSpec : SingleResultSafeDeleteSpec<PlatformType>
 {
     public PlatformTypeByIdSpec(Guid id)
     {
         Id = id;
-        
+
         Query
-            .Where(platformType => platformType.Id == id
-                                   && platformType.IsDeleted == false);
+            .Where(platformType => platformType.Id == id);
     }
 
     public Guid Id { get; }
