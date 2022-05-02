@@ -29,7 +29,7 @@ public class PublisherService : IPublisherService
 
     public async Task<ICollection<Publisher>> GetAllAsync()
     {
-        var result = await Repository.GetBySpecAsync(new PublishersWithDetailsSpec());
+        var result = await Repository.GetBySpecAsync(new PublishersListSpec());
 
         return result;
     }

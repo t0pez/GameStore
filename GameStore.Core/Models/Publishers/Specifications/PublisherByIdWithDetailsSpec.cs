@@ -3,17 +3,11 @@ using Ardalis.Specification;
 
 namespace GameStore.Core.Models.Publishers.Specifications;
 
-public sealed class PublisherByIdWithDetailsSpec : Specification<Publisher>, ISingleResultSpecification
+public sealed class PublisherByIdWithDetailsSpec : PublisherByIdSpec
 {
-    public PublisherByIdWithDetailsSpec(Guid id)
+    public PublisherByIdWithDetailsSpec(Guid id) : base(id)
     {
-        Id = id;
-        
         Query
-            .Where(publisher => publisher.Id == id &&
-                                publisher.IsDeleted == false)
             .Include(publisher => publisher.Games);
     }
-
-    public Guid Id { get; }
 }

@@ -1,11 +1,11 @@
 ﻿using System;
-using Ardalis.Specification;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Publishers;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.Infrastructure.Tests.TestData.Repositories;
 using GameStore.SharedKernel.Interfaces.DataAccess;
+using GameStore.SharedKernel.Specifications;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
@@ -41,7 +41,7 @@ public class RepositoryTests
     [Theory] 
     [GetBySpecAsyncData]
     public async void GetBySpecAsync_NotNullSpec_ReturnsCorrectModels(
-        ISpecification<Game> spec, int expectedCount)
+        SafeDeleteSpec<Game> spec, int expectedCount)
     {
         var actualResult = await _gameRepository.GetBySpecAsync(spec);
         var actualCount = actualResult.Count;
@@ -52,7 +52,7 @@ public class RepositoryTests
     [Theory]
     [GetSingleBySpecWithResultData]
     public async void GetSingleBySpecAsync_ExistingModel_ReturnsCorrectModels(
-        ISpecification<Game> spec, Guid expectedId)
+        SafeDeleteSpec<Game> spec, Guid expectedId)
     {
         var actualResult = await _gameRepository.GetSingleOrDefaultBySpecAsync(spec);
         var actualResultId = actualResult.Id;
@@ -63,7 +63,7 @@ public class RepositoryTests
     [Theory]
     [GetSingleBySpecWithoutResultData]
     public async void GetSingleBySpecAsync_NotExistingModel_ReturnsNull(
-        ISpecification<Game> spec)
+        SafeDeleteSpec<Game> spec)
     {
         const Game expectedResult = null!;
 

@@ -8,7 +8,7 @@ internal sealed class GameGenresByGameIdSpec : Specification<GameGenre>
     public GameGenresByGameIdSpec(Guid gameId)
     {
         GameId = gameId;
-        
+
         Query
             .Where(gameGenre => gameGenre.GameId == gameId);
     }

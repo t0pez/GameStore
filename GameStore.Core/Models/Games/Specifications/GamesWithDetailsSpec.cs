@@ -1,13 +1,13 @@
 ﻿using Ardalis.Specification;
+using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-public sealed class GamesWithDetailsSpec : Specification<Game>
+public sealed class GamesWithDetailsSpec : SafeDeleteSpec<Game>
 {
     public GamesWithDetailsSpec()
     {
         Query
-            .Where(g => g.IsDeleted == false)
             .Include(g => g.Comments)
             .Include(g => g.Genres)
             .ThenInclude(gameGenre => gameGenre.Genre)

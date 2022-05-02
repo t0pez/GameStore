@@ -37,7 +37,7 @@ public class PublisherServiceTests
     {
         const int expectedCount = 4;
 
-        _publisherRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<PublishersWithDetailsSpec>()))
+        _publisherRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<PublishersListSpec>()))
                           .ReturnsAsync(new List<Publisher>(new Publisher[expectedCount]));
 
         var actualResult = await _publisherService.GetAllAsync();
