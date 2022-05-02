@@ -6,7 +6,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-public class GamesByPlatformTypesSpec : MultipleResultSafeDeleteSpec<Game>
+public class GamesByPlatformTypesSpec : SafeDeleteSpec<Game>
 {
     public GamesByPlatformTypesSpec(ICollection<Guid> platformTypesIds)
     {

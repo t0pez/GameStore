@@ -2,6 +2,6 @@
 
 namespace GameStore.Core.Models.Publishers.Specifications;
 
-public sealed class PublishersListSpec : MultipleResultSafeDeleteSpec<Publisher>
+public sealed class PublishersListSpec : SafeDeleteSpec<Publisher>
 {
 }

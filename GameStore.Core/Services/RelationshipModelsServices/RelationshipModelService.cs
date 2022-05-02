@@ -17,7 +17,7 @@ public class RelationshipModelService<TModel> : IRelationshipModelService<TModel
 
     private IRepository<TModel> Repository => _unitOfWork.GetRepository<TModel>();
     
-    public async Task UpdateManyToManyAsync(IEnumerable<TModel> newModels, MultipleResultDomainSpec<TModel> deleteSpec)
+    public async Task UpdateManyToManyAsync(IEnumerable<TModel> newModels, DomainSpec<TModel> deleteSpec)
     {
         await DeleteByPreviousRelationshipsAsync(deleteSpec);
         await AddNewRelationshipsAsync(newModels);
@@ -28,7 +28,7 @@ public class RelationshipModelService<TModel> : IRelationshipModelService<TModel
         return Repository.AddRangeAsync(models);
     }
 
-    private async Task DeleteByPreviousRelationshipsAsync(MultipleResultDomainSpec<TModel> spec)
+    private async Task DeleteByPreviousRelationshipsAsync(DomainSpec<TModel> spec)
     {
         var specificationResult = await Repository.GetBySpecAsync(spec);
 

@@ -3,7 +3,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Comments.Specifications;
 
-public sealed class CommentsWithoutParentByGameKeySpec : MultipleResultSafeDeleteSpec<Comment>
+public sealed class CommentsWithoutParentByGameKeySpec : SafeDeleteSpec<Comment>
 {
     public CommentsWithoutParentByGameKeySpec(string gameKey)
     {

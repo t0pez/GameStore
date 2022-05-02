@@ -3,7 +3,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-public class GameByKeySpec : SingleResultSafeDeleteSpec<Game>
+public class GameByKeySpec : SafeDeleteSpec<Game>
 {
     public GameByKeySpec(string gameKey)
     {

@@ -4,7 +4,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.RelationalModels.Specifications;
 
-internal sealed class GamePlatformsByPlatformIdSpec : MultipleResultDomainSpec<GamePlatformType>
+internal sealed class GamePlatformsByPlatformIdSpec : DomainSpec<GamePlatformType>
 {
     public GamePlatformsByPlatformIdSpec(Guid gameId)
     {

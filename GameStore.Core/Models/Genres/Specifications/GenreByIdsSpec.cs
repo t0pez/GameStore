@@ -4,7 +4,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Genres.Specifications;
 
-public class GenreByIdSpec : SingleResultSafeDeleteSpec<Genre>
+public class GenreByIdSpec : SafeDeleteSpec<Genre>
 {
     public GenreByIdSpec(Guid id)
     {

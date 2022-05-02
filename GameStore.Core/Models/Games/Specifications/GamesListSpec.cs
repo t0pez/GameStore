@@ -2,6 +2,6 @@
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-public sealed class GamesListSpec : MultipleResultSafeDeleteSpec<Game>
+public sealed class GamesListSpec : SafeDeleteSpec<Game>
 {
 }

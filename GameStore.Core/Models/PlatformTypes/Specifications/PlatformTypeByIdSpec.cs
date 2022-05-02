@@ -4,7 +4,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.PlatformTypes.Specifications;
 
-public class PlatformTypeByIdSpec : SingleResultSafeDeleteSpec<PlatformType>
+public class PlatformTypeByIdSpec : SafeDeleteSpec<PlatformType>
 {
     public PlatformTypeByIdSpec(Guid id)
     {

@@ -3,10 +3,10 @@ using GameStore.SharedKernel.Interfaces;
 
 namespace GameStore.SharedKernel.Specifications;
 
-public class SingleResultSafeDeleteSpec<TModel>
-    : SingleResultDomainSpec<TModel> where TModel : ISafeDelete
+public class SafeDeleteSpec<TModel>
+    : DomainSpec<TModel> where TModel : ISafeDelete
 {
-    protected SingleResultSafeDeleteSpec()
+    protected SafeDeleteSpec()
     {
         Query
             .Where(model => model.IsDeleted == IsIncludedDeleted ||

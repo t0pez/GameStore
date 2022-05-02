@@ -4,7 +4,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
-public class GameByIdSpec : SingleResultSafeDeleteSpec<Game>
+public class GameByIdSpec : SafeDeleteSpec<Game>
 {
     public GameByIdSpec(Guid id)
     {

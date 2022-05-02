@@ -21,7 +21,7 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
 
     private DbSet<TModel> Set => _context.Set<TModel>();
 
-    public Task<List<TModel>> GetBySpecAsync(MultipleResultDomainSpec<TModel> spec = null)
+    public Task<List<TModel>> GetBySpecAsync(DomainSpec<TModel> spec = null)
     {
         if (spec is null)
             return Set.ToListAsync();
@@ -31,7 +31,7 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
         return specificationResult.ToListAsync();
     }
         
-    public Task<TModel> GetSingleOrDefaultBySpecAsync(SingleResultDomainSpec<TModel> spec)
+    public Task<TModel> GetSingleOrDefaultBySpecAsync(DomainSpec<TModel> spec)
     {
         var specificationResult = ApplySpecifications(spec);
 

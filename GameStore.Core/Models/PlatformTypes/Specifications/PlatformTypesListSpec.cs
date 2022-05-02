@@ -2,6 +2,6 @@
 
 namespace GameStore.Core.Models.PlatformTypes.Specifications;
 
-public sealed class PlatformTypesListSpec : MultipleResultSafeDeleteSpec<PlatformType>
+public sealed class PlatformTypesListSpec : SafeDeleteSpec<PlatformType>
 {
 }

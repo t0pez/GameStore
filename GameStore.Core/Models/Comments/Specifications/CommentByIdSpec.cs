@@ -4,7 +4,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Comments.Specifications;
 
-public sealed class CommentByIdSpec : SingleResultSafeDeleteSpec<Comment>
+public sealed class CommentByIdSpec : SafeDeleteSpec<Comment>
 {
     public CommentByIdSpec(Guid id)
     {

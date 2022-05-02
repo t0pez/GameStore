@@ -4,7 +4,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Genres.Specifications;
 
-public sealed class GenresWithDetailsSpec : MultipleResultSafeDeleteSpec<Genre>
+public sealed class GenresWithDetailsSpec : SafeDeleteSpec<Genre>
 {
     public GenresWithDetailsSpec()
     {

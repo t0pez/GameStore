@@ -4,7 +4,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Publishers.Specifications;
 
-public class PublisherByIdSpec : SingleResultSafeDeleteSpec<Publisher>
+public class PublisherByIdSpec : SafeDeleteSpec<Publisher>
 {
     public PublisherByIdSpec(Guid id)
     {

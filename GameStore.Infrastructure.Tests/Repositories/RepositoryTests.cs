@@ -41,7 +41,7 @@ public class RepositoryTests
     [Theory] 
     [GetBySpecAsyncData]
     public async void GetBySpecAsync_NotNullSpec_ReturnsCorrectModels(
-        MultipleResultSafeDeleteSpec<Game> spec, int expectedCount)
+        SafeDeleteSpec<Game> spec, int expectedCount)
     {
         var actualResult = await _gameRepository.GetBySpecAsync(spec);
         var actualCount = actualResult.Count;
@@ -52,7 +52,7 @@ public class RepositoryTests
     [Theory]
     [GetSingleBySpecWithResultData]
     public async void GetSingleBySpecAsync_ExistingModel_ReturnsCorrectModels(
-        SingleResultSafeDeleteSpec<Game> spec, Guid expectedId)
+        SafeDeleteSpec<Game> spec, Guid expectedId)
     {
         var actualResult = await _gameRepository.GetSingleOrDefaultBySpecAsync(spec);
         var actualResultId = actualResult.Id;
@@ -63,7 +63,7 @@ public class RepositoryTests
     [Theory]
     [GetSingleBySpecWithoutResultData]
     public async void GetSingleBySpecAsync_NotExistingModel_ReturnsNull(
-        SingleResultSafeDeleteSpec<Game> spec)
+        SafeDeleteSpec<Game> spec)
     {
         const Game expectedResult = null!;
 

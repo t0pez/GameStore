@@ -4,7 +4,7 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.RelationalModels.Specifications;
 
-internal sealed class GameGenresByGameIdSpec : MultipleResultDomainSpec<GameGenre>
+internal sealed class GameGenresByGameIdSpec : DomainSpec<GameGenre>
 {
     public GameGenresByGameIdSpec(Guid gameId)
     {
