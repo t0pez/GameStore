@@ -1,10 +1,9 @@
 ﻿using System;
 using Ardalis.Specification;
-using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.RelationalModels.Specifications;
 
-internal sealed class GameGenresByGameIdSpec : DomainSpec<GameGenre>
+internal sealed class GameGenresByGameIdSpec : Specification<GameGenre>
 {
     public GameGenresByGameIdSpec(Guid gameId)
     {

@@ -1,10 +1,9 @@
 ﻿using System;
 using Ardalis.Specification;
-using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.RelationalModels.Specifications;
 
-internal sealed class GamePlatformsByPlatformIdSpec : DomainSpec<GamePlatformType>
+internal sealed class GamePlatformsByPlatformIdSpec : Specification<GamePlatformType>
 {
     public GamePlatformsByPlatformIdSpec(Guid gameId)
     {

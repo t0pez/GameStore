@@ -6,7 +6,6 @@ using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Infrastructure.Data.Repositories;
 
@@ -21,7 +20,7 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
 
     private DbSet<TModel> Set => _context.Set<TModel>();
 
-    public Task<List<TModel>> GetBySpecAsync(DomainSpec<TModel> spec = null)
+    public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> spec = null)
     {
         if (spec is null)
             return Set.ToListAsync();
@@ -31,7 +30,7 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
         return specificationResult.ToListAsync();
     }
         
-    public Task<TModel> GetSingleOrDefaultBySpecAsync(DomainSpec<TModel> spec)
+    public Task<TModel> GetSingleOrDefaultBySpecAsync(ISpecification<TModel> spec)
     {
         var specificationResult = ApplySpecifications(spec);
 
@@ -63,14 +62,14 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
        return Task.Run(() => Set.RemoveRange(models));
     }
 
-    public Task<bool> AnyAsync(DomainSpec<TModel> spec)
+    public Task<bool> AnyAsync(ISpecification<TModel> spec)
     {
         var specResult = ApplySpecifications(spec);
 
         return specResult.AnyAsync();
     }
 
-    public Task<int> CountAsync(DomainSpec<TModel> spec = null)
+    public Task<int> CountAsync(ISpecification<TModel> spec = null)
     {
         if (spec is null)
             return Set.CountAsync();
