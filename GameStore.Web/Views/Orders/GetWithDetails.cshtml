@@ -1,0 +1,45 @@
+﻿@model GameStore.Web.ViewModels.Order.OrderViewModel
+
+@{
+    ViewBag.Title = "Order";
+    Layout = "_Layout";
+}
+
+<h2 class="mt-5">Order</h2>
+
+@foreach (var item in Model.OrderDetails)
+    {
+        <div class="mb-3">
+            <div>
+                @Html.LabelFor(model => item.Game.Id, "Game Id:", new { @class = "form-label fw-bolder" })
+                @Html.DisplayFor(model => item.Game.Id)
+            </div>
+            <div>
+                @Html.LabelFor(model => item.Game.Name, "Game Name:", new { @class = "form-label fw-bolder" })
+                @Html.DisplayFor(model => item.Game.Name)
+            </div>
+            <div>
+                @Html.LabelFor(model => item.Quantity, "Quantity:", new { @class = "form-label fw-bolder" })
+                @Html.DisplayFor(model => item.Quantity)
+            </div>
+            <div>
+                @Html.LabelFor(model => item.Discount, "Discount:", new { @class = "form-label fw-bolder" })
+                @Html.DisplayFor(model => item.Discount)
+            </div>
+            <div>
+                @Html.LabelFor(model => item.Price, "Unit price:", new { @class = "form-label fw-bolder" })
+                @Html.DisplayFor(model => item.Price)
+            </div>
+            <div>
+                @Html.ActionLink("Checkout", "GetWithDetails", "Games", new { gameKey = item.Game.Key }, new { @class = "btn btn-secondary" })
+            </div>
+        </div>
+    }
+
+<div>
+    <label class="form-label fw-bolder">
+        Total price: @Model.TotalSum
+    </label>
+</div>
+
+
