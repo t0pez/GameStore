@@ -3,6 +3,7 @@ using GameStore.Core.Models.Baskets;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Genres;
+using GameStore.Core.Models.Orders;
 using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.RelationalModels;
@@ -11,16 +12,17 @@ using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.Core.Models.ServiceModels.Genres;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
 using GameStore.Core.Models.ServiceModels.Publishers;
-using GameStore.Web.Models.Basket;
+using GameStore.Web.Models.Baskets;
 using GameStore.Web.Models.Comment;
 using GameStore.Web.Models.Game;
 using GameStore.Web.Models.Genre;
 using GameStore.Web.Models.PlatformType;
 using GameStore.Web.Models.Publisher;
-using GameStore.Web.ViewModels.Basket;
+using GameStore.Web.ViewModels.Baskets;
 using GameStore.Web.ViewModels.Comments;
 using GameStore.Web.ViewModels.Games;
 using GameStore.Web.ViewModels.Genres;
+using GameStore.Web.ViewModels.Order;
 using GameStore.Web.ViewModels.PlatformTypes;
 using GameStore.Web.ViewModels.Publisher;
 
@@ -45,12 +47,13 @@ public class WebCommonProfile : Profile
         CreateMap<PlatformTypeCreateRequestModel, PlatformTypeCreateModel>().ReverseMap();
         CreateMap<PlatformTypeUpdateRequestModel, PlatformTypeUpdateModel>().ReverseMap();
 
-        CreateMap<Basket, BasketViewModel>();
+        CreateMap<Basket, BasketViewModel>().ReverseMap();
         CreateMap<Basket, BasketCookieModel>().ReverseMap();
 
         CreateMap<Game, GameViewModel>();
         CreateMap<Game, GameListViewModel>();
         CreateMap<Game, GameInBasketViewModel>();
+        CreateMap<Game, GameInOrderDetailsViewModel>();
         CreateMap<Game, GameUpdateRequestModel>();
 
         CreateMap<Genre, GenreViewModel>();
@@ -59,13 +62,16 @@ public class WebCommonProfile : Profile
         CreateMap<PlatformType, PlatformTypeViewModel>();
         CreateMap<PlatformType, PlatformTypeListViewModel>();
         
-        
         CreateMap<Publisher, PublisherViewModel>();
         CreateMap<Publisher, PublisherListViewModel>();
         CreateMap<Publisher, PublisherInGameViewModel>();
         CreateMap<Publisher, PublisherUpdateRequestModel>();
 
-        CreateMap<BasketItem, BasketItemViewModel>();
+        CreateMap<Order, OrderViewModel>().ReverseMap();
+
+        CreateMap<OrderDetails, OrderDetailsViewModel>().ReverseMap();
+
+        CreateMap<BasketItem, BasketItemViewModel>().ReverseMap();
         CreateMap<BasketItem, BasketItemCookieModel>()
             .ForMember(model => model.GameId,
                        expression => expression.MapFrom(basketItem => basketItem.Game.Id));
