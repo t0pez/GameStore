@@ -39,6 +39,11 @@ public class BasketService : IBasketService
 
     public void AddToBasket(Basket basket, Guid gameId, int quantity)
     {
+        if (_gameService.GetByIdAsync(gameId) is null)
+        {
+            throw new ItemNotFoundException(typeof(Game), gameId);
+        }
+
         if (IsBasketContainGame(basket, gameId))
         {
             IncreaseQuantity(basket, gameId, quantity);
