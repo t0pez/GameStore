@@ -1,0 +1,36 @@
+﻿@model GameStore.Core.Services.PaymentMethods.VisaPaymentGetaway
+
+@{
+    ViewBag.Title = "Pay by Visa";
+    Layout = "_Layout";
+}
+
+<h2>Pay by Visa</h2>
+
+<div>
+    <h4>Order info</h4>
+    
+    <label for="OrderId">Order number:</label>
+    <p id="OrderId">@Model.OrderId</p>
+    
+    <label for="TotalSum">Order number:</label>
+    <p id="TotalSum">@Model.TotalSum</p>
+</div>
+
+<form method="post" asp-controller="Payment" asp-action="VisaResult">
+    <div class="form-floating">
+        <label for="CardNumber" class="form-label"></label>
+        <input type="text" id="CardNumber" name="CardNumber"/>
+    </div>
+    <div class="form-floating">
+        <label for="CardExpires" class="form-label"></label>
+        <input type="text" id="CardExpires" name="CardExpires"/>
+    </div>
+    <div class="form-floating">
+        <label for="CardCVV" class="form-label"></label>
+        <input type="text" id="CardCVV" name="CardCVV"/>
+    </div>
+    <button type="submit" class="btn btn-success">
+        Pay by visa
+    </button>
+</form>

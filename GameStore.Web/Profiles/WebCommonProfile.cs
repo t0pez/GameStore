@@ -10,6 +10,7 @@ using GameStore.Core.Models.RelationalModels;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.Core.Models.ServiceModels.Genres;
+using GameStore.Core.Models.ServiceModels.Orders;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
 using GameStore.Core.Models.ServiceModels.Publishers;
 using GameStore.Web.Models.Baskets;
@@ -68,6 +69,7 @@ public class WebCommonProfile : Profile
         CreateMap<Publisher, PublisherUpdateRequestModel>();
 
         CreateMap<Order, OrderViewModel>().ReverseMap();
+        CreateMap<Order, OrderListViewModel>().ReverseMap();
 
         CreateMap<OrderDetails, OrderDetailsViewModel>().ReverseMap();
 

@@ -22,6 +22,7 @@ public static class DependencyResolverModule
                 .AddScoped<IPlatformTypeService, PlatformTypeService>()
                 .AddScoped<IOrderService, OrderService>()
                 .AddScoped<IOrderMappingHelper, OrderMappingHelper>()
+                .AddScoped<IPaymentService, PaymentService>()
                 .AddScoped(typeof(IRelationshipModelService<>), typeof(RelationshipModelService<>));
     }
 }

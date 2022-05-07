@@ -78,7 +78,7 @@ public class OrdersController : Controller
         var order = await _orderService.CreateModelAsync(createModel);
         var result = _mapper.Map<OrderViewModel>(order);
 
-        return View("GetWithDetails", result);
+        return View("Checkout", result);
     }
     
     [HttpGet("{id}/update")]
