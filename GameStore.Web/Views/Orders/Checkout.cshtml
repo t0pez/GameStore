@@ -42,9 +42,17 @@
     </label>
 </div>
 
-@Html.ActionLink("Pay with Visa", "VisaPay", "Payment", new { orderViewModel = Model})
+<form method="post" asp-controller="Payment" asp-action="BankPay">
+    <input type="hidden" name="orderId" value="@Model.Id">
+    <button type="submit" class="btn ">Pay with Bank</button>
+</form>
 
-@* <form method="post" asp-controller="Payment" asp-action="VisaPay"> *@
-@*     <button type="submit" class="btn btn-success">Pay with Visa</button> *@
-@* </form> *@
+<form method="post" asp-controller="Payment" asp-action="VisaPay">
+    <input type="hidden" name="orderId" value="@Model.Id">
+    <button type="submit" class="btn">Pay with Visa</button>
+</form>
 
+<form method="post" asp-controller="Payment" asp-action="IboxPay">
+    <input type="hidden" name="orderId" value="@Model.Id">
+    <button type="submit" class="btn">Pay with IBox</button>
+</form>

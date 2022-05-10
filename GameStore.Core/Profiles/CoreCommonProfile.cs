@@ -3,12 +3,14 @@ using AutoMapper;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Genres;
+using GameStore.Core.Models.Orders;
 using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.Core.Models.ServiceModels.Genres;
+using GameStore.Core.Models.ServiceModels.Orders;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
 using GameStore.Core.Models.ServiceModels.Publishers;
 
@@ -25,6 +27,8 @@ public class CoreCommonProfile : Profile
         CreateMap<PlatformTypeCreateModel, PlatformType>();
 
         CreateMap<PublisherCreateModel, Publisher>();
+
+        CreateMap<Order, OrderUpdateModel>();
 
         CreateMap<GameCreateModel, Game>()
             .ForMember(game => game.Genres,

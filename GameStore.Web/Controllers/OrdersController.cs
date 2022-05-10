@@ -58,29 +58,20 @@ public class OrdersController : Controller
         return View(result);
     }
 
-    [HttpPost("new")]
-    public async Task<ActionResult<OrderViewModel>> CreateAsync(OrderViewModel viewModel)
-    {
-        var order = _mapper.Map<Order>(viewModel);
-        await _orderService.CreateAsync(order);
-
-        return RedirectToAction("GetAll", "Orders");
-    }
-    
-    [HttpGet("model")]
-    public async Task<ActionResult<OrderViewModel>> CreateModelAsync()
+    [HttpGet("new")]
+    public async Task<ActionResult<OrderViewModel>> CreateAsync()
     {
         var basketCookieModel = _basketCookieService.GetBasketFromCookie(HttpContext.Request.Cookies);
         var basket = _mapper.Map<Basket>(basketCookieModel);
         
         var createModel = new OrderCreateModel { Basket = basket };
         
-        var order = await _orderService.CreateModelAsync(createModel);
+        var order = await _orderService.CreateAsync(createModel);
         var result = _mapper.Map<OrderViewModel>(order);
 
         return View("Checkout", result);
     }
-    
+
     [HttpGet("{id}/update")]
     public async Task<ActionResult<OrderUpdateRequestModel>> UpdateAsync(Guid id)
     {

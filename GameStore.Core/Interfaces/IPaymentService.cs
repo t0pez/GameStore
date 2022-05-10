@@ -6,6 +6,6 @@ namespace GameStore.Core.Interfaces;
 
 public interface IPaymentService
 {
-    public Task<object> GetPaymentGateway(Order order);
+    public Task<PaymentGetaway> GetPaymentGateway(Order order, PaymentType? paymentType = null);
     public void SetPaymentMethod(IPaymentMethod paymentMethod);
 }

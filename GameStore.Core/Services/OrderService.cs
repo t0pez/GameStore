@@ -43,19 +43,16 @@ public class OrderService : IOrderService
 
         return result;
     }
-
-    public async Task CreateAsync(Order order)
+    
+    public async Task<Order> CreateAsync(OrderCreateModel createModel)
     {
+        var order = await _orderMappingHelper.GetOrderAsync(createModel.Basket);
+        
         order.OrderDate = DateTime.UtcNow;
         order.Status = OrderStatus.Created;
         
         await OrderRepository.AddAsync(order);
         await _unitOfWork.SaveChangesAsync();
-    }
-    
-    public async Task<Order> CreateModelAsync(OrderCreateModel createModel)
-    {
-        var order = await _orderMappingHelper.GetOrderAsync(createModel.Basket);
         
         return order;
     }

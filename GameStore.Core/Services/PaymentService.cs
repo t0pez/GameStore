@@ -1,29 +1,48 @@
 ﻿using System;
 using System.Threading.Tasks;
+using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.PaymentMethods;
 using GameStore.Core.Models.Orders;
+using GameStore.Core.Models.ServiceModels.Orders;
 
 namespace GameStore.Core.Services;
 
 public class PaymentService : IPaymentService
 {
     private readonly IOrderService _orderService;
+    private readonly IPaymentMethodFactory _paymentMethodFactory;
+    private readonly IMapper _mapper;
     private IPaymentMethod _paymentMethod;
 
-    public PaymentService(IOrderService orderService)
+    public PaymentService(IOrderService orderService, IPaymentMethodFactory paymentMethodFactory, IMapper mapper)
     {
         _orderService = orderService;
+        _paymentMethodFactory = paymentMethodFactory;
+        _mapper = mapper;
     }
 
-    public async Task<object> GetPaymentGateway(Order order)
+    public async Task<PaymentGetaway> GetPaymentGateway(Order order, PaymentType? paymentType = null)
     {
-        var paymentResult = _paymentMethod.GetPaymentGetaway(order);
+        if (paymentType is not null)
+        {
+            var paymentMethod = _paymentMethodFactory.GetPaymentMethod((PaymentType)paymentType);
+            SetPaymentMethod(paymentMethod);
+        }
+
+        var getawayCreateModel = new PaymentGetawayCreateModel
+        {
+            OrderId = order.Id,
+            TotalSum = order.TotalSum
+        };
+        
+        var paymentResult = _paymentMethod.GetPaymentGetaway(getawayCreateModel);
 
         order.Status = OrderStatus.Pending;
-
-        await _orderService.CreateAsync(order);
         
+        var updateModel = _mapper.Map<OrderUpdateModel>(order);
+        await _orderService.UpdateAsync(updateModel);
+
         return paymentResult;
     }
 

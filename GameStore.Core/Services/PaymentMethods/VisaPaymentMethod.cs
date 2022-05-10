@@ -1,41 +1,21 @@
-﻿using System;
-using GameStore.Core.Interfaces.PaymentMethods;
-using GameStore.Core.Models.Orders;
+﻿using GameStore.Core.Interfaces.PaymentMethods;
 
 namespace GameStore.Core.Services.PaymentMethods;
 
 public class VisaPaymentMethod : IPaymentMethod
 {
-    private readonly IThirdPartyPaymentApiService _api;
-
-    public object GetPaymentGetaway(Order order)
+    public PaymentGetaway GetPaymentGetaway(PaymentGetawayCreateModel createModel)
     {
-        _api?.Foo();
-        
         var paymentGetaway = new VisaPaymentGetaway
         {
-            OrderId = order.Id, 
-            TotalSum = order.TotalSum, 
-            PaymentUrl = "Some url"
+            TotalSum = createModel.TotalSum
         };
         
         return paymentGetaway;
     }
-
-    public object EnrollPayment(Order order)
-    {
-        throw new NotImplementedException();
-    }
 }
 
-public class VisaPaymentGetaway
+public class VisaPaymentGetaway : PaymentGetaway
 {
-    public Guid OrderId { get; set; }
     public decimal TotalSum { get; set; }
-    public string PaymentUrl { get; set; }
-}
-
-public interface IThirdPartyPaymentApiService
-{
-    void Foo();
 }

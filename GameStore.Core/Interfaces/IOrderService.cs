@@ -11,8 +11,7 @@ public interface IOrderService
     public Task<ICollection<Order>> GetAllAsync();
     public Task<Order> GetByIdAsync(Guid id);
     public Task<ICollection<Order>> GetByCustomerIdAsync(Guid customerId);
-    public Task CreateAsync(Order order);
-    public Task<Order> CreateModelAsync(OrderCreateModel createModel);
+    public Task<Order> CreateAsync(OrderCreateModel createModel);
     public Task UpdateAsync(OrderUpdateModel updateModel);
     public Task DeleteAsync(Guid id);
 }
