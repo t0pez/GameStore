@@ -1,4 +1,5 @@
 ﻿using GameStore.Core.Helpers.OrderMapping;
+using GameStore.Core.Helpers.PdfGenerators;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.PaymentMethods;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
@@ -25,6 +26,7 @@ public static class DependencyResolverModule
                 .AddScoped<IOrderMappingHelper, OrderMappingHelper>()
                 .AddScoped<IPaymentService, PaymentService>()
                 .AddScoped<IPaymentMethodFactory, PaymentMethodFactory>()
+                .AddScoped<IInvoiceFileGenerator, InvoiceFileGenerator>()
                 .AddScoped(typeof(IRelationshipModelService<>), typeof(RelationshipModelService<>));
     }
 }

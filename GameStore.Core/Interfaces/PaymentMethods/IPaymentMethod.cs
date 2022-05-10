@@ -1,4 +1,4 @@
-﻿using System;
+﻿using GameStore.Core.Models.Orders;
 
 namespace GameStore.Core.Interfaces.PaymentMethods;
 
@@ -9,8 +9,7 @@ public interface IPaymentMethod
 
 public class PaymentGetawayCreateModel
 {
-    public Guid OrderId { get; set; }
-    public decimal TotalSum { get; set; }
+    public Order Order { get; set; }
 }
 
 public abstract class PaymentGetaway

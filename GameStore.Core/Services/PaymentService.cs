@@ -32,8 +32,7 @@ public class PaymentService : IPaymentService
 
         var getawayCreateModel = new PaymentGetawayCreateModel
         {
-            OrderId = order.Id,
-            TotalSum = order.TotalSum
+            Order = order
         };
         
         var paymentResult = _paymentMethod.GetPaymentGetaway(getawayCreateModel);

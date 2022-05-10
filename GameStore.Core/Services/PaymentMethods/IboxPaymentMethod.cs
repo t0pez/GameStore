@@ -9,8 +9,8 @@ public class IboxPaymentMethod : IPaymentMethod
     {
         var getaway = new IboxPaymentGetaway
         {
-            OrderId = createModel.OrderId,
-            TotalSum = createModel.TotalSum
+            OrderId = createModel.Order.Id,
+            TotalSum = createModel.Order.TotalSum
         };
 
         return getaway;

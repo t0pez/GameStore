@@ -8,7 +8,7 @@ public class VisaPaymentMethod : IPaymentMethod
     {
         var paymentGetaway = new VisaPaymentGetaway
         {
-            TotalSum = createModel.TotalSum
+            TotalSum = createModel.Order.TotalSum
         };
         
         return paymentGetaway;

@@ -1,16 +1,23 @@
-﻿using GameStore.Core.Interfaces.PaymentMethods;
-using Newtonsoft.Json;
+﻿using GameStore.Core.Helpers.PdfGenerators;
+using GameStore.Core.Interfaces.PaymentMethods;
 
 namespace GameStore.Core.Services.PaymentMethods;
 
 public class BankPaymentMethod : IPaymentMethod
 {
+    private readonly IInvoiceFileGenerator _invoiceFileGenerator;
+
+    public BankPaymentMethod(IInvoiceFileGenerator invoiceFileGenerator)
+    {
+        _invoiceFileGenerator = invoiceFileGenerator;
+    }
+
     public PaymentGetaway GetPaymentGetaway(PaymentGetawayCreateModel createModel)
     {
         var getaway = new BankPaymentGetaway();
 
-        var orderJson = JsonConvert.SerializeObject(createModel);
-        getaway.InvoiceFileContent = orderJson;
+        var fileContent = _invoiceFileGenerator.GetFile(createModel.Order);
+        getaway.InvoiceFileContent = fileContent;
         
         return getaway;
     }
@@ -18,5 +25,5 @@ public class BankPaymentMethod : IPaymentMethod
 
 public class BankPaymentGetaway : PaymentGetaway
 {
-    public string InvoiceFileContent { get; set; }
+    public byte[] InvoiceFileContent { get; set; }
 }

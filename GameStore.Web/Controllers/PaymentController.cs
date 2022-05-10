@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AutoMapper;
-using GameStore.Core.Extensions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.PaymentMethods;
 using GameStore.Core.Models.Orders;
@@ -26,9 +25,9 @@ public class PaymentController : Controller
     }
     
     [HttpPost("visa")]
-    public async Task<ActionResult> VisaPayAsync(OrderViewModel orderViewModel)
+    public async Task<ActionResult> VisaPayAsync(Guid orderId)
     {
-        var order = _mapper.Map<Order>(orderViewModel);
+        var order = await _orderService.GetByIdAsync(orderId);
         
         var paymentResult = await _paymentService.GetPaymentGateway(order, PaymentType.Visa);
         var result = paymentResult as VisaPaymentGetaway;
@@ -44,7 +43,7 @@ public class PaymentController : Controller
         var paymentResult = await _paymentService.GetPaymentGateway(order, PaymentType.Bank);
         var result = paymentResult as BankPaymentGetaway;
 
-        return File(result.InvoiceFileContent.ToByteArray(), "application/force-download", "invoice-file.txt");
+        return File(result.InvoiceFileContent, "application/pdf", "invoice-file.pdf");
     }
     
     [HttpPost("ibox")]
