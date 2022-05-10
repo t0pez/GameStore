@@ -1,5 +1,4 @@
-﻿using System;
-using System.Text;
+﻿using System.Text;
 using GameStore.Core.Models.Orders;
 using SelectPdf;
 
@@ -23,6 +22,14 @@ public class InvoiceFileGenerator : IInvoiceFileGenerator
     {
         var stringBuilder = new StringBuilder();
 
+        AddTableWithOrderDetails(stringBuilder, order);
+        AddTotalSum(stringBuilder, order);
+
+        return stringBuilder.ToString();
+    }
+
+    private void AddTableWithOrderDetails(StringBuilder stringBuilder, Order order)
+    {
         stringBuilder.Append("<table>");
 
         const string tableHeader = "<tr>" +
@@ -41,12 +48,15 @@ public class InvoiceFileGenerator : IInvoiceFileGenerator
                 $"<td>{orderDetail.Quantity}</td>" +
                 $"<td>{orderDetail.Price}</td>" +
                 "</tr>";
-            
+
             stringBuilder.Append(orderTableRow);
         }
 
         stringBuilder.Append("</table>");
+    }
 
-        return stringBuilder.ToString();
+    private void AddTotalSum(StringBuilder stringBuilder, Order order)
+    {
+        stringBuilder.Append($"<h4>Total sum: {order.TotalSum}</h4>");
     }
 }
