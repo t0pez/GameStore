@@ -4,6 +4,7 @@ using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.PaymentMethods;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
 using GameStore.Core.Services;
+using GameStore.Core.Services.PaymentMethods;
 using GameStore.Core.Services.RelationshipModelsServices;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.SharedKernel.Interfaces.DataAccess;

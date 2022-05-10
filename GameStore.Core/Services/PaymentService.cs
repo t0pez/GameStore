@@ -4,7 +4,9 @@ using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.PaymentMethods;
 using GameStore.Core.Models.Orders;
+using GameStore.Core.Models.Payment;
 using GameStore.Core.Models.ServiceModels.Orders;
+using GameStore.Core.Models.ServiceModels.Payment;
 
 namespace GameStore.Core.Services;
 

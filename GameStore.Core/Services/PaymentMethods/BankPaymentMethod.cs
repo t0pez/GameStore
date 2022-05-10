@@ -1,5 +1,7 @@
 ﻿using GameStore.Core.Helpers.PdfGenerators;
 using GameStore.Core.Interfaces.PaymentMethods;
+using GameStore.Core.Models.Payment;
+using GameStore.Core.Models.ServiceModels.Payment;
 
 namespace GameStore.Core.Services.PaymentMethods;
 
@@ -23,7 +25,3 @@ public class BankPaymentMethod : IPaymentMethod
     }
 }
 
-public class BankPaymentGetaway : PaymentGetaway
-{
-    public byte[] InvoiceFileContent { get; set; }
-}

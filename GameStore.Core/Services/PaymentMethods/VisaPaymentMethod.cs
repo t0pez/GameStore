@@ -1,4 +1,6 @@
 ﻿using GameStore.Core.Interfaces.PaymentMethods;
+using GameStore.Core.Models.Payment;
+using GameStore.Core.Models.ServiceModels.Payment;
 
 namespace GameStore.Core.Services.PaymentMethods;
 
@@ -13,9 +15,4 @@ public class VisaPaymentMethod : IPaymentMethod
         
         return paymentGetaway;
     }
-}
-
-public class VisaPaymentGetaway : PaymentGetaway
-{
-    public decimal TotalSum { get; set; }
 }

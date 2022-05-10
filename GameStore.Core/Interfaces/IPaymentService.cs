@@ -1,6 +1,7 @@
 ﻿using System.Threading.Tasks;
 using GameStore.Core.Interfaces.PaymentMethods;
 using GameStore.Core.Models.Orders;
+using GameStore.Core.Models.Payment;
 
 namespace GameStore.Core.Interfaces;
 

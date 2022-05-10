@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.PaymentMethods;
-using GameStore.Core.Models.Orders;
-using GameStore.Core.Services.PaymentMethods;
-using GameStore.Web.ViewModels.Order;
+using GameStore.Core.Models.Payment;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameStore.Web.Controllers;
@@ -15,22 +12,18 @@ public class PaymentController : Controller
 {
     private readonly IPaymentService _paymentService;
     private readonly IOrderService _orderService;
-    private readonly IMapper _mapper;
 
-    public PaymentController(IPaymentService paymentService, IMapper mapper, IOrderService orderService)
+    public PaymentController(IPaymentService paymentService, IOrderService orderService)
     {
         _paymentService = paymentService;
         _orderService = orderService;
-        _mapper = mapper;
     }
     
     [HttpPost("visa")]
     public async Task<ActionResult> VisaPayAsync(Guid orderId)
     {
-        var order = await _orderService.GetByIdAsync(orderId);
-        
-        var paymentResult = await _paymentService.GetPaymentGateway(order, PaymentType.Visa);
-        var result = paymentResult as VisaPaymentGetaway;
+        var paymentGetaway = await GetPaymentGetaway(orderId, PaymentType.Visa);
+        var result = paymentGetaway as VisaPaymentGetaway;
 
         return View("VisaPaymentStub", result);
     }
@@ -38,21 +31,17 @@ public class PaymentController : Controller
     [HttpPost("bank")]
     public async Task<FileContentResult> BankPayAsync(Guid orderId)
     {
-        var order = await _orderService.GetByIdAsync(orderId);
-        
-        var paymentResult = await _paymentService.GetPaymentGateway(order, PaymentType.Bank);
-        var result = paymentResult as BankPaymentGetaway;
+        var paymentGetaway = await GetPaymentGetaway(orderId, PaymentType.Bank);
+        var result = paymentGetaway as BankPaymentGetaway;
 
         return File(result.InvoiceFileContent, "application/pdf", "invoice-file.pdf");
     }
     
     [HttpPost("ibox")]
-    public async Task<ActionResult> IboxPayAsync(OrderViewModel orderViewModel)
+    public async Task<ActionResult> IboxPayAsync(Guid orderId)
     {
-        var order = _mapper.Map<Order>(orderViewModel);
-        
-        var paymentResult = await _paymentService.GetPaymentGateway(order, PaymentType.Ibox);
-        var result = paymentResult as IboxPaymentGetaway;
+        var paymentGetaway = await GetPaymentGetaway(orderId, PaymentType.Ibox);
+        var result = paymentGetaway as IboxPaymentGetaway;
 
         return View("IboxPaymentStub", result);
     }
@@ -62,4 +51,12 @@ public class PaymentController : Controller
     {
         return RedirectToAction("GetAll", "Orders");
     }
+
+    private async Task<PaymentGetaway> GetPaymentGetaway(Guid orderId, PaymentType paymentType)
+    {
+        var order = await _orderService.GetByIdAsync(orderId);
+        var paymentGateway = await _paymentService.GetPaymentGateway(order, paymentType);
+
+        return paymentGateway;
+    } 
 }
