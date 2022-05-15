@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
+using FluentAssertions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.ServiceModels.Genres;
@@ -70,7 +71,45 @@ public class GenreControllerTests
         Assert.IsType<RedirectToActionResult>(actualResult);
         _genreServiceMock.Verify(service => service.CreateAsync(It.IsAny<GenreCreateModel>()), Times.Once());
     }
-    
+
+    [Fact]
+    public async void UpdateAsync_CorrectValues_ReturnsView()
+    {
+        var currentGenreId = Guid.NewGuid();
+        var allGenres = new List<Genre>()
+        {
+            new()
+            {
+                Id = currentGenreId
+            },
+            new()
+            {
+                Id = Guid.NewGuid()
+            }
+        };
+
+        _genreServiceMock.Setup(service => service.GetAllAsync())
+                         .ReturnsAsync(allGenres);
+
+        var actualResult = await _genresController.UpdateAsync(currentGenreId);
+
+        actualResult.Should().BeAssignableTo<ActionResult<GenreUpdateRequestModel>>();
+    }
+
+    [Fact]
+    public async void UpdateAsync_CorrectValues_ReturnsRedirect()
+    {
+        _mapperMock.Setup(mapper => mapper.Map<GenreUpdateModel>(It.IsAny<GenreUpdateRequestModel>()))
+                   .Returns(new GenreUpdateModel());
+        _genreServiceMock.Setup(service => service.UpdateAsync(It.IsAny<GenreUpdateModel>()))
+                         .Verifiable();
+
+        var actualResult = await _genresController.UpdateAsync(new GenreUpdateRequestModel());
+
+        actualResult.Should().BeOfType<RedirectToActionResult>();
+        _genreServiceMock.Verify(service => service.UpdateAsync(It.IsAny<GenreUpdateModel>()), Times.Once);
+    }
+
     [Fact]
     public async void DeleteAsync_ExistingGenre_ReturnsRedirect()
     {
