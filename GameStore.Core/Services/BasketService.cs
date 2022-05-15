@@ -37,12 +37,9 @@ public class BasketService : IBasketService
         basket.Items = basket.Items.Except(itemsToDelete).ToList();
     }
 
-    public void AddToBasket(Basket basket, Guid gameId, int quantity)
+    public async Task AddToBasketAsync(Basket basket, Guid gameId, int quantity)
     {
-        if (_gameService.GetByIdAsync(gameId) is null)
-        {
-            throw new ItemNotFoundException(typeof(Game), gameId);
-        }
+        await AssertGameExists(gameId);
 
         if (IsBasketContainGame(basket, gameId))
         {
@@ -74,5 +71,10 @@ public class BasketService : IBasketService
     private bool IsBasketContainGame(Basket basket, Guid gameId)
     {
         return basket.Items.Any(model => model.Game.Id == gameId);
+    }
+
+    private async Task AssertGameExists(Guid gameId)
+    {
+        _ = await _gameService.GetByIdAsync(gameId);
     }
 }

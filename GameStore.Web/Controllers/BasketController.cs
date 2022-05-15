@@ -30,9 +30,8 @@ public class BasketController : Controller
     [HttpGet("basket")]
     public async Task<ActionResult> GetCurrentBasketAsync()
     {
-        var basketCookieModel = _basketCookieService.GetBasketFromCookie(RequestCookies);
-
-        var basket = _mapper.Map<Basket>(basketCookieModel);
+        var basket = GetBasket();
+        
         await _basketService.FillWithDetailsAsync(basket);
 
         var basketViewModel = _mapper.Map<BasketViewModel>(basket);
@@ -45,14 +44,21 @@ public class BasketController : Controller
     [HttpPost("games/{gameKey}/buy")]
     public async Task<ActionResult> AddToBasketAsync(Guid gameId, int quantity)
     {
-        var basketCookieModel = _basketCookieService.GetBasketFromCookie(RequestCookies);
+        var basket = GetBasket();
 
-        var basket = _mapper.Map<Basket>(basketCookieModel);
-        _basketService.AddToBasket(basket, gameId, quantity);
+        await _basketService.AddToBasketAsync(basket, gameId, quantity);
         
         UpdateCookie(basket);
 
         return RedirectToAction("GetAll", "Games");
+    }
+
+    private Basket GetBasket()
+    {
+        var basketCookieModel = _basketCookieService.GetBasketFromCookie(RequestCookies);
+        var basket = _mapper.Map<Basket>(basketCookieModel);
+        
+        return basket;
     }
 
     private void UpdateCookie(Basket basket)
