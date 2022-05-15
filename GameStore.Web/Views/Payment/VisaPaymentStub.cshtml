@@ -7,27 +7,51 @@
 
 <h2>Pay by Visa</h2>
 
-<div>
-    <h4>Order info</h4>
-    
-    <label for="TotalSum">Total sum to pay:</label>
-    <p id="TotalSum">@Model.TotalSum</p>
-</div>
+<div class="card-body p-0">
+    <div class="collapse show p-3 pt-0">
+        <div class="row">
+            <div class="col-lg-5 mb-lg-0 mb-3">
+                <p class="h4 mb-0">Summary</p>
+                <p class="mb-0">
+                    <span class="fw-bold">Price:</span>
+                    <span class="c-green">:@Model.TotalSum</span>
+                </p>
+            </div>
+            <div class="col-lg-7">
+                <form asp-controller="Payment" asp-action="ResultStub" class="form">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form__div">
+                                <input type="text" class="form-control" placeholder=" ">
+                                <label for="" class="form__label">Card Number</label>
+                            </div>
+                        </div>
 
-<form method="post" asp-controller="Payment" asp-action="VisaResult">
-    <div class="form-floating">
-        <label for="CardNumber" class="form-label"></label>
-        <input type="text" id="CardNumber" name="CardNumber"/>
+                        <div class="col-6">
+                            <div class="form__div">
+                                <input type="text" class="form-control" placeholder=" ">
+                                <label for="" class="form__label">MM / yy</label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form__div">
+                                <input type="password" class="form-control" placeholder=" ">
+                                <label for="" class="form__label">cvv code</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form__div">
+                                <input type="text" class="form-control" placeholder=" ">
+                                <label for="" class="form__label">name on the card</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="btn btn-primary w-100">Sumbit</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="form-floating">
-        <label for="CardExpires" class="form-label"></label>
-        <input type="text" id="CardExpires" name="CardExpires"/>
-    </div>
-    <div class="form-floating">
-        <label for="CardCVV" class="form-label"></label>
-        <input type="text" id="CardCVV" name="CardCVV"/>
-    </div>
-    <button type="submit" class="btn btn-success">
-        Pay by visa
-    </button>
-</form>
+</div>

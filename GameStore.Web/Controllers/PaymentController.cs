@@ -47,7 +47,7 @@ public class PaymentController : Controller
     }
     
     [HttpPost("payment-result")]
-    public async Task<ActionResult> VisaResultAsync(VisaPaymentGetaway paymentGetaway)
+    public async Task<ActionResult> ResultStubAsync(VisaPaymentGetaway paymentGetaway)
     {
         return RedirectToAction("GetAll", "Orders");
     }
