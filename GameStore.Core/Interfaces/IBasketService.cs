@@ -7,5 +7,5 @@ namespace GameStore.Core.Interfaces;
 public interface IBasketService
 {
     public Task FillWithDetailsAsync(Basket basket);
-    public void AddToBasket(Basket basket, Guid gameId, int quantity);
+    public Task AddToBasketAsync(Basket basket, Guid gameId, int quantity);
 }

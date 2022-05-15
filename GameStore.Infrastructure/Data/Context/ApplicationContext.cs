@@ -1,6 +1,7 @@
 ﻿using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Genres;
+using GameStore.Core.Models.Orders;
 using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.RelationalModels;
@@ -17,6 +18,8 @@ public sealed class ApplicationContext : DbContext
     public DbSet<PlatformType> PlatformTypes { get; set; }
     public DbSet<Comment> Comments { get; set; }
     public DbSet<Publisher> Publishers { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<OrderDetails> OrderDetails { get; set; }
 
     public DbSet<GameGenre> GameGenres { get; set; }
     public DbSet<GamePlatformType> GamePlatformTypes { get; set; }
@@ -34,7 +37,9 @@ public sealed class ApplicationContext : DbContext
         modelBuilder.ApplyConfiguration(new GenreConfiguration());
         modelBuilder.ApplyConfiguration(new PlatformTypesConfiguration());
         modelBuilder.ApplyConfiguration(new PublisherConfiguration());
-        
+        modelBuilder.ApplyConfiguration(new OrderConfiguration());
+        modelBuilder.ApplyConfiguration(new OrderDetailsConfiguration());
+
         modelBuilder.ApplyConfiguration(new GameGenreConfiguration());
         modelBuilder.ApplyConfiguration(new GamePlatformConfiguration());
     }

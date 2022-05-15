@@ -1,4 +1,4 @@
-﻿@model GameStore.Web.ViewModels.Basket.BasketViewModel
+﻿@model GameStore.Web.ViewModels.Baskets.BasketViewModel
 
 @{
     ViewBag.Title = "Basket";
@@ -35,4 +35,7 @@ else
             </div>
         </div>
     }
+
+    @Html.ActionLink("Create order", "Create", "Orders", new { }, new { @class = "btn btn-primary" })
 }
+

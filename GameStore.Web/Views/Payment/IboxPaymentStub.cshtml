@@ -1,0 +1,64 @@
+﻿@model GameStore.Core.Models.Payment.IboxPaymentGetaway
+
+@{
+    ViewBag.Title = "Pay with IBox";
+    Layout = "_Layout";
+}
+
+<h2>Pay with IBox</h2>
+
+<div class="card-body p-0">
+    <div class="collapse show p-3 pt-0">
+        <div class="row">
+            <div class="col-lg-5 mb-lg-0 mb-3">
+                <p class="h4 mb-0">Summary</p>
+                <p class="mb-0">
+                    <span class="fw-bold">Price:</span>
+                    <span class="c-green">:@Model.TotalSum</span>
+                </p>
+            </div>
+            <div class="col-lg-7">
+                <form asp-controller="Payment" asp-action="ResultStub" class="form">
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="form__div">
+                                <input type="text" class="form-control" placeholder=" " value="@Model.OrderId" disabled="disabled">
+                                <label for="" class="form__label">Order Id</label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="form__div">
+                                <input type="text" class="form-control" placeholder=" ">
+                                <label for="" class="form__label">Card Number</label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form__div">
+                                <input type="text" class="form-control" placeholder=" ">
+                                <label for="" class="form__label">MM / yy</label>
+                            </div>
+                        </div>
+
+                        <div class="col-6">
+                            <div class="form__div">
+                                <input type="password" class="form-control" placeholder=" ">
+                                <label for="" class="form__label">cvv code</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="form__div">
+                                <input type="text" class="form-control" placeholder=" ">
+                                <label for="" class="form__label">name on the card</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div class="btn btn-primary w-100">Sumbit</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

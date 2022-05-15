@@ -78,7 +78,7 @@ public class GamesController : Controller
     public async Task<FileContentResult> GetFileAsync([FromRoute] string gameKey)
     {
         var bytes = await _gameService.GetFileAsync(gameKey);
-        var fileName = gameKey;
+        var fileName = gameKey + ".txt";
 
         return File(bytes, "application/force-download", fileName);
     }

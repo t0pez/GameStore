@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace GameStore.Web.Models.Basket;
+namespace GameStore.Web.Models.Baskets;
 
 public class BasketItemCookieModel
 {

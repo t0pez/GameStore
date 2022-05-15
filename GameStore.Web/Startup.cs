@@ -13,6 +13,7 @@ using System.Text.Json.Serialization;
 using AutoMapper;
 using GameStore.Core.Profiles;
 using GameStore.Web.Filters;
+using GameStore.Web.Infrastructure;
 
 namespace GameStore.Web;
 
@@ -40,6 +41,7 @@ public class Startup
                                 });
 
         services.ConfigureDomainServices();
+        services.ConfigureWebServices();
 
         services.AddScoped<WorkTimeTrackingFilter>();
 
