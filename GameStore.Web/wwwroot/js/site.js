@@ -3,7 +3,7 @@
 
 
 function generateKey() {
-    var name = document.getElementById("Name").value;
+    let name = document.getElementById("Name").value;
     console.log(document.getElementById("Name").value);
     fetch("key/" + name, {
         method: "POST",
@@ -14,4 +14,44 @@ function generateKey() {
     })
         .then(response => response.json())
         .then(json => document.getElementById("Key").value = json.key)
+}
+
+
+function addCommentReply(name, id) {
+    let section = document.getElementById("StateSection")
+    let sectionText = document.getElementById("StateSectionText")
+    let status = document.getElementById("State")
+    let parentId = document.getElementById("ParentId")
+
+    sectionText.innerText = "You are replying to " + name
+    status.value = 1 // ReplyState
+    parentId.value = id
+    
+    section.hidden = false
+}
+
+function addCommentQuote(name, id) {
+    let section = document.getElementById("StateSection")
+    let sectionText = document.getElementById("StateSectionText")
+    let status = document.getElementById("State")
+    let parentId = document.getElementById("ParentId")
+
+    sectionText.innerText = "You are quoting " + name
+    status.value = 2 // QuoteState
+    parentId.value = id
+
+    section.hidden = false
+}
+
+function removeCommentReplyingStatus() {
+    let section = document.getElementById("StatusSection")
+    let sectionText = document.getElementById("StatusSectionText")
+    let status = document.getElementById("Status")
+    let parentId = document.getElementById("ParentId")
+
+    sectionText.innerText = "";
+    status.value = "0"
+    parentId.value = null
+
+    section.hidden = true
 }
