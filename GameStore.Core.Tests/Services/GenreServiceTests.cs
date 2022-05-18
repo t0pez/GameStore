@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
+using FluentAssertions;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.ServiceModels.Genres;
@@ -104,12 +105,41 @@ public class GenreServiceTests
     [Fact]
     public async void DeleteAsync_CorrectValues_GenreSoftDeleted()
     {
-        _genreRepoMock.Setup(repository => repository.GetSingleOrDefaultBySpecAsync(It.IsAny<GenreByIdSpec>()))
-                      .ReturnsAsync(new Genre());
+        var genreToDeleteId = Guid.NewGuid();
+        var parentGenreToDeleteId = Guid.NewGuid();
 
-        await _genreService.DeleteAsync(Guid.NewGuid());
+        var subGenreId = Guid.NewGuid();
+        var subGenre = new Genre
+        {
+            Id = subGenreId,
+            ParentId = genreToDeleteId
+        };
+        
+        var genreToDelete = new Genre
+        {
+            Id = genreToDeleteId,
+            ParentId = parentGenreToDeleteId,
+            SubGenres = new List<Genre>
+            {
+                subGenre
+            }
+        };
 
-        _genreRepoMock.Verify(repository => repository.UpdateAsync(It.IsAny<Genre>()), Times.Once);
+        _genreRepoMock.Setup(repository =>
+                                 repository.GetSingleOrDefaultBySpecAsync(
+                                     It.Is<GenreByIdSpec>(spec => spec.Id == genreToDeleteId)))
+                      .ReturnsAsync(genreToDelete);
+        _genreRepoMock.Setup(repository =>
+                                 repository.GetBySpecAsync(
+                                     It.Is<GenresByParentIdSpec>(spec => spec.ParentId == genreToDeleteId)))
+                      .ReturnsAsync(new List<Genre> { subGenre });
+
+        await _genreService.DeleteAsync(genreToDeleteId);
+
+        genreToDelete.IsDeleted.Should().Be(true);
+        subGenre.ParentId.Should().Be(parentGenreToDeleteId);
+        
+        _genreRepoMock.Verify(repository => repository.UpdateAsync(It.Is<Genre>(genre => genre.Id == genreToDeleteId)), Times.Once);
         _unitOfWorkMock.Verify(work => work.SaveChangesAsync(), Times.Once);
     }
 }
