@@ -37,9 +37,8 @@ public class GameControllerTests
         _platformServiceMock = new Mock<IPlatformTypeService>();
         _mapperMock = new Mock<IMapper>();
 
-        _gameController = new GamesController(_gameServiceMock.Object, _commentServiceMock.Object,
-                                              _mapperMock.Object, _publisherServiceMock.Object,
-                                              _genreServiceMock.Object, _platformServiceMock.Object);
+        _gameController = new GamesController(_gameServiceMock.Object, _commentServiceMock.Object, _publisherServiceMock.Object,
+                                              _genreServiceMock.Object, _platformServiceMock.Object, _mapperMock.Object);
     }
 
     [Fact]
@@ -157,7 +156,7 @@ public class GameControllerTests
         _mapperMock.Setup(mapper => mapper.Map<CommentCreateModel>(It.IsAny<CommentCreateRequestModel>()))
                    .Returns(new CommentCreateModel());
         
-        var actualResult = await _gameController.CommentGameAsync(createModel);
+        var actualResult = await _gameController.CreateCommentAsync(createModel);
 
         Assert.IsType<RedirectToActionResult>(actualResult);
         _commentServiceMock.Verify(service => service.CommentGameAsync(It.IsAny<CommentCreateModel>()), Times.Once);

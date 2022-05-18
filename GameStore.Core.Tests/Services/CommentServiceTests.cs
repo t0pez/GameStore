@@ -111,11 +111,14 @@ public class CommentServiceTests
     [Fact]
     public async void ReplyCommentAsync_CorrectValues()
     {
-        var createModel = new ReplyCreateModel { GameId = Guid.NewGuid(), ParentId = Guid.NewGuid() };
+        var createModel = new ReplyCreateModel { GameKey = "game-key", ParentId = Guid.NewGuid() };
+        var expectedGameId = Guid.NewGuid();
 
-        _gameRepoMock.Setup(repository =>
-                                repository.AnyAsync(It.Is<GameByIdSpec>(spec => spec.Id == createModel.GameId)))
-                     .ReturnsAsync(true);
+        _gameRepoMock
+            .Setup(repository =>
+                       repository.GetSingleOrDefaultBySpecAsync(
+                           It.Is<GameByKeySpec>(spec => spec.Key == createModel.GameKey)))
+            .ReturnsAsync(new Game { Id = expectedGameId });
         _commentRepoMock.Setup(repository =>
                                    repository.AnyAsync(
                                        It.Is<CommentByIdSpec>(spec => spec.Id == createModel.ParentId)))
@@ -147,14 +150,14 @@ public class CommentServiceTests
     [Fact]
     public async void ReplyCommentAsync_NotExistingGame_ThrowsNotFoundException()
     {
-        var createModel = new ReplyCreateModel { GameId = Guid.Empty, ParentId = Guid.NewGuid() };
+        var createModel = new ReplyCreateModel { GameKey = "not-existing-game", ParentId = Guid.NewGuid() };
 
         _commentRepoMock.Setup(repository =>
                                    repository.AnyAsync(
                                        It.Is<CommentByIdSpec>(spec => spec.Id == createModel.ParentId)))
                         .ReturnsAsync(true);
         _gameRepoMock.Setup(repository =>
-                                repository.AnyAsync(It.Is<GameByIdSpec>(spec => spec.Id == createModel.GameId)))
+                                repository.AnyAsync(It.Is<GameByKeySpec>(spec => spec.Key == createModel.GameKey)))
                      .ReturnsAsync(false);
 
         var operation = async () => await _commentService.ReplyCommentAsync(createModel);
