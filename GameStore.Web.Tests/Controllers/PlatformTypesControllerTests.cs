@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
+using FluentAssertions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
@@ -74,6 +75,15 @@ public class PlatformTypesControllerTests
     }
 
     [Fact]
+    public async void CreateAsync_NoParameters_ReturnsView()
+    {
+        var actualResult = await _platformController.CreateAsync();
+
+        actualResult.Result.Should().BeOfType<ViewResult>()
+                    .Which.Model.Should().BeOfType<PlatformTypeCreateRequestModel>();
+    }
+    
+    [Fact]
     public async void CreateAsync_CorrectParameters_ReturnsRedirect()
     {
         _platformServiceMock.Setup(service => service.CreateAsync(It.IsAny<PlatformTypeCreateModel>()))
@@ -84,6 +94,32 @@ public class PlatformTypesControllerTests
         var actualResult = await _platformController.CreateAsync(new PlatformTypeCreateRequestModel());
         Assert.IsType<RedirectToActionResult>(actualResult);
         _platformServiceMock.Verify(service => service.CreateAsync(It.IsAny<PlatformTypeCreateModel>()), Times.Once());
+    }
+    
+    [Fact]
+    public async void UpdateAsync_ExistingPlatformType_ReturnsView()
+    {
+        var platformId = Guid.NewGuid();
+        
+        var actualResult = await _platformController.UpdateAsync(platformId);
+
+        actualResult.Result.Should().BeOfType<ViewResult>()
+                    .Which.Model.Should().BeOfType<PlatformTypeUpdateRequestModel>()
+                    .And.Subject.As<PlatformTypeUpdateRequestModel>().Id.Should().Be(platformId);
+    }
+    
+    [Fact]
+    public async void UpdateAsync_CorrectParameters_ReturnsRedirect()
+    {
+        _platformServiceMock.Setup(service => service.UpdateAsync(It.IsAny<PlatformTypeUpdateModel>()))
+                            .Verifiable();
+        _mapperMock.Setup(mapper => mapper.Map<PlatformTypeUpdateModel>(It.IsAny<PlatformTypeUpdateRequestModel>()))
+                   .Returns(new PlatformTypeUpdateModel());
+
+        var actualResult = await _platformController.UpdateAsync(new PlatformTypeUpdateRequestModel());
+
+        actualResult.Should().BeOfType<RedirectToActionResult>();
+        _platformServiceMock.Verify(service => service.UpdateAsync(It.IsAny<PlatformTypeUpdateModel>()), Times.Once());
     }
 
     [Fact]
