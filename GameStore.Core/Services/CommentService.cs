@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using GameStore.Core.Helpers.Specifications;
 using GameStore.Core.Models.ServiceModels.Comments;
 
 namespace GameStore.Core.Services;
@@ -54,7 +55,8 @@ public class CommentService : ICommentService
             throw new ItemNotFoundException(typeof(Game), gameKey);
         }
 
-        var result = await CommentRepository.GetBySpecAsync(new CommentsWithoutParentByGameKeySpec(gameKey));
+        var result =
+            await CommentRepository.GetBySpecAsync(new CommentsWithoutParentByGameKeySpec(gameKey).IncludeDeleted());
 
         return result;
     }
