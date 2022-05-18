@@ -34,14 +34,15 @@ public class GamesController : Controller
     private readonly IAliasCraft _gameKeyAliasCraft;
     private readonly IMapper _mapper;
 
-    public GamesController(IGameService gameService, ICommentService commentService, IMapper mapper, IPublisherService publisherService, IGenreService genreService, IPlatformTypeService platformTypeService)
+    public GamesController(IGameService gameService, ICommentService commentService, IPublisherService publisherService,
+                           IGenreService genreService, IPlatformTypeService platformTypeService, IMapper mapper)
     {
         _gameService = gameService;
         _commentService = commentService;
-        _mapper = mapper;
         _publisherService = publisherService;
         _genreService = genreService;
         _platformTypeService = platformTypeService;
+        _mapper = mapper;
         _gameKeyAliasCraft =
             new AliasCraftBuilder()
                 .Values("_", " ").ReplaceWith("-")
@@ -109,13 +110,38 @@ public class GamesController : Controller
     }
 
     [HttpPost("{gameKey}/newcomment")]
-    public async Task<ActionResult> CommentGameAsync([FromHybrid] CommentCreateRequestModel request)
+    public async Task<ActionResult> CreateCommentAsync([FromHybrid] CommentCreateRequestModel request)
     {
-        var createModel = _mapper.Map<CommentCreateModel>(request);
-
-        await _commentService.CommentGameAsync(createModel);
+        if (request.ParentId is null)
+        {
+            var createModel = _mapper.Map<CommentCreateModel>(request);
+            await _commentService.CommentGameAsync(createModel);
+        }
+        else
+        {
+            var createModel = _mapper.Map<ReplyCreateModel>(request);
+            await _commentService.ReplyCommentAsync(createModel);
+        }
 
         return RedirectToAction("GetComments", new { gameKey = request.GameKey });
+    }
+    
+    [HttpPost("{gameKey}/comment/update")]
+    public async Task<ActionResult> UpdateCommentAsync([FromHybrid] CommentUpdateRequestModel request)
+    {
+        var updateModel = _mapper.Map<CommentUpdateModel>(request);
+        
+        await _commentService.UpdateAsync(updateModel);
+
+        return RedirectToAction("GetComments", new { gameKey = request.GameKey });
+    }
+    
+    [HttpPost("{gameKey}/comment/delete")]
+    public async Task<ActionResult> DeleteCommentAsync(Guid id, string gameKey)
+    {
+        await _commentService.DeleteAsync(id);
+
+        return RedirectToAction("GetComments", new { gameKey });
     }
 
     [HttpGet("{gameKey}/comments")]

@@ -30,7 +30,7 @@ public class RepositoryTests
     [Fact]
     public async void GetBySpecAsync_NullSpec_ReturnsAllModels()
     {
-        const int expectedResultCount = 4;
+        const int expectedResultCount = 5;
 
         var actualResult = await _gameRepository.GetBySpecAsync();
         var actualResultCount = actualResult.Count;
@@ -77,7 +77,7 @@ public class RepositoryTests
     public async void AddAsync_CorrectModel(
         Game model)
     {
-        const int expectedCount = 5;
+        const int expectedCount = 6;
         
         await _gameRepository.AddAsync(model);
         await _context.SaveChangesAsync();
@@ -119,7 +119,7 @@ public class RepositoryTests
     [DeleteAsyncCorrectModelData]
     public async void DeleteAsync_ExistingModel(Game model)
     {
-        const int expectedCount = 3;
+        const int expectedCount = 4;
 
         await _gameRepository.DeleteAsync(model);
         await _context.SaveChangesAsync();

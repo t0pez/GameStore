@@ -14,6 +14,7 @@ internal class CommentConfiguration : IEntityTypeConfiguration<Comment>
         builder.Property(comment => comment.Body).IsRequired();
         builder.Property(comment => comment.DateOfCreation).IsRequired();
         builder.Property(comment => comment.IsDeleted).IsRequired();
+        builder.Property(comment => comment.State).IsRequired();
 
         builder.HasOne(comment => comment.Game)
                .WithMany(game => game.Comments)

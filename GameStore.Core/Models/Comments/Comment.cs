@@ -14,6 +14,7 @@ public class Comment : ISafeDelete
     public Guid Id { get; set; }
     public string Name { get; set; }
     public string Body { get; set; }
+    public CommentState State { get; set; }
     public DateTime DateOfCreation { get; set; }
 
     public Guid GameId { get; set; }
