@@ -63,7 +63,9 @@ public class GenreService : IGenreService
         var genre = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdSpec(id))
                                  ?? throw new ItemNotFoundException(typeof(Genre), id);
 
+        await SetNewParentForChildrenGenres(genre);
         genre.IsDeleted = true;
+        
         await Repository.UpdateAsync(genre);
         await _unitOfWork.SaveChangesAsync();
     }
@@ -72,5 +74,19 @@ public class GenreService : IGenreService
     {
         genre.Name = updateModel.Name;
         genre.ParentId = updateModel.ParentId != Guid.Empty ? updateModel.ParentId : null;
+    }
+
+
+    private async Task SetNewParentForChildrenGenres(Genre genre)
+    {
+        var children = await Repository.GetBySpecAsync(new GenresByParentIdSpec(genre.Id));
+        
+        var newParentId = genre.ParentId;
+
+        foreach (var child in children)
+        {
+            child.ParentId = newParentId;
+            await Repository.UpdateAsync(child);
+        }
     }
 }
