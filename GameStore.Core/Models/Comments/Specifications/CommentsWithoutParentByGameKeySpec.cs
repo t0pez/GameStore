@@ -13,6 +13,7 @@ public sealed class CommentsWithoutParentByGameKeySpec : SafeDeleteSpec<Comment>
             .Where(comment => comment.Game.Key == gameKey &&
                               comment.ParentId == null)
             .Include(comment => comment.Replies)
+            .ThenInclude(comment => comment.Replies)
             .Include(comment => comment.Game);
     }
 

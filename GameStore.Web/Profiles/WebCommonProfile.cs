@@ -36,7 +36,8 @@ public class WebCommonProfile : Profile
         CreateMap<GameUpdateRequestModel, GameUpdateModel>().ReverseMap();
 
         CreateMap<CommentCreateRequestModel, CommentCreateModel>().ReverseMap();
-        CreateMap<ReplyCreateRequestModel, ReplyCreateModel>().ReverseMap();
+        CreateMap<CommentCreateRequestModel, ReplyCreateModel>().ReverseMap();
+        CreateMap<CommentUpdateRequestModel, CommentUpdateModel>().ReverseMap();
 
         CreateMap<PublisherCreateRequestModel, PublisherCreateModel>().ReverseMap();
         CreateMap<PublisherUpdateRequestModel, PublisherUpdateModel>().ReverseMap();
@@ -84,7 +85,14 @@ public class WebCommonProfile : Profile
             .ForMember(model => model.GameKey,
                        expression => expression.MapFrom(comment => comment.Game.Key))
             .ForMember(model => model.AuthorName,
-                       expression => expression.MapFrom(comment => comment.Name));
+                       expression => expression.MapFrom(comment => comment.Name))
+            .ForMember(model => model.MessageIsDeleted,
+                       expression => expression.MapFrom(comment => comment.IsDeleted));
+        CreateMap<Comment, CommentInReplyViewModel>()
+            .ForMember(model => model.AuthorName,
+                       expression => expression.MapFrom(comment => comment.Name))
+            .ForMember(model => model.MessageIsDeleted,
+                       expression => expression.MapFrom(comment => comment.IsDeleted));
 
         CreateMap<GameGenre, GenreViewModel>()
             .ForMember(viewModel => viewModel.Id,

@@ -60,6 +60,18 @@ public class GenreControllerTests
     }
     
     [Fact]
+    public async void CreateAsync_NoParameters_ReturnsView()
+    {
+        _genreServiceMock.Setup(service => service.GetAllAsync())
+                         .ReturnsAsync(new List<Genre>());
+
+        var actualResult = await _genresController.CreateAsync();
+
+        actualResult.Should().BeOfType<ViewResult>()
+                    .Which.Model.Should().BeOfType<GenreCreateRequestModel>();
+    }
+    
+    [Fact]
     public async void CreateAsync_CorrectParameters_ReturnsRedirect()
     {
         _genreServiceMock.Setup(service => service.CreateAsync(It.IsAny<GenreCreateModel>()))
@@ -94,6 +106,17 @@ public class GenreControllerTests
         var actualResult = await _genresController.UpdateAsync(currentGenreId);
 
         actualResult.Should().BeAssignableTo<ActionResult<GenreUpdateRequestModel>>();
+    }
+    
+    [Fact]
+    public async void UpdateAsync_IncorrectValues_ReturnsBadResult()
+    {
+        _genreServiceMock.Setup(service => service.GetAllAsync())
+                         .ReturnsAsync(new List<Genre>());
+
+        var actualResult = await _genresController.UpdateAsync(Guid.Empty);
+
+        actualResult.Result.Should().BeAssignableTo<BadRequestResult>();
     }
 
     [Fact]

@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
+using GameStore.Core.Helpers.Specifications;
 using GameStore.Core.Models.ServiceModels.Comments;
 
 namespace GameStore.Core.Services;
@@ -38,6 +39,7 @@ public class CommentService : ICommentService
         var comment = _mapper.Map<Comment>(model);
         comment.GameId = game.Id;
         comment.DateOfCreation = DateTime.UtcNow;
+        comment.State = CommentState.Head;
 
         await CommentRepository.AddAsync(comment);
         await _unitOfWork.SaveChangesAsync();
@@ -53,7 +55,8 @@ public class CommentService : ICommentService
             throw new ItemNotFoundException(typeof(Game), gameKey);
         }
 
-        var result = await CommentRepository.GetBySpecAsync(new CommentsWithoutParentByGameKeySpec(gameKey));
+        var result =
+            await CommentRepository.GetBySpecAsync(new CommentsWithoutParentByGameKeySpec(gameKey).IncludeDeleted());
 
         return result;
     }
@@ -65,12 +68,11 @@ public class CommentService : ICommentService
             throw new ItemNotFoundException(typeof(Comment), createModel.ParentId, nameof(createModel.ParentId));
         }
 
-        if (await GameRepository.AnyAsync(new GameByIdSpec(createModel.GameId)) == false)
-        {
-            throw new ItemNotFoundException(typeof(Game), createModel.GameId, nameof(createModel.GameId));
-        }
-
+        var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeySpec(createModel.GameKey))
+                   ?? throw new ItemNotFoundException(typeof(Game), createModel.GameKey, nameof(createModel.GameKey));
+        
         var reply = _mapper.Map<Comment>(createModel);
+        reply.GameId = game.Id;
         reply.DateOfCreation = DateTime.UtcNow;
 
         await CommentRepository.AddAsync(reply);
@@ -79,5 +81,31 @@ public class CommentService : ICommentService
         _logger.LogInformation("Reply successfully added for comment. " +
                                "ParentId = {ParentId}, ReplyId = {ReplyId}",
                                reply.ParentId, reply.Id);
+    }
+
+    public async Task UpdateAsync(CommentUpdateModel updateModel)
+    {
+        var comment = await CommentRepository.GetSingleOrDefaultBySpecAsync(new CommentByIdSpec(updateModel.Id));
+
+        UpdateValues(comment, updateModel);
+
+        await CommentRepository.UpdateAsync(comment);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var comment = await CommentRepository.GetSingleOrDefaultBySpecAsync(new CommentByIdSpec(id));
+
+        comment.IsDeleted = true;
+        
+        await CommentRepository.UpdateAsync(comment);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
+    private void UpdateValues(Comment comment, CommentUpdateModel updateModel)
+    {
+        comment.Body = updateModel.Body;
+        comment.Name = updateModel.AuthorName;
     }
 }
