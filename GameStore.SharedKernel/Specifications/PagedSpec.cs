@@ -1,22 +1,13 @@
-﻿using System;
-using Ardalis.Specification;
+﻿using Ardalis.Specification;
 using GameStore.SharedKernel.Specifications.Filters;
 
 namespace GameStore.SharedKernel.Specifications;
 
 public class PagedSpec<TModel> : Specification<TModel>
 {
-    public PagedSpec<TModel> EnablePaging(BaseSearchFilter searchFilter)
+    public PagedSpec<TModel> EnablePaging(PaginationFilter searchFilter)
     {
-        if (searchFilter.IsPagingEnabled == false)
-        {
-            throw new ArgumentException("Paging isn't enabled");
-        }
-
-        var skip = PaginationHelper.CalculateSkip(searchFilter);
-        var take = PaginationHelper.CalculateTake(searchFilter);
-
-        EnablePaging(skip, take);
+        EnablePaging(searchFilter.Skip, searchFilter.Take);
 
         return this;
     }

@@ -39,13 +39,10 @@ public class GamesByFilterSpec : SafeDeleteSpec<Game>
         if (filter.PriceRange is not null)
         {
             Query
-                .Where(game => game.Price.InRange((Range<decimal>)filter.PriceRange));
+                .Where(game => game.Price.IsInRange(filter.PriceRange));
         }
 
-        if (filter.IsPagingEnabled)
-        {
-            EnablePaging(filter);
-        }
+        EnablePaging(filter);
 
         Query
             .OrderBy(filter.OrderBy);

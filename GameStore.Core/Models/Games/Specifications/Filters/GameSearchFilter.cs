@@ -6,10 +6,10 @@ using GameStore.SharedKernel.Specifications.Filters;
 
 namespace GameStore.Core.Models.Games.Specifications.Filters;
 
-public class GameSearchFilter : BaseSearchFilter
+public class GameSearchFilter : PaginationFilter
 {
     public string Name { get; set; }
-    public Range<decimal>? PriceRange { get; set; }
+    public Range<decimal> PriceRange { get; set; }
     public Guid? PublisherId { get; set; }
 
     public IEnumerable<Guid> GenresIds { get; set; }
