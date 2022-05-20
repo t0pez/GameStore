@@ -2,7 +2,7 @@
 
 namespace GameStore.SharedKernel;
 
-public class Range<T> where T : IComparable<T>
+public readonly struct Range<T> where T : IComparable<T>
 {
     public Range(T min, T max)
     {
@@ -10,7 +10,7 @@ public class Range<T> where T : IComparable<T>
         {
             throw new ArgumentException("Min can not be greater than max");
         }
-        
+
         Min = min;
         Max = max;
     }
@@ -20,7 +20,8 @@ public class Range<T> where T : IComparable<T>
 
     public bool Contains(T element)
     {
-        return element.CompareTo(Min) == 1 && element.CompareTo(Max) == -1;
+        return (element.CompareTo(Min) == 1 || element.CompareTo(Min) == 0) &&
+               (element.CompareTo(Max) == -1 || element.CompareTo(Max) == 0);
     }
 }
 

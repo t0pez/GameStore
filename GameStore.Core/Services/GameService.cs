@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
+using GameStore.Core.Models.Games.Specifications.Filters;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.PlatformTypes;
@@ -65,6 +66,13 @@ public class GameService : IGameService
     public async Task<ICollection<Game>> GetAllAsync()
     {
         var result = await GameRepository.GetBySpecAsync(new GamesListSpec());
+
+        return result;
+    }
+
+    public async Task<ICollection<Game>> GetByFilterAsync(GameSearchFilter filter)
+    {
+        var result = await GameRepository.GetBySpecAsync(new GamesByFilterSpec(filter));
 
         return result;
     }
