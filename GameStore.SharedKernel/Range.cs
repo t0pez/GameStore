@@ -6,7 +6,7 @@ public class Range<T> where T : IComparable<T>
 {
     public Range(T min, T max)
     {
-        if (min.CompareTo(max) == -1)
+        if (min.CompareTo(max) == 1)
         {
             throw new ArgumentException("Min can not be greater than max");
         }
@@ -20,7 +20,7 @@ public class Range<T> where T : IComparable<T>
 
     public bool Contains(T element)
     {
-        return element.CompareTo(Min) == -1 && element.CompareTo(Max) == 1;
+        return element.CompareTo(Min) == 1 && element.CompareTo(Max) == -1;
     }
 }
 
