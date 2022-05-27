@@ -48,6 +48,7 @@ public class GameService : IGameService
     public async Task<Game> CreateAsync(GameCreateModel model)
     {
         var game = _mapper.Map<Game>(model);
+        game.AddedToStoreAt = DateTime.UtcNow;
 
         await GameRepository.AddAsync(game);
         await _unitOfWork.SaveChangesAsync();

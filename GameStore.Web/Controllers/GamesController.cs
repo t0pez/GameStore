@@ -7,6 +7,8 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using GameStore.Core.Helpers.AliasCrafting;
+using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Games.Specifications.Filters;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.Publishers;
@@ -19,6 +21,7 @@ using GameStore.Web.ViewModels.Comments;
 using GameStore.Web.ViewModels.Games;
 using HybridModelBinding;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.OpenApi.Extensions;
 
 namespace GameStore.Web.Controllers;
 
@@ -58,8 +61,21 @@ public class GamesController : Controller
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GameListViewModel>>> GetAllAsync()
+    public async Task<ActionResult<IEnumerable<GameListViewModel>>> GetAllAsync(GamesFilterRequestModel filter = null)
     {
+        await FillViewData();
+
+        var orderBySelectList = new SelectList(
+            Enum.GetValues(typeof(GameSearchFilterOrderByState)).OfType<Enum>()
+                .Select(enumElement => new SelectListItem
+                {
+                    Value = Convert.ToInt32(enumElement).ToString(),
+                    Text = enumElement.GetDisplayName()
+                }),
+            nameof(SelectListItem.Value), nameof(SelectListItem.Value),
+            filter?.OrderBy ?? GameSearchFilterOrderByState.Default);
+
+
         var games = await _gameService.GetAllAsync();
         var result = _mapper.Map<IEnumerable<GameListViewModel>>(games);
 
@@ -70,6 +86,9 @@ public class GamesController : Controller
     public async Task<ActionResult<GameViewModel>> GetWithDetailsAsync([FromRoute] string gameKey)
     {
         var game = await _gameService.GetByKeyAsync(gameKey);
+
+        await IncreaseViews(game);
+
         var result = _mapper.Map<GameViewModel>(game);
 
         return View(result);
@@ -125,7 +144,7 @@ public class GamesController : Controller
 
         return RedirectToAction("GetComments", new { gameKey = request.GameKey });
     }
-    
+
     [HttpPost("{gameKey}/comment/update")]
     public async Task<ActionResult> UpdateCommentAsync([FromHybrid] CommentUpdateRequestModel request)
     {
@@ -135,7 +154,7 @@ public class GamesController : Controller
 
         return RedirectToAction("GetComments", new { gameKey = request.GameKey });
     }
-    
+
     [HttpPost("{gameKey}/comment/delete")]
     public async Task<ActionResult> DeleteCommentAsync(Guid id, string gameKey)
     {
@@ -187,6 +206,13 @@ public class GamesController : Controller
         return new JsonResult(new { key = _gameKeyAliasCraft.CreateAlias(name) });
     }
 
+    private async Task IncreaseViews(Game game)
+    {
+        game.Views++;
+        var updateModel = _mapper.Map<GameUpdateModel>(game);
+        await _gameService.UpdateAsync(updateModel);
+    }
+
     private async Task<byte[]> GetBytesFromFormFile()
     {
         var file = HttpContext.Request.Form.Files.FirstOrDefault()
@@ -201,10 +227,6 @@ public class GamesController : Controller
 
     private async Task FillViewData()
     {
-        var publishers = await _publisherService.GetAllAsync();
-        var publishersSelectList = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
-        ViewData["Publishers"] = publishersSelectList;
-
         var genres = await _genreService.GetAllAsync();
         var genresSelectList = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
         ViewData["Genres"] = genresSelectList;
@@ -212,5 +234,9 @@ public class GamesController : Controller
         var platforms = await _platformTypeService.GetAllAsync();
         var platformsSelectList = new SelectList(platforms, nameof(PlatformType.Id), nameof(PlatformType.Name));
         ViewData["Platforms"] = platformsSelectList;
+        
+        var publishers = await _publisherService.GetAllAsync();
+        var publishersSelectList = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
+        ViewData["Publishers"] = publishersSelectList;
     }
 }

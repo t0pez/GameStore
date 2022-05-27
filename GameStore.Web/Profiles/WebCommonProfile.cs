@@ -1,7 +1,9 @@
-﻿using AutoMapper;
+﻿using System.Linq;
+using AutoMapper;
 using GameStore.Core.Models.Baskets;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Games.Specifications.Filters;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Orders;
 using GameStore.Core.Models.PlatformTypes;
@@ -25,6 +27,7 @@ using GameStore.Web.ViewModels.Genres;
 using GameStore.Web.ViewModels.Order;
 using GameStore.Web.ViewModels.PlatformTypes;
 using GameStore.Web.ViewModels.Publisher;
+using SimpleValueRange;
 
 namespace GameStore.Web.Profiles;
 
@@ -34,6 +37,11 @@ public class WebCommonProfile : Profile
     {
         CreateMap<GameCreateRequestModel, GameCreateModel>().ReverseMap();
         CreateMap<GameUpdateRequestModel, GameUpdateModel>().ReverseMap();
+        CreateMap<Game, GameUpdateModel>()
+            .ForMember(updateModel => updateModel.GenresIds,
+                       expression => expression.MapFrom(game => game.Genres.Select(gg => gg.GenreId)))
+            .ForMember(updateModel => updateModel.PlatformsIds,
+                       expression => expression.MapFrom(game => game.Platforms.Select(gp => gp.PlatformId)));
 
         CreateMap<CommentCreateRequestModel, CommentCreateModel>().ReverseMap();
         CreateMap<CommentCreateRequestModel, ReplyCreateModel>().ReverseMap();
@@ -101,11 +109,27 @@ public class WebCommonProfile : Profile
                        expression => expression.MapFrom(gameGenre => gameGenre.Genre.Name))
             .ForMember(viewModel => viewModel.SubGenres,
                        expression => expression.MapFrom(gameGenre => gameGenre.Genre.SubGenres));
+        CreateMap<GameGenre, GenreListViewModel>()
+            .ForMember(viewModel => viewModel.Id,
+                       expression => expression.MapFrom(gameGenre => gameGenre.GenreId))
+            .ForMember(viewModel => viewModel.Name,
+                       expression => expression.MapFrom(gameGenre => gameGenre.Genre.Name));
 
         CreateMap<GamePlatformType, PlatformTypeViewModel>()
             .ForMember(viewModel => viewModel.Id,
                        expression => expression.MapFrom(gameGenre => gameGenre.PlatformId))
             .ForMember(viewModel => viewModel.Name,
                        expression => expression.MapFrom(gameGenre => gameGenre.Platform.Name));
+        CreateMap<GamePlatformType, PlatformTypeListViewModel>()
+            .ForMember(viewModel => viewModel.Id,
+                       expression => expression.MapFrom(gameGenre => gameGenre.PlatformId))
+            .ForMember(viewModel => viewModel.Name,
+                       expression => expression.MapFrom(gameGenre => gameGenre.Platform.Name));
+
+        CreateMap<GamesFilterRequestModel, GameSearchFilter>()
+            .ForMember(searchFilter => searchFilter.PriceRange,
+                       expression =>
+                           expression.MapFrom(
+                               request => Range<decimal>.Create(request.MinPrice, request.MaxPrice)));
     }
 }

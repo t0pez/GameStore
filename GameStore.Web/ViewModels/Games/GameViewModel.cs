@@ -16,8 +16,11 @@ public class GameViewModel
     public decimal Price { get; set; }
     public decimal Discount { get; set; }
     public int UnitsInStock { get; set; }
+    public DateTime PublishedAt { get; set; }
+    public DateTime AddedToStoreAt { get; set; }
+    public int Views { get; set; }
 
     public PublisherInGameViewModel Publisher { get; set; }
-    public List<GenreViewModel> Genres { get; set; }
-    public List<PlatformTypeViewModel> Platforms { get; set; }
+    public List<GenreListViewModel> Genres { get; set; }
+    public List<PlatformTypeListViewModel> Platforms { get; set; }
 }
