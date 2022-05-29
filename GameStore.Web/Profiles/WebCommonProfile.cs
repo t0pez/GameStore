@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using AutoMapper;
 using GameStore.Core.Models.Baskets;
 using GameStore.Core.Models.Comments;
@@ -130,6 +131,18 @@ public class WebCommonProfile : Profile
             .ForMember(searchFilter => searchFilter.PriceRange,
                        expression =>
                            expression.MapFrom(
-                               request => Range<decimal>.Create(request.MinPrice, request.MaxPrice)));
+                               request => Range<decimal>.Create(request.MinPrice, request.MaxPrice)))
+            .ForMember(searchFilter => searchFilter.GenresIds,
+                       expression =>
+                           expression.MapFrom(
+                               request => request.SelectedGenres.Select(Guid.Parse)))
+            .ForMember(searchFilter => searchFilter.PlatformsIds,
+                       expression =>
+                           expression.MapFrom(
+                               request => request.SelectedPlatforms.Select(Guid.Parse)))
+            .ForMember(searchFilter => searchFilter.PublishersIds,
+                       expression =>
+                           expression.MapFrom(
+                               request => request.SelectedPublishers.Select(Guid.Parse)));
     }
 }

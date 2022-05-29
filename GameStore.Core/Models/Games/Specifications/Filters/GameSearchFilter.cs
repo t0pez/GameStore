@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq.Expressions;
 using GameStore.SharedKernel.Specifications.Filters;
 using SimpleValueRange;
 
@@ -15,5 +14,5 @@ public class GameSearchFilter : PaginationFilter
     public IEnumerable<Guid> PlatformsIds { get; set; } = new List<Guid>();
     public IEnumerable<Guid> PublishersIds { get; set; } = new List<Guid>();
 
-    public Expression<Func<Game, object>> OrderBy { get; set; } = game => game.Comments.Count;
+    public GameSearchFilterOrderByState OrderBy { get; set; }
 }

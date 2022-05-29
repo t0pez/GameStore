@@ -19,7 +19,7 @@ using GameStore.Web.Models.Comment;
 using GameStore.Web.Models.Game;
 using GameStore.Web.ViewModels.Comments;
 using GameStore.Web.ViewModels.Games;
-using HybridModelBinding;
+
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.OpenApi.Extensions;
 
@@ -59,11 +59,46 @@ public class GamesController : Controller
     {
         return await _gameService.GetTotalCountAsync();
     }
-
+    
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<GameListViewModel>>> GetAllAsync(GamesFilterRequestModel filter = null)
+    public async Task<ActionResult<GamesGetAllViewModel>> GetAllAsync(GamesFilterRequestModel filterRequest)
     {
-        await FillViewData();
+        ICollection<Game> games;
+
+        filterRequest ??= new GamesFilterRequestModel();
+
+        if (filterRequest.IsEmpty)
+        {
+            games = await _gameService.GetAllAsync();
+        }
+        else
+        {
+            var filter = _mapper.Map<GameSearchFilter>(filterRequest);
+            games = await _gameService.GetByFilterAsync(filter);
+        }
+
+        var mappedGames = _mapper.Map<IEnumerable<GameListViewModel>>(games);
+        
+        var genres = await _genreService.GetAllAsync();
+        filterRequest.Genres = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
+        foreach (var genre in filterRequest.Genres)
+        {
+            genre.Selected = filterRequest.SelectedGenres.Contains(genre.Value);
+        }
+
+        var platforms = await _platformTypeService.GetAllAsync();
+        filterRequest.Platforms = new SelectList(platforms, nameof(PlatformType.Id), nameof(PlatformType.Name));
+        foreach (var platform in filterRequest.Platforms)
+        {
+            platform.Selected = filterRequest.SelectedPlatforms.Contains(platform.Value);
+        }
+
+        var publishers = await _publisherService.GetAllAsync();
+        filterRequest.Publishers = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
+        foreach (var publisher in filterRequest.Publishers)
+        {
+            publisher.Selected = filterRequest.SelectedPublishers.Contains(publisher.Value);
+        }
 
         var orderBySelectList = new SelectList(
             Enum.GetValues(typeof(GameSearchFilterOrderByState)).OfType<Enum>()
@@ -73,11 +108,15 @@ public class GamesController : Controller
                     Text = enumElement.GetDisplayName()
                 }),
             nameof(SelectListItem.Value), nameof(SelectListItem.Value),
-            filter?.OrderBy ?? GameSearchFilterOrderByState.Default);
+            filterRequest.OrderBy);
 
+        ViewData["OrderBy"] = orderBySelectList;
 
-        var games = await _gameService.GetAllAsync();
-        var result = _mapper.Map<IEnumerable<GameListViewModel>>(games);
+        var result = new GamesGetAllViewModel
+        {
+            Games = mappedGames,
+            Filter = filterRequest
+        };
 
         return View(result);
     }
@@ -129,7 +168,7 @@ public class GamesController : Controller
     }
 
     [HttpPost("{gameKey}/newcomment")]
-    public async Task<ActionResult> CreateCommentAsync([FromHybrid] CommentCreateRequestModel request)
+    public async Task<ActionResult> CreateCommentAsync(CommentCreateRequestModel request)
     {
         if (request.ParentId is null)
         {
@@ -146,7 +185,7 @@ public class GamesController : Controller
     }
 
     [HttpPost("{gameKey}/comment/update")]
-    public async Task<ActionResult> UpdateCommentAsync([FromHybrid] CommentUpdateRequestModel request)
+    public async Task<ActionResult> UpdateCommentAsync(CommentUpdateRequestModel request)
     {
         var updateModel = _mapper.Map<CommentUpdateModel>(request);
         
@@ -186,8 +225,9 @@ public class GamesController : Controller
     [HttpPost("{gameKey}/update")]
     public async Task<ActionResult> UpdateAsync(GameUpdateRequestModel request)
     {
-        var game = _mapper.Map<GameUpdateModel>(request);
-        await _gameService.UpdateAsync(game);
+        var updateModel = _mapper.Map<GameUpdateModel>(request);
+        updateModel.File = await GetBytesFromFormFile();
+        await _gameService.UpdateAsync(updateModel);
 
         return RedirectToAction("GetWithDetails", "Games", new { gameKey = request.Key });
     }
