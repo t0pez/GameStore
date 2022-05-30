@@ -18,6 +18,7 @@ using GameStore.Core.Models.PlatformTypes.Specifications;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Core.Models.RelationalModels.Specifications;
 using GameStore.Core.Models.ServiceModels.Games;
+using GameStore.Core.PagedResult;
 
 namespace GameStore.Core.Services;
 
@@ -64,23 +65,25 @@ public class GameService : IGameService
         return GameRepository.CountAsync(new GamesListSpec());
     }
 
-    public async Task<ICollection<Game>> GetAllAsync()
+    public async Task<List<Game>> GetAllAsync()
     {
         var result = await GameRepository.GetBySpecAsync(new GamesListSpec());
 
         return result;
     }
 
-    public async Task<ICollection<Game>> GetByFilterAsync(GameSearchFilter filter)
+    public async Task<PagedResult<Game>> GetByFilterAsync(GameSearchFilter filter)
     {
         if (filter.GenresIds.Any())
         {
-            var allGenres = await GetGenresWithChildrenAsync(filter.GenresIds);
-            filter.GenresIds = allGenres;
+            var genresWithChildren = await GetGenresWithChildrenAsync(filter.GenresIds);
+            filter.GenresIds = genresWithChildren;
         }
 
-        var result = await GameRepository.GetBySpecAsync(new GamesByFilterSpec(filter));
+        var games = await GameRepository.GetBySpecAsync(new GamesByFilterSpec(filter).EnablePaging(filter));
+        var totalGamesCount = await GameRepository.CountAsync(new GamesByFilterSpec(filter));
 
+        var result = new PagedResult<Game>(games, totalGamesCount, filter);
         return result;
     }
 

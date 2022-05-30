@@ -1,24 +1,26 @@
 ﻿@model GameStore.Web.Models.Game.GamesFilterRequestModel
 
-<form method="get" asp-controller="Games" asp-action="GetAll">
+<form id="FilterForm" method="get" asp-controller="Games" asp-action="GetAll">
+    <input type="hidden" asp-for="CurrentPage">
+    <input type="hidden" asp-for="PageSize">
     <div>
         <h5>Name</h5>
         <input type="text" class="form-control" asp-for="@Model.Name" placeholder="Game name">
     </div>
-            
+
     <hr>
 
     <div>
         <h5>Price</h5>
         <div class="input-group">
             <input type="text" class="form-control" asp-for="@Model.MinPrice" placeholder="Minimal price">
-            <span class="input-group-text">  -  </span>
+            <span class="input-group-text"> - </span>
             <input type="text" class="form-control" asp-for="@Model.MaxPrice" placeholder="Maximal price">
         </div>
     </div>
 
     <hr>
-    
+
     <div>
         <h5>Genres</h5>
         <table class="table">
@@ -31,9 +33,9 @@
             }
         </table>
     </div>
-            
+
     <hr>
-    
+
     <div>
         <h5>Platforms</h5>
         <table class="table">
@@ -46,9 +48,9 @@
             }
         </table>
     </div>
-    
+
     <hr>
-    
+
     <div>
         <h5>Publishers</h5>
         <table class="table">
@@ -61,15 +63,15 @@
             }
         </table>
     </div>
-            
+
     <hr>
-    
+
     <div class="input-group mb-3">
-        @Html.DropDownList(nameof(Model.OrderBy), ViewData["OrderBy"] as SelectList, new{ @class="form-control"})
+        @Html.DropDownList(nameof(Model.OrderBy), ViewData["OrderBy"] as SelectList, new { @class = "form-control" })
     </div>
 
     <div>
-        <input type="submit" class="btn btn-primary" value="Filter">
+        <input type="submit" class="btn btn-primary" value="Filter" onclick="resetPage()">
     </div>
 
 </form>

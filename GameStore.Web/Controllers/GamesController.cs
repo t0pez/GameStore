@@ -61,60 +61,21 @@ public class GamesController : Controller
     }
     
     [HttpGet]
-    public async Task<ActionResult<GamesGetAllViewModel>> GetAllAsync(GamesFilterRequestModel filterRequest)
+    public async Task<ActionResult<GamesGetAllViewModel>> GetAllAsync(GamesFilterRequestModel filterRequest,
+                                                                      int? currentPage, int? pageSize)
     {
-        ICollection<Game> games;
-
         filterRequest ??= new GamesFilterRequestModel();
+        filterRequest.CurrentPage = currentPage ?? 1;
+        filterRequest.PageSize = pageSize ?? 10;
 
-        if (filterRequest.IsEmpty)
-        {
-            games = await _gameService.GetAllAsync();
-        }
-        else
-        {
-            var filter = _mapper.Map<GameSearchFilter>(filterRequest);
-            games = await _gameService.GetByFilterAsync(filter);
-        }
+        var filter = _mapper.Map<GameSearchFilter>(filterRequest);
+        var games = await _gameService.GetByFilterAsync(filter);
 
-        var mappedGames = _mapper.Map<IEnumerable<GameListViewModel>>(games);
-        
-        var genres = await _genreService.GetAllAsync();
-        filterRequest.Genres = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
-        foreach (var genre in filterRequest.Genres)
-        {
-            genre.Selected = filterRequest.SelectedGenres.Contains(genre.Value);
-        }
-
-        var platforms = await _platformTypeService.GetAllAsync();
-        filterRequest.Platforms = new SelectList(platforms, nameof(PlatformType.Id), nameof(PlatformType.Name));
-        foreach (var platform in filterRequest.Platforms)
-        {
-            platform.Selected = filterRequest.SelectedPlatforms.Contains(platform.Value);
-        }
-
-        var publishers = await _publisherService.GetAllAsync();
-        filterRequest.Publishers = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
-        foreach (var publisher in filterRequest.Publishers)
-        {
-            publisher.Selected = filterRequest.SelectedPublishers.Contains(publisher.Value);
-        }
-
-        var orderBySelectList = new SelectList(
-            Enum.GetValues(typeof(GameSearchFilterOrderByState)).OfType<Enum>()
-                .Select(enumElement => new SelectListItem
-                {
-                    Value = Convert.ToInt32(enumElement).ToString(),
-                    Text = enumElement.GetDisplayName()
-                }),
-            nameof(SelectListItem.Value), nameof(SelectListItem.Value),
-            filterRequest.OrderBy);
-
-        ViewData["OrderBy"] = orderBySelectList;
+        await FillFilterData(filterRequest);
 
         var result = new GamesGetAllViewModel
         {
-            Games = mappedGames,
+            GamesPaged = games,
             Filter = filterRequest
         };
 
@@ -278,5 +239,41 @@ public class GamesController : Controller
         var publishers = await _publisherService.GetAllAsync();
         var publishersSelectList = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
         ViewData["Publishers"] = publishersSelectList;
+    }
+    
+    private async Task FillFilterData(GamesFilterRequestModel filterRequest)
+    {
+        var genres = await _genreService.GetAllAsync();
+        filterRequest.Genres = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
+        foreach (var genre in filterRequest.Genres)
+        {
+            genre.Selected = filterRequest.SelectedGenres.Contains(genre.Value);
+        }
+
+        var platforms = await _platformTypeService.GetAllAsync();
+        filterRequest.Platforms = new SelectList(platforms, nameof(PlatformType.Id), nameof(PlatformType.Name));
+        foreach (var platform in filterRequest.Platforms)
+        {
+            platform.Selected = filterRequest.SelectedPlatforms.Contains(platform.Value);
+        }
+
+        var publishers = await _publisherService.GetAllAsync();
+        filterRequest.Publishers = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
+        foreach (var publisher in filterRequest.Publishers)
+        {
+            publisher.Selected = filterRequest.SelectedPublishers.Contains(publisher.Value);
+        }
+
+        var orderBySelectList = new SelectList(
+            Enum.GetValues(typeof(GameSearchFilterOrderByState)).OfType<Enum>()
+                .Select(enumElement => new SelectListItem
+                {
+                    Value = Convert.ToInt32(enumElement).ToString(),
+                    Text = enumElement.GetDisplayName()
+                }),
+            nameof(SelectListItem.Value), nameof(SelectListItem.Value),
+            filterRequest.OrderBy);
+
+        ViewData["OrderBy"] = orderBySelectList;
     }
 }

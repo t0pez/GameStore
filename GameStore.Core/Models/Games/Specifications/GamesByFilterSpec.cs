@@ -36,8 +36,6 @@ public class GamesByFilterSpec : SafeDeleteSpec<Game>
         EnablePriceFilter();
 
         EnableSorting();
-
-        EnablePaging(filter);
     }
 
     public GameSearchFilter Filter { get; set; }

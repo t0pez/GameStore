@@ -28,7 +28,6 @@ using GameStore.Web.ViewModels.Genres;
 using GameStore.Web.ViewModels.Order;
 using GameStore.Web.ViewModels.PlatformTypes;
 using GameStore.Web.ViewModels.Publisher;
-using SimpleValueRange;
 
 namespace GameStore.Web.Profiles;
 
@@ -128,10 +127,6 @@ public class WebCommonProfile : Profile
                        expression => expression.MapFrom(gameGenre => gameGenre.Platform.Name));
 
         CreateMap<GamesFilterRequestModel, GameSearchFilter>()
-            .ForMember(searchFilter => searchFilter.PriceRange,
-                       expression =>
-                           expression.MapFrom(
-                               request => Range<decimal>.Create(request.MinPrice, request.MaxPrice)))
             .ForMember(searchFilter => searchFilter.GenresIds,
                        expression =>
                            expression.MapFrom(

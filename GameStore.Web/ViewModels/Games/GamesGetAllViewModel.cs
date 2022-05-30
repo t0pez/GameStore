@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using GameStore.Core.Models.Games;
+using GameStore.Core.PagedResult;
 using GameStore.Web.Models.Game;
 
 namespace GameStore.Web.ViewModels.Games;
 
 public class GamesGetAllViewModel
 {
-    public IEnumerable<GameListViewModel> Games { get; set; }
+    public PagedResult<Game> GamesPaged { get; set; }
     public GamesFilterRequestModel Filter { get; set; } = new();
 }

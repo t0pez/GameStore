@@ -26,21 +26,35 @@
                 <th></th>
             </tr>
 
-            @foreach (var item in Model.Games) {
+            @foreach (var game in Model.GamesPaged) {
                 <tr>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Name)
+                        @Html.DisplayFor(modelItem => game.Name)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.Price)
+                        @Html.DisplayFor(modelItem => game.Price)
                     </td>
                     <td>
-                        @Html.ActionLink("Checkout", "GetWithDetails", new { gameKey = item.Key })
+                        @Html.ActionLink("Checkout", "GetWithDetails", new { gameKey = game.Key })
                     </td>
                 </tr>
             }
-
         </table>
+        
+        <div>
+            <label>Page size: </label>
+            <a asp-action="GetAll" asp-route-pageSize="10" asp-route-currentPage="1">10</a>
+            <a asp-action="GetAll" asp-route-pageSize="20" asp-route-currentPage="1">20</a>
+            <a asp-action="GetAll" asp-route-pageSize="50" asp-route-currentPage="1">50</a>
+            <a asp-action="GetAll" asp-route-pageSize="100" asp-route-currentPage="1">100</a>
+            <a asp-action="GetAll" asp-route-pageSize="0" asp-route-currentPage="1">All</a>
+        </div>
+        
+        <div>
+            <a class="btn @(Model.GamesPaged.HasPreviousPage ? "" : "disabled")" onclick="previousPage()">Previous</a>
+
+            <a class="btn @(Model.GamesPaged.HasNextPage ? "" : "disabled")" onclick="nextPage()">Next</a>
+        </div>
     </div>
 
 </div>
