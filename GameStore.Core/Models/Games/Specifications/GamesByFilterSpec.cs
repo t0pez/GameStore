@@ -7,8 +7,6 @@ namespace GameStore.Core.Models.Games.Specifications;
 
 public class GamesByFilterSpec : SafeDeleteSpec<Game>
 {
-    private const decimal SqlDecimalMaxValue = 1234567898822222.88m;
-
     public GamesByFilterSpec(GameSearchFilter filter)
     {
         Filter = filter;
@@ -33,7 +31,15 @@ public class GamesByFilterSpec : SafeDeleteSpec<Game>
             EnablePublishersFilter();
         }
 
-        EnablePriceFilter();
+        if (Filter.MinPrice is not null)
+        {
+            EnableLowerPriceFilter();
+        }
+
+        if (Filter.MaxPrice is not null)
+        {
+            EnableHighestPriceFilter();
+        }
 
         EnableSorting();
     }
@@ -65,11 +71,16 @@ public class GamesByFilterSpec : SafeDeleteSpec<Game>
             .Where(game => Filter.PublishersIds.Any(publisherId => game.PublisherId == publisherId));
     }
 
-    private void EnablePriceFilter()
+    private void EnableLowerPriceFilter()
     {
         Query
-            .Where(game => game.Price >= (Filter.MinPrice ?? -1) && 
-                           game.Price <= (Filter.MaxPrice ?? SqlDecimalMaxValue));
+            .Where(game => game.Price >= Filter.MinPrice);
+    }
+    
+    private void EnableHighestPriceFilter()
+    {
+        Query
+            .Where(game => game.Price <= Filter.MaxPrice);
     }
 
     private void EnableSorting()
