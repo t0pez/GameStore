@@ -1,21 +1,21 @@
 ﻿using System.Linq;
 using Ardalis.Specification;
 using GameStore.Core.Models.Games.Specifications.Filters;
-using GameStore.Core.Models.RelationalModels;
 using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Games.Specifications;
 
 public class GamesByFilterSpec : SafeDeleteSpec<Game>
 {
+    private const decimal SqlDecimalMaxValue = 1234567898822222.88m;
+
     public GamesByFilterSpec(GameSearchFilter filter)
     {
         Filter = filter;
 
         if (string.IsNullOrEmpty(filter.Name) == false)
         {
-            Query
-                .Where(game => game.Name.ToLower().Contains(filter.Name.ToLower()));
+            EnableNameFilter(filter);
         }
 
         if (filter.GenresIds.Any())
@@ -33,71 +33,32 @@ public class GamesByFilterSpec : SafeDeleteSpec<Game>
             EnablePublishersFilter();
         }
 
-        Query
-            .Where(game => filter.PriceRange.Contains(game.Price));
-        
-        Query
-            .OrderBy(filter.OrderBy);
+        EnablePriceFilter();
+
+        EnableSorting();
 
         EnablePaging(filter);
     }
 
     public GameSearchFilter Filter { get; set; }
 
+
+    private void EnableNameFilter(GameSearchFilter filter)
+    {
+        Query
+            .Where(game => game.Name.ToLower().Contains(filter.Name.ToLower()));
+    }
+
     private void EnableGenresFilter()
     {
         Query
-            .Where(game => game.Genres.Join(Filter.GenresIds,
-                                            gg => gg.GenreId,
-                                            genreId => genreId,
-                                            (genreId, _) => genreId)
-                               .Count() == Filter.GenresIds.Count());
-        
-        Query
-            .Where(game => Filter.GenresIds.Intersect(game.Genres.Select(gg => gg.GenreId))
-                                 .Count() == Filter.GenresIds.Count());
-        
-        Query
-            .Where(game => game.Genres
-                               .Intersect(Filter.GenresIds.Select(
-                                              genreId => new GameGenre { GameId = game.Id, GenreId = genreId }))
-                               .Count() == Filter.GenresIds.Count());
-        
-        Query
-            .Where(game => game.Genres.Select(gg => gg.GenreId)
-                               .Intersect(Filter.GenresIds).Count() == Filter.GenresIds.Count());
-        
-        Query
-            .Where(game => game.Genres
-                               .Intersect(Filter.GenresIds.Select(
-                                              genreId => new GameGenre { GameId = game.Id, GenreId = genreId }))
-                               .SequenceEqual(
-                                   Filter.GenresIds.Select(genreId => new GameGenre
-                                                               { GameId = game.Id, GenreId = genreId })));
-        
-        Query
-            .Where(game => game.Genres
-                               .Intersect(Filter.GenresIds.Select(
-                                              genreId => new GameGenre { GameId = game.Id, GenreId = genreId }))
-                               .Count() == Filter.GenresIds.Count());
-        
-        Query
-            .Where(game => Filter.GenresIds.Except(game.Genres.Select(gg => gg.GenreId))
-                                 .Any() == false);
-        
-        Query
-            .Where(game => Filter.GenresIds.All(genreId => game.Genres.Select(gg => gg.GenreId).Contains(genreId)));
-        
-        Query
-            .Where(game => Filter.GenresIds.All(genreId => game.Genres.Any(gg => gg.GenreId == genreId)));
-
-        Query
-            .Where(game => game.Genres.Select(gg => gg.GenreId)
-                               .SequenceEqual(Filter.GenresIds.Intersect(game.Genres.Select(gg => gg.GenreId))));
+            .Where(game => game.Genres.Any(gg => Filter.GenresIds.Any(genreId => gg.GenreId == genreId)));
     }
 
     private void EnablePlatformsFilter()
     {
+        Query
+            .Where(game => game.Platforms.Any(gp => Filter.PlatformsIds.Any(platformId => gp.PlatformId == platformId)));
     }
 
     private void EnablePublishersFilter()
@@ -105,5 +66,41 @@ public class GamesByFilterSpec : SafeDeleteSpec<Game>
         Query
             .Where(game => Filter.PublishersIds.Any(publisherId => game.PublisherId == publisherId));
     }
-}
 
+    private void EnablePriceFilter()
+    {
+        Query
+            .Where(game => game.Price >= (Filter.MinPrice ?? -1) && 
+                           game.Price <= (Filter.MaxPrice ?? SqlDecimalMaxValue));
+    }
+
+    private void EnableSorting()
+    {
+        switch (Filter.OrderBy)
+        {
+            case GameSearchFilterOrderByState.MostPopular:
+                Query
+                    .OrderBy(game => game.Views);
+                break;
+            case GameSearchFilterOrderByState.MostCommented:
+                Query
+                    .OrderBy(game => game.Comments.Count(comment => comment.IsDeleted == false));
+                break;
+            case GameSearchFilterOrderByState.PriceAscending:
+                Query
+                    .OrderBy(game => game.Price);
+                break;
+            case GameSearchFilterOrderByState.PriceDescending:
+                Query
+                    .OrderByDescending(game => game.Price);
+                break;
+            case GameSearchFilterOrderByState.New:
+                Query
+                    .OrderBy(game => game.AddedToStoreAt);
+                break;
+            case GameSearchFilterOrderByState.Default:
+            default:
+                return;
+        }
+    }
+}

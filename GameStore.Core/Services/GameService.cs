@@ -73,6 +73,12 @@ public class GameService : IGameService
 
     public async Task<ICollection<Game>> GetByFilterAsync(GameSearchFilter filter)
     {
+        if (filter.GenresIds.Any())
+        {
+            var allGenres = await GetGenresWithChildrenAsync(filter.GenresIds);
+            filter.GenresIds = allGenres;
+        }
+
         var result = await GameRepository.GetBySpecAsync(new GamesByFilterSpec(filter));
 
         return result;
@@ -141,6 +147,29 @@ public class GameService : IGameService
                    ?? throw new ItemNotFoundException(typeof(Game), gameKey);
 
         return game.File;
+    }
+
+    private async Task<IEnumerable<Guid>> GetGenresWithChildrenAsync(IEnumerable<Guid> genresIds)
+    {
+        var genres = await GenreRepository.GetBySpecAsync(new GenresByIdsWithDetails(genresIds));
+        var allChildren= GetAllChildrenGenres(genres);
+
+        var result = allChildren.Select(genre => genre.Id);
+
+        return result;
+    }
+
+    private IEnumerable<Genre> GetAllChildrenGenres(IEnumerable<Genre> genres)
+    {
+        var result = genres.ToList();
+
+        foreach (var genre in genres)
+        {
+            var children = GetAllChildrenGenres(genre.SubGenres);
+            result.AddRange(children);   
+        }
+
+        return result;
     }
 
     private async Task UpdateGameValues(Game game, GameUpdateModel updateModel)
