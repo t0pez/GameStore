@@ -9,7 +9,7 @@ public class GetBySpecAsyncData : DataAttribute
 {
     public override IEnumerable<object[]> GetData(MethodInfo testMethod)
     {
-        yield return new object[] { new GamesWithDetailsSpec(), 5 };
+        yield return new object[] { new GamesWithDetailsSpec(), 6 };
         
     }
 }
