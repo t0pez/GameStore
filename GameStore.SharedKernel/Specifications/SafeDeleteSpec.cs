@@ -4,7 +4,7 @@ using GameStore.SharedKernel.Interfaces;
 namespace GameStore.SharedKernel.Specifications;
 
 public class SafeDeleteSpec<TModel>
-    : Specification<TModel> where TModel : ISafeDelete
+    : PagedSpec<TModel> where TModel : ISafeDelete
 {
     protected SafeDeleteSpec()
     {

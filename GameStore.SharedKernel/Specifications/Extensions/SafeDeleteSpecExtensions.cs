@@ -1,12 +1,12 @@
 ﻿using GameStore.SharedKernel.Interfaces;
-using GameStore.SharedKernel.Specifications;
 
-namespace GameStore.Core.Helpers.Specifications;
+namespace GameStore.SharedKernel.Specifications.Extensions;
 
-public static class DomainSpecExtensions
+public static class SafeDeleteSpecExtensions
 {
     public static SafeDeleteSpec<T> IncludeDeleted<T>(this SafeDeleteSpec<T> spec,
-                                                      bool isEnabledDeleted = true) where T : ISafeDelete
+                                                      bool isEnabledDeleted = true) 
+        where T : ISafeDelete
     {
         spec.IsIncludedDeleted = isEnabledDeleted;
         return spec;

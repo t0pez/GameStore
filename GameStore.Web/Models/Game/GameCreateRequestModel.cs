@@ -11,6 +11,12 @@ public class GameCreateRequestModel
     [Required] [MinLength(10)] public string Description { get; set; }
     public decimal Price { get; set; }
     public Guid PublisherId { get; set; }
+
+    [DataType(DataType.Date)]
+    [Display(Name = "Date of release")]
+    [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:MM/dd/yyyy}")]
+    public DateTime PublishedAt { get; set; }
+
     [Required] public ICollection<Guid> GenresIds { get; set; }
     [Required] public ICollection<Guid> PlatformsIds { get; set; }
 }

@@ -38,6 +38,11 @@
                     @Html.LabelFor(model => model.Price, new {@class = "ps-4"})
                     @Html.ValidationMessageFor(model => model.Price, "", new {@class = "text-danger"})
                 </div>
+                <div class="form-floating col mb-3">
+                    @Html.EditorFor(model => model.PublishedAt, "Date of release", new{@class="form-control", @placehoder="Date of release"})
+                    @Html.LabelFor(model => model.PublishedAt, "Date of release", new { @class = "" })
+                    @Html.ValidationMessageFor(model => model.PublishedAt, "", new { @class = "text-danger" })
+                </div>
                 <div class="form-floating mb-3">
                     @Html.DropDownListFor(model => model.PublisherId, ViewData["Publishers"] as IEnumerable<SelectListItem>, new{@class="form-select from-select-lg"})
                     @Html.LabelFor(model => model.PublisherId, "Publisher", new { @class = "ps-4" })

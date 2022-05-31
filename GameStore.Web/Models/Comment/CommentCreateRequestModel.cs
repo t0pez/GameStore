@@ -8,8 +8,8 @@ namespace GameStore.Web.Models.Comment;
 public class CommentCreateRequestModel
 {
     [FromRoute(Name = "gameKey")] public string GameKey { get; set; }
-    public Guid? ParentId { get; set; }
-    public CommentState State { get; set; }
     [Required] public string AuthorName { get; set; }
     [Required] public string Message { get; set; }
+    public Guid? ParentId { get; set; }
+    public CommentState State { get; set; }
 }

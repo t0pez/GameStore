@@ -9,11 +9,6 @@ namespace GameStore.Core.Models.Games;
 
 public class Game : ISafeDelete
 {
-    public Game()
-    {
-        
-    }
-
     public Guid Id { get; set; }
     public string Key { get; set; }
     public string Name { get; set; }
@@ -22,7 +17,11 @@ public class Game : ISafeDelete
     public bool Discontinued { get; set; }
     public int UnitsInStock { get; set; }
     public byte[] File { get; set; }
-    
+    public int Views { get; set; }
+
+    public DateTime PublishedAt { get; set; }
+    public DateTime AddedToStoreAt { get; set; }
+
     public Guid PublisherId { get; set; }
     public Publisher Publisher { get; set; }
     

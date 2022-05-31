@@ -11,6 +11,7 @@ public class GameCreateModel
     public decimal Price { get; set; }
     public byte[] File { get; set; }
     public Guid PublisherId { get; set; }
+    public DateTime PublishedAt { get; set; }
     public ICollection<Guid> GenresIds { get; set; }
     public ICollection<Guid> PlatformsIds { get; set; }
 }

@@ -32,6 +32,21 @@
                 </div>
                 
                 <div>
+                    @Html.LabelFor(model => model.PublishedAt, "Date of release:", new { @class = "form-label fw-bolder" })
+                    @Html.DisplayFor(model => model.PublishedAt)
+                </div>
+                
+                <div>
+                    @Html.LabelFor(model => model.AddedToStoreAt, "Date of adding to store:", new { @class = "form-label fw-bolder" })
+                    @Html.DisplayFor(model => model.AddedToStoreAt)
+                </div>
+                
+                <div>
+                    @Html.LabelFor(model => model.Views, "Views:", new { @class = "form-label fw-bolder" })
+                    @Html.DisplayFor(model => model.Views)
+                </div>
+                
+                <div>
                     <label class="form-label">Genres: </label>
                     <table class="table">
                         @foreach (var item in Model.Genres)
@@ -42,7 +57,7 @@
                                 </td>
 
                                 <td>
-                                    @Html.ActionLink("Checkout", "GetWithDetails", new { id = item.Id })
+                                    @Html.ActionLink("Checkout",  "GetWithDetails", "Genres", new { id = item.Id })
                                 </td>
                             </tr>
                         }
@@ -59,7 +74,7 @@
                                 </td>
 
                                 <td>
-                                    @Html.ActionLink("Checkout", "GetWithDetails", new { id = item.Id })
+                                    @Html.ActionLink("Checkout", "GetWithDetails", "PlatformTypes", new { id = item.Id })
                                 </td>
                             </tr>
                         }

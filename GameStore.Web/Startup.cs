@@ -28,7 +28,7 @@ public class Startup
 
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddMvc().AddHybridModelBinder();
+        services.AddMvc();
 
         services.AddSwaggerGen();
         services.AddControllers()

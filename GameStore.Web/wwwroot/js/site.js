@@ -16,6 +16,33 @@ function generateKey() {
         .then(json => document.getElementById("Key").value = json.key)
 }
 
+function resetPage(){
+    let currentPageInput = document.getElementById("CurrentPage")
+    currentPageInput.value = 1
+}
+
+function nextPage(){
+    let currentPageInput = document.getElementById("CurrentPage")
+    let currentPage = parseInt(currentPageInput.value)
+    currentPage++
+    currentPageInput.value = currentPage
+    
+    executeFilterForm()
+}
+
+function previousPage(){
+    let currentPageInput = document.getElementById("CurrentPage")
+    let currentPage = parseInt(currentPageInput.value)
+    currentPage--
+    currentPageInput.value = currentPage
+
+    executeFilterForm()
+}
+
+function executeFilterForm(){
+    let filterForm = document.getElementById("FilterForm")
+    filterForm.submit()
+}
 
 function addCommentReply(name, id) {
     let section = document.getElementById("StateSection")

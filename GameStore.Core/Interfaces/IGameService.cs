@@ -2,14 +2,17 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using GameStore.Core.Models.Games.Specifications.Filters;
 using GameStore.Core.Models.ServiceModels.Games;
+using GameStore.Core.PagedResult;
 
 namespace GameStore.Core.Interfaces;
 
 public interface IGameService
 {
     public Task<int> GetTotalCountAsync();
-    public Task<ICollection<Game>> GetAllAsync();
+    public Task<List<Game>> GetAllAsync();
+    public Task<PagedResult<Game>> GetByFilterAsync(GameSearchFilter filter);
     public Task<ICollection<Game>> GetByGenreAsync(Guid genreId);
     public Task<ICollection<Game>> GetByPlatformTypesAsync(ICollection<Guid> platformTypesIds);
     public Task<Game> GetByKeyAsync(string key);

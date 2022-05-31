@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
@@ -12,7 +13,9 @@ using GameStore.Web.Models.Comment;
 using GameStore.Web.Models.Game;
 using GameStore.Web.ViewModels.Comments;
 using GameStore.Web.ViewModels.Games;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Primitives;
 using Moq;
 using Xunit;
 
@@ -39,20 +42,6 @@ public class GameControllerTests
 
         _gameController = new GamesController(_gameServiceMock.Object, _commentServiceMock.Object, _publisherServiceMock.Object,
                                               _genreServiceMock.Object, _platformServiceMock.Object, _mapperMock.Object);
-    }
-
-    [Fact]
-    public async void GetAllAsync_NoParameters_ReturnsCorrectValue()
-    {
-        const int expectedResultCount = 4;
-
-        _gameServiceMock.Setup(service => service.GetAllAsync())
-                        .ReturnsAsync(new List<Game>(new Game[expectedResultCount]));
-        _mapperMock.Setup(service => service.Map<ICollection<GameListViewModel>>(It.IsAny<ICollection<Game>>()))
-                        .Returns(new List<GameListViewModel>(new GameListViewModel[expectedResultCount]));
-        
-        var actualResult = await _gameController.GetAllAsync();
-        Assert.IsType<ActionResult<IEnumerable<GameListViewModel>>>(actualResult);
     }
 
     [Fact]
@@ -165,10 +154,15 @@ public class GameControllerTests
     [Fact]
     public async void UpdateAsync_CorrectValues_ReturnsRedirect()
     {
-        var updateRequestModel = new GameUpdateRequestModel();
-
         _mapperMock.Setup(mapper => mapper.Map<GameUpdateModel>(It.IsAny<GameUpdateRequestModel>()))
                    .Returns(new GameUpdateModel());
+
+        var fileCollection = new FormFileCollection { new FormFile(Stream.Null, 0, 0, "", "") };
+        _gameController.ControllerContext = new ControllerContext();
+        _gameController.ControllerContext.HttpContext = new DefaultHttpContext();
+        _gameController.ControllerContext.HttpContext.Request.Form = new FormCollection(new Dictionary<string, StringValues>(), fileCollection);
+
+        var updateRequestModel = new GameUpdateRequestModel();
 
         var actualResult = await _gameController.UpdateAsync(updateRequestModel);
 

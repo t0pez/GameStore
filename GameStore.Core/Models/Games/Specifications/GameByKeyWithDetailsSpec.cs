@@ -9,9 +9,7 @@ public sealed class GameByKeyWithDetailsSpec : GameByKeySpec
         Query
             .Include(g => g.Comments)
             .Include(g => g.Genres)
-            .ThenInclude(gameGenre => gameGenre.Genre)
             .Include(g => g.Platforms)
-            .ThenInclude(gamePlatform => gamePlatform.Platform)
             .Include(game => game.Publisher);
     }
 }

@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
+using GameStore.Core.Models.Games.Specifications.Filters;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.PlatformTypes;
@@ -17,6 +18,7 @@ using GameStore.Core.Models.PlatformTypes.Specifications;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Core.Models.RelationalModels.Specifications;
 using GameStore.Core.Models.ServiceModels.Games;
+using GameStore.Core.PagedResult;
 
 namespace GameStore.Core.Services;
 
@@ -47,6 +49,7 @@ public class GameService : IGameService
     public async Task<Game> CreateAsync(GameCreateModel model)
     {
         var game = _mapper.Map<Game>(model);
+        game.AddedToStoreAt = DateTime.UtcNow;
 
         await GameRepository.AddAsync(game);
         await _unitOfWork.SaveChangesAsync();
@@ -62,10 +65,25 @@ public class GameService : IGameService
         return GameRepository.CountAsync(new GamesListSpec());
     }
 
-    public async Task<ICollection<Game>> GetAllAsync()
+    public async Task<List<Game>> GetAllAsync()
     {
         var result = await GameRepository.GetBySpecAsync(new GamesListSpec());
 
+        return result;
+    }
+
+    public async Task<PagedResult<Game>> GetByFilterAsync(GameSearchFilter filter)
+    {
+        if (filter.GenresIds.Any())
+        {
+            var genresWithChildren = await GetGenresWithChildrenAsync(filter.GenresIds);
+            filter.GenresIds = genresWithChildren;
+        }
+
+        var games = await GameRepository.GetBySpecAsync(new GamesByFilterSpec(filter).EnablePaging(filter));
+        var totalGamesCount = await GameRepository.CountAsync(new GamesByFilterSpec(filter));
+
+        var result = new PagedResult<Game>(games, totalGamesCount, filter);
         return result;
     }
 
@@ -132,6 +150,29 @@ public class GameService : IGameService
                    ?? throw new ItemNotFoundException(typeof(Game), gameKey);
 
         return game.File;
+    }
+
+    private async Task<IEnumerable<Guid>> GetGenresWithChildrenAsync(IEnumerable<Guid> genresIds)
+    {
+        var genres = await GenreRepository.GetBySpecAsync(new GenresByIdsWithDetails(genresIds));
+        var allChildren= GetAllChildrenGenres(genres);
+
+        var result = allChildren.Select(genre => genre.Id);
+
+        return result;
+    }
+
+    private IEnumerable<Genre> GetAllChildrenGenres(IEnumerable<Genre> genres)
+    {
+        var result = genres.ToList();
+
+        foreach (var genre in genres)
+        {
+            var children = GetAllChildrenGenres(genre.SubGenres);
+            result.AddRange(children);   
+        }
+
+        return result;
     }
 
     private async Task UpdateGameValues(Game game, GameUpdateModel updateModel)
