@@ -30,7 +30,7 @@ function nextPage(){
     executeFilterForm()
 }
 
-function nextPage(){
+function previousPage(){
     let currentPageInput = document.getElementById("CurrentPage")
     let currentPage = parseInt(currentPageInput.value)
     currentPage--

@@ -5,7 +5,7 @@ using GameStore.SharedKernel.Specifications.Filters;
 
 namespace GameStore.Core.PagedResult;
 
-public class PagedResult<T> : IEnumerable<T>
+public class PagedResult<T>
 {
     public PagedResult(IEnumerable<T> result, int totalGamesCount, PaginationFilter paginationFilter)
     {
@@ -22,14 +22,4 @@ public class PagedResult<T> : IEnumerable<T>
 
     public bool HasNextPage => TotalPagesCount > CurrentPage;
     public bool HasPreviousPage => CurrentPage > 1;
-
-    public IEnumerator<T> GetEnumerator()
-    {
-        return Result.GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
 }
