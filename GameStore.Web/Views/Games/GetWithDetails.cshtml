@@ -57,7 +57,7 @@
                                 </td>
 
                                 <td>
-                                    @Html.ActionLink("Checkout", "GetWithDetails", new { id = item.Id })
+                                    @Html.ActionLink("Checkout",  "GetWithDetails", "Genres", new { id = item.Id })
                                 </td>
                             </tr>
                         }
@@ -74,7 +74,7 @@
                                 </td>
 
                                 <td>
-                                    @Html.ActionLink("Checkout", "GetWithDetails", new { id = item.Id })
+                                    @Html.ActionLink("Checkout", "GetWithDetails", "PlatformTypes", new { id = item.Id })
                                 </td>
                             </tr>
                         }

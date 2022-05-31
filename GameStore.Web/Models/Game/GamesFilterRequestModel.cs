@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using GameStore.Core.Models.Games.Specifications.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -7,6 +8,7 @@ namespace GameStore.Web.Models.Game;
 
 public class GamesFilterRequestModel
 {
+    [MinLength(3)]
     public string Name { get; set; }
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
