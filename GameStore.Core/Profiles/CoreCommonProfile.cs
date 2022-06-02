@@ -20,8 +20,6 @@ public class CoreCommonProfile : Profile
 {
     public CoreCommonProfile()
     {
-        CreateMap<GameCreateModel, Game>();
-
         CreateMap<GenreCreateModel, Genre>();
 
         CreateMap<PlatformTypeCreateModel, PlatformType>();
