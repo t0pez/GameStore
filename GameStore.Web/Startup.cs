@@ -14,6 +14,7 @@ using AutoMapper;
 using GameStore.Core.Profiles;
 using GameStore.Web.Filters;
 using GameStore.Web.Infrastructure;
+using Quartz;
 
 namespace GameStore.Web;
 
@@ -39,6 +40,13 @@ public class Startup
                                     options.JsonSerializerOptions.ReferenceHandler =
                                         ReferenceHandler.IgnoreCycles;
                                 });
+
+        services.AddQuartz(configurator =>
+                           {
+                               configurator.UseMicrosoftDependencyInjectionJobFactory();
+                               configurator.AddOrderTimeOutHostedService();
+                           });
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         services.ConfigureDomainServices();
         services.ConfigureWebServices();

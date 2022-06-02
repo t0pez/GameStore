@@ -25,6 +25,8 @@ public static class DependencyResolverModule
                 .AddScoped<IPlatformTypeService, PlatformTypeService>()
                 .AddScoped<IOrderService, OrderService>()
                 .AddScoped<IOrderMappingHelper, OrderMappingHelper>()
+                .AddScoped<IOpenedOrderService, OpenedOrderService>()
+                .AddScoped<IOrderTimeOutService, OrderTimeOutService>()
                 .AddScoped<IPaymentService, PaymentService>()
                 .AddScoped<IPaymentMethodFactory, PaymentMethodFactory>()
                 .AddScoped<IInvoiceFileGenerator, InvoiceFileGenerator>()
