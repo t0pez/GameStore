@@ -27,6 +27,18 @@ public class BasketService : IBasketService
             try
             {
                 var game = await _gameService.GetByIdAsync(currentGameId);
+
+                if (game.UnitsInStock == 0)
+                {
+                    itemsToDelete.Add(basketItem);
+                    continue;
+                }
+
+                if (game.UnitsInStock < basketItem.Quantity)
+                {
+                    basketItem.Quantity = game.UnitsInStock;
+                }
+
                 basketItem.Game = game;
             }
             catch (ItemNotFoundException)
