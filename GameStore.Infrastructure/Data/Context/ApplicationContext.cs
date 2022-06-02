@@ -23,6 +23,8 @@ public sealed class ApplicationContext : DbContext
 
     public DbSet<GameGenre> GameGenres { get; set; }
     public DbSet<GamePlatformType> GamePlatformTypes { get; set; }
+    
+    public DbSet<OpenedOrder> OpenedOrders { get; set; }
 
     public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
     {
@@ -42,5 +44,6 @@ public sealed class ApplicationContext : DbContext
 
         modelBuilder.ApplyConfiguration(new GameGenreConfiguration());
         modelBuilder.ApplyConfiguration(new GamePlatformConfiguration());
+        modelBuilder.ApplyConfiguration(new OpenedOrderConfiguration());
     }
 }
