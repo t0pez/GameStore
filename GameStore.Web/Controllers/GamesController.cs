@@ -14,14 +14,13 @@ using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Core.Models.ServiceModels.Games;
+using GameStore.Web.Extensions;
 using GameStore.Web.Filters;
 using GameStore.Web.Models.Comment;
 using GameStore.Web.Models.Game;
 using GameStore.Web.ViewModels.Comments;
 using GameStore.Web.ViewModels.Games;
-
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.OpenApi.Extensions;
 
 namespace GameStore.Web.Controllers;
 
@@ -271,7 +270,7 @@ public class GamesController : Controller
                     Value = Convert.ToInt32(enumElement).ToString(),
                     Text = enumElement.GetDisplayName()
                 }),
-            nameof(SelectListItem.Value), nameof(SelectListItem.Value),
+            nameof(SelectListItem.Value), nameof(SelectListItem.Text),
             filterRequest.OrderBy);
 
         ViewData["OrderBy"] = orderBySelectList;

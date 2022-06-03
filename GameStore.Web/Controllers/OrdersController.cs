@@ -7,6 +7,7 @@ using GameStore.Core.Models.Baskets;
 using GameStore.Core.Models.Orders;
 using GameStore.Core.Models.ServiceModels.Orders;
 using GameStore.Web.Interfaces;
+using GameStore.Web.Models.Baskets;
 using GameStore.Web.Models.Order;
 using GameStore.Web.ViewModels.Order;
 using Microsoft.AspNetCore.Mvc;
@@ -70,6 +71,9 @@ public class OrdersController : Controller
         
         var order = await _orderService.CreateAsync(createModel);
         await _timeOutService.CreateOpenedOrderAsync(order);
+
+        basketCookieModel = new BasketCookieModel(); 
+        _basketCookieService.AppendBasketCookie(HttpContext.Response.Cookies, basketCookieModel);
         
         var result = _mapper.Map<OrderViewModel>(order);
 

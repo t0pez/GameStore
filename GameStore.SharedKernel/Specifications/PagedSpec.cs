@@ -7,9 +7,7 @@ public class PagedSpec<TModel> : Specification<TModel>
 {
     public PagedSpec<TModel> EnablePaging(PaginationFilter searchFilter)
     {
-        EnablePaging(searchFilter.Skip, searchFilter.Take);
-
-        return this;
+        return EnablePaging(searchFilter.Skip, searchFilter.Take);
     }
 
     public PagedSpec<TModel> EnablePaging(int skip, int take)

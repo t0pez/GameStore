@@ -30,8 +30,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddMvc();
-
-        services.AddSwaggerGen();
+        
         services.AddControllers()
                 .AddJsonOptions(options =>
                                 {
@@ -69,8 +68,6 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI();
         }
 
         app.UseHttpsRedirection();
