@@ -20,13 +20,16 @@ public class OrdersController : Controller
     private readonly IOrderService _orderService;
     private readonly IOrderTimeOutService _timeOutService;
     private readonly IBasketCookieService _basketCookieService;
+    private readonly IActiveOrderCookieService _activeOrderCookieService;
     private readonly IMapper _mapper;
 
     public OrdersController(IOrderService orderService, IOrderTimeOutService timeOutService,
-                            IBasketCookieService basketCookieService, IMapper mapper)
+                            IBasketCookieService basketCookieService, IActiveOrderCookieService activeOrderCookieService,
+                            IMapper mapper)
     {
         _orderService = orderService;
         _mapper = mapper;
+        _activeOrderCookieService = activeOrderCookieService;
         _basketCookieService = basketCookieService;
         _timeOutService = timeOutService;
     }
@@ -64,6 +67,8 @@ public class OrdersController : Controller
     [HttpGet("new")]
     public async Task<ActionResult<OrderViewModel>> CreateAsync()
     {
+        await ValidateActiveOrderCookie();
+        
         var basketCookieModel = _basketCookieService.GetBasketFromCookie(HttpContext.Request.Cookies);
         var basket = _mapper.Map<Basket>(basketCookieModel);
         
@@ -74,6 +79,7 @@ public class OrdersController : Controller
 
         basketCookieModel = new BasketCookieModel(); 
         _basketCookieService.AppendBasketCookie(HttpContext.Response.Cookies, basketCookieModel);
+        _activeOrderCookieService.AppendActiveOrder(HttpContext.Response.Cookies, order.Id);
         
         var result = _mapper.Map<OrderViewModel>(order);
 
@@ -89,7 +95,7 @@ public class OrdersController : Controller
 
         return View(result);
     }
-    
+
     [HttpPost("{id}/update")]
     public async Task<ActionResult<OrderViewModel>> UpdateAsync(OrderUpdateRequestModel requestModel)
     {
@@ -112,5 +118,26 @@ public class OrdersController : Controller
         await _timeOutService.RemoveOpenedOrderByOrderIdAsync(id);
 
         return RedirectToAction("GetAll", "Orders");
+    }
+
+    private async Task ValidateActiveOrderCookie()
+    {
+        if (_activeOrderCookieService.TryGetActiveOrderId(HttpContext.Request.Cookies, out var orderId))
+        {
+            if (await IsOrderNotActiveAnymore(orderId))
+            {
+                _activeOrderCookieService.RemoveActiveOrder(HttpContext.Response.Cookies);
+            }
+            else
+            {
+                RedirectToAction("GetCurrentBasket", "Basket");
+            }
+        }
+    }
+
+    private async Task<bool> IsOrderNotActiveAnymore(Guid orderId)
+    {
+        var activeOrder = await _orderService.GetByIdAsync(orderId);
+        return activeOrder.Status is OrderStatus.Cancelled or OrderStatus.Completed;
     }
 }

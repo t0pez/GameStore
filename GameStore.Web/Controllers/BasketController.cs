@@ -15,12 +15,15 @@ public class BasketController : Controller
 {
     private readonly IBasketCookieService _basketCookieService;
     private readonly IBasketService _basketService;
+    private readonly IActiveOrderCookieService _activeOrderCookieService;
     private readonly IMapper _mapper;
 
-    public BasketController(IBasketCookieService basketCookieService, IBasketService basketService, IMapper mapper)
+    public BasketController(IBasketCookieService basketCookieService, IBasketService basketService,
+                            IActiveOrderCookieService activeOrderCookieService, IMapper mapper)
     {
         _basketService = basketService;
         _mapper = mapper;
+        _activeOrderCookieService = activeOrderCookieService;
         _basketCookieService = basketCookieService;
     }
 
@@ -37,6 +40,9 @@ public class BasketController : Controller
         var basketViewModel = _mapper.Map<BasketViewModel>(basket);
         
         UpdateCookie(basket);
+
+        var hasActiveOrder = _activeOrderCookieService.IsCookieContainsActiveOrder(HttpContext.Request.Cookies);
+        ViewData["HasActiveOrder"] = hasActiveOrder;
         
         return View(basketViewModel);
     }
