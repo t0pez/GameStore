@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
@@ -18,6 +19,13 @@ public class OpenedOrderService : IOpenedOrderService
     }
 
     private IRepository<OpenedOrder> OpenedOrderRepository => _unitOfWork.GetRepository<OpenedOrder>();
+
+    public async Task<IEnumerable<OpenedOrder>> GetAll()
+    {
+        var result = await OpenedOrderRepository.GetBySpecAsync();
+
+        return result;
+    }
 
     public async Task CreateAsync(OpenedOrder openedOrder)
     {

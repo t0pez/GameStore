@@ -5,7 +5,6 @@ using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Orders;
 using GameStore.Core.Models.ServiceModels.Orders;
-using GameStore.SharedKernel.Interfaces.DataAccess;
 using Quartz;
 
 namespace GameStore.Core.Services.HostedServices;
@@ -14,22 +13,20 @@ public class OrderTimeOutJob : IJob
 {
     private readonly IOrderService _orderService;
     private readonly IOrderTimeOutService _orderTimeOutService;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IOpenedOrderService _openedOrderService;
     private readonly IMapper _mapper;
 
-    public OrderTimeOutJob(IOrderTimeOutService orderTimeOutService, IUnitOfWork unitOfWork, IOrderService orderService, IMapper mapper)
+    public OrderTimeOutJob(IOrderTimeOutService orderTimeOutService, IOpenedOrderService openedOrderService, IOrderService orderService, IMapper mapper)
     {
         _orderTimeOutService = orderTimeOutService;
-        _unitOfWork = unitOfWork;
+        _openedOrderService = openedOrderService;
         _orderService = orderService;
         _mapper = mapper;
     }
 
-    private IRepository<OpenedOrder> OpenedOrderRepository => _unitOfWork.GetRepository<OpenedOrder>();
-
     public async Task Execute(IJobExecutionContext context)
     {
-        var openedOrders = await OpenedOrderRepository.GetBySpecAsync();
+        var openedOrders = await _openedOrderService.GetAll();
 
         foreach (var openedOrder in openedOrders.Where(openedOrder => openedOrder.TimeOutDate < DateTime.UtcNow))
         {
