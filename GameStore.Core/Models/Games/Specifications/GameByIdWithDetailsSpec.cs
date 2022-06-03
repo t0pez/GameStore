@@ -9,6 +9,8 @@ public sealed class GameByIdWithDetailsSpec : GameByIdSpec
     {
         Query
             .Include(game => game.Genres)
-            .Include(game => game.Platforms);
+            .ThenInclude(gg => gg.Genre)
+            .Include(game => game.Platforms)
+            .ThenInclude(gp => gp.Platform);
     }
 }
