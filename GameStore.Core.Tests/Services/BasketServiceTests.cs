@@ -44,7 +44,7 @@ public class BasketServiceTests
         const string expectedGameName = "Game 1";
 
         _gameServiceMock.Setup(service => service.GetByIdAsync(gameId))
-                        .ReturnsAsync(new Game { Id = gameId, Name = expectedGameName });
+                        .ReturnsAsync(new Game { Id = gameId, Name = expectedGameName, UnitsInStock = 100});
 
         await _basketService.FillWithDetailsAsync(basket);
         
@@ -82,7 +82,7 @@ public class BasketServiceTests
         const int expectedCount = 1;
 
         _gameServiceMock.Setup(service => service.GetByIdAsync(existingGameId))
-                        .ReturnsAsync(new Game { Id = existingGameId, Name = expectedGameName });
+                        .ReturnsAsync(new Game { Id = existingGameId, Name = expectedGameName, UnitsInStock = 10});
         _gameServiceMock.Setup(service => service.GetByIdAsync(notExistingGameId))
                         .ThrowsAsync(new ItemNotFoundException());
 

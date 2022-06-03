@@ -19,6 +19,7 @@ public class OrdersControllerTests
     private readonly Mock<IOrderService> _orderServiceMock;
     private readonly Mock<IBasketCookieService> _basketCookieServiceMock;
     private readonly Mock<IOrderTimeOutService> _timeOutServiceMock;
+    private readonly Mock<IActiveOrderCookieService> _activeOrderCookieServiceMock;
     private readonly Mock<IMapper> _mapperMock;
 
     public OrdersControllerTests()
@@ -26,10 +27,12 @@ public class OrdersControllerTests
         _orderServiceMock = new Mock<IOrderService>();
         _timeOutServiceMock = new Mock<IOrderTimeOutService>();
         _basketCookieServiceMock = new Mock<IBasketCookieService>();
+        _timeOutServiceMock = new Mock<IOrderTimeOutService>();
+        _activeOrderCookieServiceMock = new Mock<IActiveOrderCookieService>();
         _mapperMock = new Mock<IMapper>();
         _ordersController =
             new OrdersController(_orderServiceMock.Object, _timeOutServiceMock.Object, _basketCookieServiceMock.Object,
-                                 _mapperMock.Object);
+                                 _activeOrderCookieServiceMock.Object, _mapperMock.Object);
     }
 
     [Fact]
