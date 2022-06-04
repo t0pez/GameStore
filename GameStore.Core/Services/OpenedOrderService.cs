@@ -20,7 +20,7 @@ public class OpenedOrderService : IOpenedOrderService
 
     private IRepository<OpenedOrder> OpenedOrderRepository => _unitOfWork.GetRepository<OpenedOrder>();
 
-    public async Task<IEnumerable<OpenedOrder>> GetAll()
+    public async Task<IEnumerable<OpenedOrder>> GetAllAsync()
     {
         var result = await OpenedOrderRepository.GetBySpecAsync();
 

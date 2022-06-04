@@ -7,7 +7,7 @@ namespace GameStore.Core.Interfaces;
 
 public interface IOpenedOrderService
 {
-    public Task<IEnumerable<OpenedOrder>> GetAll();
+    public Task<IEnumerable<OpenedOrder>> GetAllAsync();
     public Task CreateAsync(OpenedOrder openedOrder);
     public Task DeleteByOrderIdAsync(Guid oderId);
 }

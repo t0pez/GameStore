@@ -26,7 +26,7 @@ public class OrderTimeOutJob : IJob
 
     public async Task Execute(IJobExecutionContext context)
     {
-        var openedOrders = await _openedOrderService.GetAll();
+        var openedOrders = await _openedOrderService.GetAllAsync();
 
         foreach (var openedOrder in openedOrders.Where(openedOrder => openedOrder.TimeOutDate < DateTime.UtcNow))
         {

@@ -227,37 +227,31 @@ public class GamesController : Controller
 
     private async Task FillViewData()
     {
-        var genres = await _genreService.GetAllAsync();
-        var genresSelectList = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
+        var genresSelectList = await GetGenresSelectList();
         ViewData["Genres"] = genresSelectList;
 
-        var platforms = await _platformTypeService.GetAllAsync();
-        var platformsSelectList = new SelectList(platforms, nameof(PlatformType.Id), nameof(PlatformType.Name));
+        var platformsSelectList = await GetPlatformsSelectList();
         ViewData["Platforms"] = platformsSelectList;
         
-        var publishers = await _publisherService.GetAllAsync();
-        var publishersSelectList = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
+        var publishersSelectList = await GetPublishersSelectList();
         ViewData["Publishers"] = publishersSelectList;
     }
-    
+
     private async Task FillFilterData(GamesFilterRequestModel filterRequest)
     {
-        var genres = await _genreService.GetAllAsync();
-        filterRequest.Genres = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
+        filterRequest.Genres = await GetGenresSelectList();
         foreach (var genre in filterRequest.Genres)
         {
             genre.Selected = filterRequest.SelectedGenres.Contains(genre.Value);
         }
 
-        var platforms = await _platformTypeService.GetAllAsync();
-        filterRequest.Platforms = new SelectList(platforms, nameof(PlatformType.Id), nameof(PlatformType.Name));
+        filterRequest.Platforms = await GetPlatformsSelectList();
         foreach (var platform in filterRequest.Platforms)
         {
             platform.Selected = filterRequest.SelectedPlatforms.Contains(platform.Value);
         }
 
-        var publishers = await _publisherService.GetAllAsync();
-        filterRequest.Publishers = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
+        filterRequest.Publishers = await GetPublishersSelectList();
         foreach (var publisher in filterRequest.Publishers)
         {
             publisher.Selected = filterRequest.SelectedPublishers.Contains(publisher.Value);
@@ -274,5 +268,29 @@ public class GamesController : Controller
             filterRequest.OrderBy);
 
         ViewData["OrderBy"] = orderBySelectList;
+    }
+
+    private async Task<SelectList> GetGenresSelectList()
+    {
+        var genres = await _genreService.GetAllAsync();
+        var genresSelectList = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
+        
+        return genresSelectList;
+    }
+
+    private async Task<SelectList> GetPlatformsSelectList()
+    {
+        var platforms = await _platformTypeService.GetAllAsync();
+        var platformsSelectList = new SelectList(platforms, nameof(PlatformType.Id), nameof(PlatformType.Name));
+        
+        return platformsSelectList;
+    }
+
+    private async Task<SelectList> GetPublishersSelectList()
+    {
+        var publishers = await _publisherService.GetAllAsync();
+        var publishersSelectList = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
+        
+        return publishersSelectList;
     }
 }

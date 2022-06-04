@@ -18,7 +18,8 @@ public class BasketController : Controller
     private readonly IActiveOrderCookieService _activeOrderCookieService;
     private readonly IMapper _mapper;
 
-    public BasketController(IBasketCookieService basketCookieService, IBasketService basketService,
+    public BasketController(IBasketService basketService,
+                            IBasketCookieService basketCookieService,
                             IActiveOrderCookieService activeOrderCookieService, IMapper mapper)
     {
         _basketService = basketService;
