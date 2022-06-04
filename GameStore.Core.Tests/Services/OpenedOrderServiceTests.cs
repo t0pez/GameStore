@@ -81,9 +81,9 @@ public class OpenedOrderServiceTests
         _openedOrderRepoMock.Setup(repository => repository.DeleteAsync(openedOrder))
                             .Verifiable();
 
-        await _openedOrderService.CreateAsync(openedOrder);
+        await _openedOrderService.DeleteByOrderIdAsync(openedOrderId);
         
-        _openedOrderRepoMock.Verify(repository => repository.AddAsync(openedOrder));
+        _openedOrderRepoMock.Verify(repository => repository.DeleteAsync(openedOrder));
         _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync());
     }
     

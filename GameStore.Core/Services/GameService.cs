@@ -87,13 +87,6 @@ public class GameService : IGameService
         return result;
     }
 
-    public async Task<ICollection<Game>> GetByGenreAsync(Guid genreId)
-    {
-        var result = await GameRepository.GetBySpecAsync(new GamesByGenreSpec(genreId));
-
-        return result;
-    }
-
     public async Task<Game> GetByKeyAsync(string gameKey)
     {
         var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeyWithDetailsSpec(gameKey))
@@ -107,13 +100,6 @@ public class GameService : IGameService
         var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdSpec(id))
                      ?? throw new ItemNotFoundException(typeof(Game), id);
         
-        return result;
-    }
-
-    public async Task<ICollection<Game>> GetByPlatformTypesAsync(ICollection<Guid> platformTypesIds)
-    {
-        var result = await GameRepository.GetBySpecAsync(new GamesByPlatformTypesSpec(platformTypesIds));
-
         return result;
     }
 

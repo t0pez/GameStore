@@ -13,8 +13,6 @@ public interface IGameService
     public Task<int> GetTotalCountAsync();
     public Task<List<Game>> GetAllAsync();
     public Task<PagedResult<Game>> GetByFilterAsync(GameSearchFilter filter);
-    public Task<ICollection<Game>> GetByGenreAsync(Guid genreId);
-    public Task<ICollection<Game>> GetByPlatformTypesAsync(ICollection<Guid> platformTypesIds);
     public Task<Game> GetByKeyAsync(string key);
     public Task<Game> GetByIdAsync(Guid id);
     public Task<Game> CreateAsync(GameCreateModel createModel);
