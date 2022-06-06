@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
+using FluentAssertions;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
@@ -55,6 +56,39 @@ public class GameServiceTests
         Assert.Equal(expectedCount, actualCount);
     }
 
+    [Fact]
+    public async void GetByIdAsync_ExistingId_ReturnsGames()
+    {
+        var gameId = Guid.NewGuid();
+        var game = new Game { Id = gameId };
+
+        _gameRepoMock.Setup(repository =>
+                                repository.GetSingleOrDefaultBySpecAsync(
+                                    It.Is<GameByIdSpec>(spec => spec.Id == gameId)))
+                     .ReturnsAsync(game);
+
+        var actualResult = await _gameService.GetByIdAsync(gameId);
+
+        actualResult.Id.Should().Be(gameId);
+    }
+
+    [Fact]
+    public async void GetByIdAsync_NotExistingId_ThrowsNotFoundException()
+    {
+        var gameId = Guid.NewGuid();
+        Game game = null!;
+
+        _gameRepoMock
+            .Setup(repository =>
+                       repository.GetSingleOrDefaultBySpecAsync(
+                           It.Is<GameByIdSpec>(spec => spec.Id == gameId)))
+            .ReturnsAsync(game);
+
+        var operation = async () => await _gameService.GetByIdAsync(gameId);
+
+        await Assert.ThrowsAsync<ItemNotFoundException>(operation);
+    }
+    
     [Fact]
     public async void GetByKeyAsync_ExistingKey_ReturnsGames()
     {
@@ -112,6 +146,19 @@ public class GameServiceTests
         Assert.Equal(expectedId, actualResult.Id);
         _gameRepoMock.Verify(repository => repository.AddAsync(It.IsAny<Game>()), Times.Once);
         _unitOfWorkMock.Verify(unit => unit.SaveChangesAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async void GetTotalCountAsync_NoParameters_ReturnsCorrectValues()
+    {
+        const int expectedCount = 4;
+
+        _gameRepoMock.Setup(repository => repository.CountAsync(It.IsAny<GamesListSpec>()))
+                     .ReturnsAsync(expectedCount);
+
+        var actualResult = await _gameService.GetTotalCountAsync();
+
+        actualResult.Should().Be(expectedCount);
     }
 
     [Fact]

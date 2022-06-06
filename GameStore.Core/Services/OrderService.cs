@@ -12,10 +12,10 @@ namespace GameStore.Core.Services;
 
 public class OrderService : IOrderService
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly IOrderMappingHelper _orderMappingHelper;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public OrderService(IUnitOfWork unitOfWork, IOrderMappingHelper orderMappingHelper)
+    public OrderService(IOrderMappingHelper orderMappingHelper, IUnitOfWork unitOfWork)
     {
         _unitOfWork = unitOfWork;
         _orderMappingHelper = orderMappingHelper;
@@ -43,17 +43,17 @@ public class OrderService : IOrderService
 
         return result;
     }
-    
+
     public async Task<Order> CreateAsync(OrderCreateModel createModel)
     {
         var order = await _orderMappingHelper.GetOrderAsync(createModel.Basket);
-        
+
         order.OrderDate = DateTime.UtcNow;
         order.Status = OrderStatus.Created;
-        
+
         await OrderRepository.AddAsync(order);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return order;
     }
 
@@ -62,6 +62,8 @@ public class OrderService : IOrderService
         var order = await OrderRepository.GetSingleOrDefaultBySpecAsync(new OrderByIdWithDetailsSpec(updateModel.Id));
 
         UpdateValues(order, updateModel);
+        await OrderRepository.UpdateAsync(order);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(Guid id)

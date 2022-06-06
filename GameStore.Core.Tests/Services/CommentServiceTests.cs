@@ -164,4 +164,41 @@ public class CommentServiceTests
 
         await Assert.ThrowsAsync<ItemNotFoundException>(operation);
     }
+
+    [Fact]
+    public async void UpdateAsync_CorrectValue()
+    {
+        var commentId = Guid.NewGuid();
+        var commentUpdateModel = new CommentUpdateModel
+            { Id = commentId, AuthorName = "New author name", Body = "New author body" };
+
+
+        var comment = new Comment { Id = commentId, Name = "Old author name", Body = "Old author body" };
+        _commentRepoMock.Setup(repository =>
+                                   repository.GetSingleOrDefaultBySpecAsync(
+                                       It.Is<CommentByIdSpec>(spec => spec.Id == commentId)))
+                        .ReturnsAsync(comment);
+
+        await _commentService.UpdateAsync(commentUpdateModel);
+        
+        _commentRepoMock.Verify(repository => repository.UpdateAsync(comment));
+        _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync());
+    }
+    
+    [Fact]
+    public async void DeleteAsync_CorrectValues_CommentMarkedAsDeleted()
+    {
+        var commentId = Guid.NewGuid();
+
+        var comment = new Comment { Id = commentId };
+        _commentRepoMock.Setup(repository =>
+                                   repository.GetSingleOrDefaultBySpecAsync(
+                                       It.Is<CommentByIdSpec>(spec => spec.Id == commentId)))
+                        .ReturnsAsync(comment);
+
+        await _commentService.DeleteAsync(commentId);
+        
+        _commentRepoMock.Verify(repository => repository.UpdateAsync(comment));
+        _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync());
+    }
 }

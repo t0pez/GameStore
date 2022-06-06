@@ -8,6 +8,7 @@ public static class DependencyResolverModule
 {
     public static void ConfigureWebServices(this IServiceCollection services)
     {
-        services.AddScoped<IBasketCookieService, BasketCookieService>();
+        services.AddScoped<IBasketCookieService, BasketCookieService>()
+                .AddScoped<IActiveOrderCookieService, ActiveOrderCookieService>();
     }
 }

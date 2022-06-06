@@ -14,6 +14,7 @@ using AutoMapper;
 using GameStore.Core.Profiles;
 using GameStore.Web.Filters;
 using GameStore.Web.Infrastructure;
+using Quartz;
 
 namespace GameStore.Web;
 
@@ -29,8 +30,7 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddMvc();
-
-        services.AddSwaggerGen();
+        
         services.AddControllers()
                 .AddJsonOptions(options =>
                                 {
@@ -39,6 +39,13 @@ public class Startup
                                     options.JsonSerializerOptions.ReferenceHandler =
                                         ReferenceHandler.IgnoreCycles;
                                 });
+
+        services.AddQuartz(configurator =>
+                           {
+                               configurator.UseMicrosoftDependencyInjectionJobFactory();
+                               configurator.AddOrderTimeOutHostedService();
+                           });
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         services.ConfigureDomainServices();
         services.ConfigureWebServices();
@@ -61,8 +68,6 @@ public class Startup
         if (env.IsDevelopment())
         {
             app.UseDeveloperExceptionPage();
-            app.UseSwagger();
-            app.UseSwaggerUI();
         }
 
         app.UseHttpsRedirection();

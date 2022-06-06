@@ -36,6 +36,13 @@ else
         </div>
     }
 
-    @Html.ActionLink("Create order", "Create", "Orders", new { }, new { @class = "btn btn-primary" })
+    if ((bool)ViewData["HasActiveOrder"] == false)
+    {
+        @Html.ActionLink("Create order", "Create", "Orders", new { }, new { @class = "btn btn-primary" })
+    }
+    else
+    {
+        <a class="btn btn-primary disabled">You're already have an active order</a>
+    }
 }
 

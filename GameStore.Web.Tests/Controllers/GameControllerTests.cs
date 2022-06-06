@@ -2,12 +2,19 @@
 using System.Collections.Generic;
 using System.IO;
 using AutoMapper;
+using FluentAssertions;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Games.Specifications.Filters;
+using GameStore.Core.Models.Genres;
+using GameStore.Core.Models.PlatformTypes;
+using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Core.Models.ServiceModels.Games;
+using GameStore.Core.PagedResult;
+using GameStore.SharedKernel.Specifications.Filters;
 using GameStore.Web.Controllers;
 using GameStore.Web.Models.Comment;
 using GameStore.Web.Models.Game;
@@ -54,6 +61,73 @@ public class GameControllerTests
 
         var actualResult = await _gameController.GetTotalGamesCount();
         Assert.Equal(expectedGamesCount, actualResult);
+    }
+
+    [Fact]
+    public async void GetAllAsync_EmptyFilter_CreatesDefaultFilter()
+    {
+        GamesFilterRequestModel filterRequestModel = null!;
+        int? currentPage = null;
+        int? pageSize = null;
+
+        _mapperMock.Setup(mapper => mapper.Map<GameSearchFilter>(filterRequestModel))
+                   .Returns(new GameSearchFilter { CurrentPage = 1, PageSize = 10 });
+        _gameServiceMock.Setup(service => service.GetByFilterAsync(It.IsAny<GameSearchFilter>()))
+                        .ReturnsAsync(new PagedResult<Game>(new List<Game>(), 1,
+                                                            new PaginationFilter { CurrentPage = 1, PageSize = 10 }));
+        _genreServiceMock.Setup(service => service.GetAllAsync())
+                         .ReturnsAsync(new List<Genre>());
+        _platformServiceMock.Setup(service => service.GetAllAsync())
+                            .ReturnsAsync(new List<PlatformType>());
+        _publisherServiceMock.Setup(service => service.GetAllAsync())
+                            .ReturnsAsync(new List<Publisher>());
+
+        var actualResult = await _gameController.GetAllAsync(filterRequestModel, currentPage, pageSize);
+
+        actualResult.Result.Should().BeAssignableTo<ViewResult>();
+    }
+
+    [Fact]
+    public async void CreateAsync_NoParameters_ReturnsView()
+    {
+        _genreServiceMock.Setup(service => service.GetAllAsync())
+                         .ReturnsAsync(new List<Genre>());
+        _platformServiceMock.Setup(service => service.GetAllAsync())
+                            .ReturnsAsync(new List<PlatformType>());
+        _publisherServiceMock.Setup(service => service.GetAllAsync())
+                             .ReturnsAsync(new List<Publisher>());
+        
+        var actualResult = await _gameController.CreateAsync();
+
+        actualResult.Should().BeAssignableTo<ViewResult>();
+    }
+    
+    [Fact]
+    public async void CreateAsync_CorrectParameters_ReturnsRedirect()
+    {
+        const string gameKey = "game-key";
+        var requestModel = new GameCreateRequestModel
+        {
+            Key = gameKey
+        };
+        var createModel = new GameCreateModel
+        {
+            Key = gameKey
+        };
+        
+        var fileCollection = new FormFileCollection { new FormFile(Stream.Null, 0, 0, "", "") };
+        _gameController.ControllerContext = new ControllerContext();
+        _gameController.ControllerContext.HttpContext = new DefaultHttpContext();
+        _gameController.ControllerContext.HttpContext.Request.Form = new FormCollection(new Dictionary<string, StringValues>(), fileCollection);
+
+        _mapperMock.Setup(mapper => mapper.Map<GameCreateModel>(requestModel))
+                   .Returns(createModel);
+        _gameServiceMock.Setup(service => service.CreateAsync(createModel))
+                        .ReturnsAsync(new Game { Key = gameKey });
+
+        var actualResult = await _gameController.CreateAsync(requestModel);
+
+        actualResult.Should().BeAssignableTo<RedirectToActionResult>();
     }
 
     [Fact]
@@ -150,7 +224,64 @@ public class GameControllerTests
         Assert.IsType<RedirectToActionResult>(actualResult);
         _commentServiceMock.Verify(service => service.CommentGameAsync(It.IsAny<CommentCreateModel>()), Times.Once);
     }
+    
+    [Fact]
+    public async void UpdateCommentAsync_CorrectValue_ReturnsRedirect()
+    {
+        var updateRequest = new CommentUpdateRequestModel();
+        var updateModel = new CommentUpdateModel();
 
+        _mapperMock.Setup(mapper => mapper.Map<CommentUpdateModel>(updateRequest))
+                   .Returns(updateModel);
+        
+        var actualResult = await _gameController.UpdateCommentAsync(updateRequest);
+
+        actualResult.Should().BeAssignableTo<RedirectToActionResult>();
+        _commentServiceMock.Verify(service => service.UpdateAsync(updateModel), Times.Once);
+    }
+    
+    [Fact]
+    public async void DeleteCommentAsync_CorrectValue_ReturnsRedirect()
+    {
+        var commentId = Guid.NewGuid();
+        const string gameKey = "game-key";
+        
+        var actualResult = await _gameController.DeleteCommentAsync(commentId, gameKey);
+
+        actualResult.Should().BeAssignableTo<RedirectToActionResult>();
+        _commentServiceMock.Verify(service => service.DeleteAsync(commentId), Times.Once);
+    }
+    
+    [Fact]
+    public async void DeleteCommentAsync_NotCorrectValue_ThrowsException()
+    {
+        var commentId = Guid.NewGuid();
+        const string gameKey = "game-key";
+        
+        var actualResult = await _gameController.DeleteCommentAsync(commentId, gameKey);
+
+        actualResult.Should().BeAssignableTo<RedirectToActionResult>();
+        _commentServiceMock.Verify(service => service.DeleteAsync(commentId), Times.Once);
+    }
+
+    [Fact]
+    public async void UpdateAsync_NoParameters_ReturnsView()
+    {
+        const string gameKey = "game-key";
+        
+        _genreServiceMock.Setup(service => service.GetAllAsync())
+                         .ReturnsAsync(new List<Genre>());
+        _platformServiceMock.Setup(service => service.GetAllAsync())
+                            .ReturnsAsync(new List<PlatformType>());
+        _publisherServiceMock.Setup(service => service.GetAllAsync())
+                             .ReturnsAsync(new List<Publisher>());
+
+        
+        var actualResult = await _gameController.UpdateAsync(gameKey);
+
+        actualResult.Should().BeAssignableTo<ViewResult>();
+    }
+    
     [Fact]
     public async void UpdateAsync_CorrectValues_ReturnsRedirect()
     {
