@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace GameStore.Infrastructure.Data.Repositories;
 
-public class Repository<TModel> : IRepository<TModel> where TModel : class
+public class EfRepository<TModel> : IRepository<TModel> where TModel : class
 {
     private readonly ApplicationContext _context;
 
-    public Repository(ApplicationContext context)
+    public EfRepository(ApplicationContext context)
     {
         _context = context;
     }
@@ -29,7 +29,14 @@ public class Repository<TModel> : IRepository<TModel> where TModel : class
 
         return specificationResult.ToListAsync();
     }
-        
+
+    public Task<TModel> GetFirstOrDefaultBySpecAsync(ISpecification<TModel> spec)
+    {
+        var specificationResult = ApplySpecifications(spec);
+
+        return specificationResult.FirstOrDefaultAsync();
+    }
+
     public Task<TModel> GetSingleOrDefaultBySpecAsync(ISpecification<TModel> spec)
     {
         var specificationResult = ApplySpecifications(spec);

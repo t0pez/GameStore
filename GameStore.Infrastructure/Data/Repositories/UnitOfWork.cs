@@ -3,28 +3,46 @@ using GameStore.SharedKernel.Interfaces.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using MongoDB.Driver;
 
 namespace GameStore.Infrastructure.Data.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
+    private const string ConnectionString = "mongodb://localhost:27017/Northwind";
+    
     private readonly ApplicationContext _context;
-    private readonly Dictionary<Type, object> _repositories;
+    private readonly IMongoDatabase _database;
+    private readonly Dictionary<Type, object> _efRepositories = new();
+    private readonly Dictionary<Type, object> _mongoRepositories = new();
 
     public UnitOfWork(ApplicationContext context)
     {
         _context = context;
-        _repositories = new Dictionary<Type, object>();
+        
+        var connection = new MongoUrlBuilder(ConnectionString);
+        var client = new MongoClient(ConnectionString);
+        _database = client.GetDatabase(connection.DatabaseName);
     }
 
-    public IRepository<TModel> GetRepository<TModel>() where TModel : class
+    public IRepository<TModel> GetEfRepository<TModel>() where TModel : class
     {
         var modelType = typeof(TModel);
 
-        if (HasRepositoryOfModelType(modelType) == false)
-            _repositories.Add(modelType, new Repository<TModel>(_context));
+        if (HasEfRepositoryOfModelType(modelType) == false)
+            _efRepositories.Add(modelType, new EfRepository<TModel>(_context));
 
-        return (IRepository<TModel>)_repositories[modelType];
+        return (IRepository<TModel>)_efRepositories[modelType];
+    }
+    
+    public IRepository<TModel> GetMongoRepository<TModel>() where TModel : class
+    {
+        var modelType = typeof(TModel);
+
+        if (HasMongoRepositoryOfModelType(modelType) == false)
+            _mongoRepositories.Add(modelType, new MongoRepository<TModel>(_database));
+
+        return (IRepository<TModel>)_mongoRepositories[modelType];
     }
 
     public Task<int> SaveChangesAsync()
@@ -32,8 +50,13 @@ public class UnitOfWork : IUnitOfWork
         return _context.SaveChangesAsync();
     }
 
-    private bool HasRepositoryOfModelType(Type type)
+    private bool HasEfRepositoryOfModelType(Type type)
     {
-        return _repositories.ContainsKey(type);
+        return _efRepositories.ContainsKey(type);
+    }
+    
+    private bool HasMongoRepositoryOfModelType(Type type)
+    {
+        return _mongoRepositories.ContainsKey(type);
     }
 }
