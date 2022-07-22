@@ -30,6 +30,13 @@ public class EfRepository<TModel> : IRepository<TModel> where TModel : class
         return specificationResult.ToListAsync();
     }
 
+    public Task<List<TResult>> SelectBySpecAsync<TResult>(ISpecification<TModel, TResult> spec)
+    {
+        var specificationResult = ApplySelectSpecifications(spec);
+
+        return specificationResult.ToListAsync();
+    }
+
     public Task<TModel> GetFirstOrDefaultBySpecAsync(ISpecification<TModel> spec)
     {
         var specificationResult = ApplySpecifications(spec);
@@ -86,6 +93,13 @@ public class EfRepository<TModel> : IRepository<TModel> where TModel : class
     }
 
     private IQueryable<TModel> ApplySpecifications(ISpecification<TModel> specification)
+    {
+        var specEvaluator = new SpecificationEvaluator();
+
+        return specEvaluator.GetQuery(Set.AsQueryable(), specification);
+    }
+    
+    private IQueryable<TResult> ApplySelectSpecifications<TResult>(ISpecification<TModel, TResult> specification)
     {
         var specEvaluator = new SpecificationEvaluator();
 

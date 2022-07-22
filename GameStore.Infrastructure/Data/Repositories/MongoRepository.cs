@@ -8,6 +8,7 @@ using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using AutoMapper.Execution;
 using AutoMapper.Internal;
+using GameStore.Core.Exceptions;
 using GameStore.Core.Models.Mongo.Attributes;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using MongoDB.Driver;
@@ -26,16 +27,33 @@ public class MongoRepository<T> : IRepository<T> where T : class
 
     private IMongoCollection<T> Collection => _database.GetNorthwindCollection<T>();
 
-    public Task<List<T>> GetBySpecAsync(ISpecification<T> spec = null)
+    public async Task<List<T>> GetBySpecAsync(ISpecification<T> spec = null)
     {
         if (spec is null)
         {
-            return Collection.Find(Builders<T>.Filter.Empty).ToListAsync();
+            return await Collection.Find(Builders<T>.Filter.Empty).ToListAsync();
         }
 
         var query = ApplySpecification(Collection.AsQueryable(), spec);
 
-        return query.ToListAsync();
+        var result = await query.ToListAsync();
+        
+        if (spec.IncludeExpressions.Any())
+        {
+            foreach (var model in result)
+            {
+                AddIncludeProperties(model, spec);
+            }
+        }
+        
+        return result;
+    }
+
+    public async Task<List<TResult>> SelectBySpecAsync<TResult>(ISpecification<T, TResult> spec)
+    {
+        var query = ApplySelectSpecification(Collection.AsQueryable(), spec);
+
+        return query.ToList();
     }
 
     public async Task<T> GetFirstOrDefaultBySpecAsync(ISpecification<T> spec)
@@ -83,16 +101,15 @@ public class MongoRepository<T> : IRepository<T> where T : class
         var updateBuilder = Builders<T>.Update;
         UpdateDefinition<T> updateDefinition = null;
 
-        var existEntity = Collection.Find(filter).SingleOrDefault();
+        var existEntity = Collection.Find(filter).SingleOrDefault()
+            ?? throw new ItemNotFoundException();
 
         var entityType = updated.GetType();
 
-        foreach (var propertyInfo in entityType.GetProperties())
+        foreach (var propertyInfo in entityType.GetProperties().Where(info => info.GetCustomAttribute<UpdatablePropertyAttribute>() is not null))
         {
-            var existEntityProperty = propertyInfo.GetValue(existEntity);
             var updatingEntityProperty = propertyInfo.GetValue(updated);
-
-            if (updatingEntityProperty is null || updatingEntityProperty.Equals(existEntityProperty))
+            if (updatingEntityProperty is null)
             {
                 continue;
             }
@@ -152,8 +169,21 @@ public class MongoRepository<T> : IRepository<T> where T : class
 
         return specResult;
     }
+    
+    private IQueryable<TResult> ApplySelectSpecification<TResult>(IQueryable<T> query, ISpecification<T, TResult> spec)
+    {
+        if (spec.Selector is null)
+        {
+            throw new InvalidOperationException();
+        }
+        
+        var evaluator = new SpecificationEvaluator(true);
+        var specResult = evaluator.GetQuery(query, spec);
 
-    public void AddIncludeProperties(T model, ISpecification<T> spec)
+        return specResult;
+    }
+
+    private void AddIncludeProperties(T model, ISpecification<T> spec)
     {
         if (spec.IncludeExpressions.Any() == false)
         {
@@ -212,7 +242,8 @@ public class MongoRepository<T> : IRepository<T> where T : class
             var lambda = GetFilterExpression(targetEntityType, targetNavIdProperty, sourceNavIdValue);
 
             var firstOrDefaultMethod = typeof(Queryable).GetMethods()
-                                                        .First(info => info.Name == "FirstOrDefault");
+                                                        .First(info => info.Name == nameof(Queryable.FirstOrDefault) &&
+                                                                       info.GetParameters().Length == 2);
             var firstOrDefaultGenericMethod = firstOrDefaultMethod.MakeGenericMethod(targetEntityType);
             var navEntity = firstOrDefaultGenericMethod.Invoke(null, new[] { query, lambda });
 
@@ -246,7 +277,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
             var lambda = GetFilterExpression(targetEntityType, navIdProperty, sourceNavIdValue);
 
             var whereMethod = typeof(Queryable).GetMethods()
-                                               .First(info => info.Name == "Where");
+                                               .First(info => info.Name == nameof(Queryable.Where));
             var whereGenericMethod = whereMethod.MakeGenericMethod(targetEntityType);
             var navEntities = whereGenericMethod.Invoke(null, new[] { query, lambda });
 
@@ -271,7 +302,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
     private static object GetQuery(Type targetEntityType, object mongoCollection)
     {
         var asQueryableMethod = typeof(IMongoCollectionExtensions).GetMethods()
-                                                                  .First(info => info.Name == "AsQueryable" &&
+                                                                  .First(info => info.Name == nameof(IMongoCollectionExtensions.AsQueryable) &&
                                                                              info.GetParameters().Length == 2);
         var asQueryableGenericMethod = asQueryableMethod.MakeGenericMethod(targetEntityType);
         var query = asQueryableGenericMethod.Invoke(null, new[] { mongoCollection, null });

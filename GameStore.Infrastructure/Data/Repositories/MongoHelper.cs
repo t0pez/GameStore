@@ -38,7 +38,7 @@ public static class MongoHelper
         
         var propertyValue = property.GetValue(model);
         
-        var filter = Builders<T>.Filter.Eq(func, propertyValue);
+        var filter = builder.Eq(func, propertyValue);
 
         return filter;
     }
