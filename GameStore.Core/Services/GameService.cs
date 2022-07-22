@@ -84,21 +84,6 @@ public class GameService : IGameService
         return mappedItems.Count();
     }
 
-    public async Task<PagedResult<Game>> GetByFilterAsync(GameSearchFilter filter)
-    {
-        if (filter.GenresIds.Any())
-        {
-            var genresWithChildren = await GetGenresWithChildrenAsync(filter.GenresIds);
-            filter.GenresIds = genresWithChildren;
-        }
-
-        var games = await GameRepository.GetBySpecAsync(new GamesByFilterSpec(filter).EnablePaging(filter));
-
-        var result = new PagedResult<Game>(games, totalGamesCount, filter);
-
-        return result;
-    }
-
     public async Task<Game> GetByKeyAsync(string gameKey)
     {
         var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeyWithDetailsSpec(gameKey))
