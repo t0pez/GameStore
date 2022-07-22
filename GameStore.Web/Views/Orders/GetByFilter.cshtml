@@ -10,28 +10,30 @@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.Id)
+            @Html.DisplayNameFor(model => model.CustomerId)
         </th> 
         
         <th>
-            @Html.DisplayNameFor(model => model.Price)
+            @Html.DisplayNameFor(model => model.ItemsCount)
         </th>
         
-        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.TotalSum)
+        </th>
     </tr>
 
     @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Id)
+                @Html.DisplayFor(modelItem => item.CustomerId)
+            </td>
+            
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemsCount)
             </td>
         
             <td>
-                @Html.DisplayFor(modelItem => item.Price)
-            </td>
-        
-            <td>
-                @Html.ActionLink("Checkout", "GetWithDetails", new { id = item.Id })
+                @Html.DisplayFor(modelItem => item.TotalSum)
             </td>
         </tr>
     }

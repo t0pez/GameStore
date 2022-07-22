@@ -114,7 +114,7 @@
             var gameKey = routeData.Values["gameKey"].ToString();
         }
         
-        <form method="post" asp-action="CreateComment" asp-route-gameKey="@gameKey">
+        <form method="post" asp-controller="Comments" asp-action="CreateComment" asp-route-gameKey="@gameKey">
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             
             <div>
@@ -160,7 +160,7 @@
     <div class="modal fade" id="editModal" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form method="post" asp-controller="Games" asp-action="UpdateComment" asp-route-gameKey="@gameKey">
+                <form method="post" asp-controller="Comments" asp-action="UpdateComment" asp-route-gameKey="@gameKey">
                     <div class="modal-header">
                         <h5 class="modal-title" id="editModalLabel">Edit message</h5>
                     </div>
@@ -187,7 +187,7 @@
     <div class="modal fade" id="deleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
-                <form method="post" asp-controller="Games" asp-action="DeleteComment" asp-route-gameKey="@gameKey">
+                <form method="post" asp-controller="Comments" asp-action="DeleteComment" asp-route-gameKey="@gameKey">
                     <div class="modal-header">
                         <h5 class="modal-title" id="deleteModalLabel">Delete message</h5>
                     </div>
@@ -207,7 +207,7 @@
     <div class="modal fade" id="banModal" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form method="post" asp-controller="Games" asp-action="DeleteComment" asp-route-gameKey="@gameKey">
+                <form method="post" asp-controller="Comments" asp-action="DeleteComment" asp-route-gameKey="@gameKey">
                     <div class="modal-header">
                         <h5 class="modal-title" id="banModalLabel">Ban user</h5>
                     </div>

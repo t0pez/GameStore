@@ -1,4 +1,4 @@
-﻿@model GameStore.Web.ViewModels.Baskets.BasketViewModel
+﻿@model GameStore.Web.ViewModels.Order.OrderViewModel
 
 @{
     ViewBag.Title = "Basket";
@@ -7,7 +7,7 @@
 
 <h2 class="mt-5">Basket</h2>
 
-@if (Model.Items.Count == 0)
+@if (Model.OrderDetails.Any() == false)
 {
     <p>
         You have no items in basket
@@ -15,7 +15,7 @@
 }
 else
 {
-    foreach (var item in Model.Items)
+    foreach (var item in Model.OrderDetails)
     {
         <div class="mb-3">
             <div>
@@ -38,7 +38,7 @@ else
 
     if ((bool)ViewData["HasActiveOrder"] == false)
     {
-        @Html.ActionLink("Create order", "Create", "Orders", new { }, new { @class = "btn btn-primary" })
+        @Html.ActionLink("Create order", "MakeOrder", "Orders", new { orderId = Model.Id }, new { @class = "btn btn-primary" })
     }
     else
     {

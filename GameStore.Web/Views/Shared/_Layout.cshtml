@@ -85,11 +85,11 @@
                     </li>
                     
                     <li class="nav-item">
-                        @Html.ActionLink("Orders", "GetAll", "Orders", new { area = "" }, new { @class = "nav-link active" })
+                        @Html.ActionLink("Orders", "GetByFilter", "Orders", new { area = "" }, new { @class = "nav-link active" })
                     </li>
                     
                     <li class="nav-item">
-                        @Html.ActionLink("Basket", "GetCurrentBasket", "Basket", new { area = "" }, new { @class = "nav-link active" })
+                        @Html.ActionLink("Basket", "GetCurrentBasket", "Orders", new { area = "" }, new { @class = "nav-link active" })
                     </li>
                 </ul>
             </div>

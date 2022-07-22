@@ -42,17 +42,12 @@
     </label>
 </div>
 
-<form method="post" asp-controller="Payment" asp-action="BankPay">
+<form method="post" asp-controller="Orders" asp-action="Payment" id="SubmitForm">
     <input type="hidden" name="orderId" value="@Model.Id">
-    <button type="submit" class="btn ">Pay with Bank</button>
-</form>
-
-<form method="post" asp-controller="Payment" asp-action="VisaPay">
-    <input type="hidden" name="orderId" value="@Model.Id">
-    <button type="submit" class="btn">Pay with Visa</button>
-</form>
-
-<form method="post" asp-controller="Payment" asp-action="IboxPay">
-    <input type="hidden" name="orderId" value="@Model.Id">
-    <button type="submit" class="btn">Pay with IBox</button>
+    <input type="hidden" id="PaymentType" name="paymentType">
+    
+    <button type="button" onclick="submitOrderPaymentType(0)" class="btn ">Pay with Visa</button>
+    <button type="button" onclick="submitOrderPaymentType(1)" class="btn ">Pay with IBox</button>
+    <button type="button" onclick="submitOrderPaymentType(2)" class="btn ">Pay with Bank</button>
+    
 </form>

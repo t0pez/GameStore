@@ -1,4 +1,5 @@
-﻿@model GameStore.Web.ViewModels.Games.GameViewModel
+﻿@using GameStore.Core.Models.ServiceModels.Enums
+@model GameStore.Web.ViewModels.Games.GameViewModel
 
 @{
     ViewBag.Title = Model.Name;
@@ -96,45 +97,54 @@
             <div class="mb-3">
                 @Html.ActionLink("Download", "GetFile", new { gameKey = Model.Key }, new { @class = "btn btn-outline-secondary" })
             </div>
-            <div class="mb-3">
-                @Html.ActionLink("View comments", "GetComments", new { gameKey = Model.Key }, new{ @class="btn btn-outline-secondary" })
-            </div>
+            
+            @if (Model.Database != Database.Mongo)
+            {
+                <div class="mb-3">
+                    @Html.ActionLink("View comments", "GetComments", "Comments", new { gameKey = Model.Key }, new { @class = "btn btn-outline-secondary" })
+                </div>
+            }
+            
             <div class="mb-3">
                 <label>Publisher:</label>
-                <p>
-                    @Html.ActionLink(Model.Publisher.Name, "GetWithDetails", "Publisher", new { companyName = Model.Publisher.Name })
-                </p>
+                @if(Model.Publisher is not null)
+                {
+                    <p>
+                        @Html.ActionLink(Model.Publisher.Name, "GetWithDetails", "Publisher", new { companyName = Model.Publisher.Name })
+                    </p>
+                }
             </div>
-            <div class="mb-3">
-                <form method="post" asp-controller="Basket" asp-action="AddToBasket" asp-route-gameKey="@Model.Key">
-                    <script src="~/lib/jquery/dist/jquery.js"></script>
-                    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
-                    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
-                
-                    <div>
-                        
-                        <h4>Add to basket</h4>
-                        
-                        <hr/>
+            @if ((bool)ViewData["CustomerHasActiveOrder"] == false)
+            {
+                <div class="mb-3">
+                    <form method="post" asp-controller="Orders" asp-action="AddToBasket" asp-route-gameKey="@Model.Key">
+                        <script src="~/lib/jquery/dist/jquery.js"></script>
+                        <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+                        <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 
-                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        <div>
+                            <h4>Add to basket</h4>
 
-                        <div class="form-floating mb-3 col-4">
-                            <input class="d-none" id="gameId" name="gameId" value="@Model.Id"/>
+                            <hr/>
 
-                            <input class="form-control form-control-lg" placeholder="Author"
-                                   id="quantity" name="quantity" type="number" required/>
-                            <label class="ps-4" for="quantity">Count:</label>
+                            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
-                            @Html.ValidationMessage("quantity", "", new { @class = "text-danger" })
+                            <div class="form-floating mb-3 col-4">
+                                <input class="form-control form-control-lg" placeholder=""
+                                       id="quantity" name="quantity" type="number" required/>
+                                <label class="ps-4" for="quantity">Count:</label>
+
+                                @Html.ValidationMessage("quantity", "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-3">
+                                <input type="submit" class="btn btn-primary" content="Leave comment"/>
+                            </div>
                         </div>
-
-                        <div class="mb-3">
-                            <input type="submit" class="btn btn-primary" content="Leave comment"/>
-                        </div>
-                    </div>
-                </form>
-            </div>
+                    </form>
+                </div>
+            }
+            
         </div>
     </div>
 </div>

@@ -44,9 +44,9 @@
                     @Html.ValidationMessageFor(model => model.PublishedAt, "", new { @class = "text-danger" })
                 </div>
                 <div class="form-floating mb-3">
-                    @Html.DropDownListFor(model => model.PublisherId, ViewData["Publishers"] as IEnumerable<SelectListItem>, new{@class="form-select from-select-lg"})
-                    @Html.LabelFor(model => model.PublisherId, "Publisher", new { @class = "ps-4" })
-                    @Html.ValidationMessageFor(model => model.PublisherId, "", new { @class = "text-danger" })
+                    @Html.DropDownListFor(model => model.PublisherName, ViewData["Publishers"] as IEnumerable<SelectListItem>, new{@class="form-select from-select-lg"})
+                    @Html.LabelFor(model => model.PublisherName, "Publisher", new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.PublisherName, "", new { @class = "text-danger" })
                 </div>
                 <div class="mb-3">
                     <label for="File" class="form-label">Game file:</label>
