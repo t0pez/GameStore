@@ -1,6 +1,6 @@
+using GameStore.Core.Events.Notifications;
 using GameStore.Infrastructure;
 using GameStore.Infrastructure.Data.Context;
-using GameStore.Web.Converters;
 using GameStore.Web.Middlewares;
 using GameStore.Web.Profiles;
 using Microsoft.AspNetCore.Builder;
@@ -9,11 +9,12 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Text.Json.Serialization;
-using AutoMapper;
 using GameStore.Core.Profiles;
+using GameStore.Infrastructure.Data.Configurations;
 using GameStore.Web.Filters;
 using GameStore.Web.Infrastructure;
+using MediatR;
+using Newtonsoft.Json;
 using Quartz;
 
 namespace GameStore.Web;
@@ -30,16 +31,13 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddMvc();
-        
-        services.AddControllers()
-                .AddJsonOptions(options =>
-                                {
-                                    options.JsonSerializerOptions.Converters.Add(
-                                        new ByteArrayJsonConverter());
-                                    options.JsonSerializerOptions.ReferenceHandler =
-                                        ReferenceHandler.IgnoreCycles;
-                                });
+        services.AddMediatR(typeof(Startup), typeof(GameKeyUpdatedNotification));
 
+        services.AddControllers()
+                .AddNewtonsoftJson(options =>
+                                   {
+                                       options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+                                   });
         services.AddQuartz(configurator =>
                            {
                                configurator.UseMicrosoftDependencyInjectionJobFactory();
@@ -58,12 +56,16 @@ public class Startup
                                                           Configuration.GetConnectionString("DefaultConnection");
                                                       options.UseSqlServer(connectionString);
                                                   });
-
+        services.ConfigureNorthwindDatabase();
         services.AddAutoMapper(
-            configuration => configuration.AddProfiles(new Profile[] { new WebCommonProfile(), new CoreCommonProfile() }));
+            configuration =>
+            {
+                configuration.AddCoreProfiles();
+                configuration.AddWebProfiles();
+            });
     }
 
-    public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationContext dbContext)
+    public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
     {
         if (env.IsDevelopment())
         {

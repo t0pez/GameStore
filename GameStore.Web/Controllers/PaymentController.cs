@@ -28,7 +28,7 @@ public class PaymentController : Controller
         return View("VisaPaymentStub", result);
     }
     
-    [HttpPost("bank")]
+    [HttpGet("bank")]
     public async Task<FileContentResult> BankPayAsync(Guid orderId)
     {
         var paymentGetaway = await GetPaymentGetaway(orderId, PaymentType.Bank);
@@ -49,7 +49,7 @@ public class PaymentController : Controller
     [HttpPost("payment-result")]
     public async Task<ActionResult> ResultStubAsync(VisaPaymentGetaway paymentGetaway)
     {
-        return RedirectToAction("GetAll", "Orders");
+        return RedirectToAction("GetByFilter", "Orders");
     }
 
     private async Task<PaymentGetaway> GetPaymentGetaway(Guid orderId, PaymentType paymentType)

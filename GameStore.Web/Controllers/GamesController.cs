@@ -2,23 +2,22 @@
 using GameStore.Core.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using GameStore.Core.Helpers.AliasCrafting;
-using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Dto;
+using GameStore.Core.Models.Dto.Filters;
 using GameStore.Core.Models.Games.Specifications.Filters;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.Publishers;
-using GameStore.Core.Models.ServiceModels.Comments;
+using GameStore.Core.Models.ServiceModels.Enums;
 using GameStore.Core.Models.ServiceModels.Games;
+using GameStore.SharedKernel.Specifications.Filters;
 using GameStore.Web.Extensions;
 using GameStore.Web.Filters;
-using GameStore.Web.Models.Comment;
+using GameStore.Web.Interfaces;
 using GameStore.Web.Models.Game;
-using GameStore.Web.ViewModels.Comments;
 using GameStore.Web.ViewModels.Games;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -29,27 +28,25 @@ namespace GameStore.Web.Controllers;
 public class GamesController : Controller
 {
     private readonly IGameService _gameService;
-    private readonly ICommentService _commentService;
     private readonly IPublisherService _publisherService;
     private readonly IGenreService _genreService;
     private readonly IPlatformTypeService _platformTypeService;
-    private readonly IAliasCraft _gameKeyAliasCraft;
+    private readonly ISearchService _searchService;
+    private readonly IOrderService _orderService;
+    private readonly IUserCookieService _userCookieService;
     private readonly IMapper _mapper;
 
-    public GamesController(IGameService gameService, ICommentService commentService, IPublisherService publisherService,
-                           IGenreService genreService, IPlatformTypeService platformTypeService, IMapper mapper)
+    public GamesController(ISearchService searchService, IGameService gameService, IPublisherService publisherService,
+                           IGenreService genreService, IPlatformTypeService platformTypeService, IMapper mapper, IOrderService orderService, IUserCookieService userCookieService)
     {
+        _searchService = searchService;
         _gameService = gameService;
-        _commentService = commentService;
         _publisherService = publisherService;
         _genreService = genreService;
         _platformTypeService = platformTypeService;
         _mapper = mapper;
-        _gameKeyAliasCraft =
-            new AliasCraftBuilder()
-                .Values("_", " ").ReplaceWith("-")
-                .Values(",", ".", ":", "?").Delete()
-                .Build();
+        _orderService = orderService;
+        _userCookieService = userCookieService;
     }
 
     [HttpGet("count")]
@@ -64,11 +61,11 @@ public class GamesController : Controller
                                                                       int? currentPage, int? pageSize)
     {
         filterRequest ??= new GamesFilterRequestModel();
-        filterRequest.CurrentPage = currentPage ?? 1;
-        filterRequest.PageSize = pageSize ?? 10;
+        filterRequest.CurrentPage = currentPage ?? PaginationFilter.DefaultCurrentPage;
+        filterRequest.PageSize = pageSize ?? PaginationFilter.DefaultPageSize;
 
-        var filter = _mapper.Map<GameSearchFilter>(filterRequest);
-        var games = await _gameService.GetByFilterAsync(filter);
+        var filter = _mapper.Map<AllProductsFilter>(filterRequest);
+        var games = await _searchService.GetProductDtosByFilterAsync(filter);
 
         await FillFilterData(filterRequest);
 
@@ -84,9 +81,14 @@ public class GamesController : Controller
     [HttpGet("{gameKey}")]
     public async Task<ActionResult<GameViewModel>> GetWithDetailsAsync([FromRoute] string gameKey)
     {
-        var game = await _gameService.GetByKeyAsync(gameKey);
+        var game = await _searchService.GetProductDtoByGameKeyOrDefaultAsync(gameKey);
 
         await IncreaseViews(game);
+
+        if (_userCookieService.TryGetCookiesUserId(HttpContext.Request.Cookies, out var customerId))
+        {
+            ViewData["CustomerHasActiveOrder"] = await _orderService.IsCustomerHasActiveOrder(customerId);
+        }
 
         var result = _mapper.Map<GameViewModel>(game);
 
@@ -113,62 +115,21 @@ public class GamesController : Controller
     [HttpPost("new")]
     public async Task<ActionResult> CreateAsync(GameCreateRequestModel request)
     {
-        if (ModelState.IsValid == false ||
-            HttpContext.Request.Form.Files.Count == 0)
+        if (await _gameService.IsGameKeyAlreadyExists(request.Key))
         {
-            return View("Error");
+            ModelState.AddModelError(nameof(request.Key), "Same game key already exists");
+        }
+        
+        if (ModelState.IsValid == false)
+        {
+            return View(request);
         }
 
         var createModel = _mapper.Map<GameCreateModel>(request);
-        createModel.File = await GetBytesFromFormFile();
 
         var game = await _gameService.CreateAsync(createModel);
 
         return RedirectToAction("GetWithDetails", new { gameKey = game.Key });
-    }
-
-    [HttpPost("{gameKey}/newcomment")]
-    public async Task<ActionResult> CreateCommentAsync(CommentCreateRequestModel request)
-    {
-        if (request.ParentId is null)
-        {
-            var createModel = _mapper.Map<CommentCreateModel>(request);
-            await _commentService.CommentGameAsync(createModel);
-        }
-        else
-        {
-            var createModel = _mapper.Map<ReplyCreateModel>(request);
-            await _commentService.ReplyCommentAsync(createModel);
-        }
-
-        return RedirectToAction("GetComments", new { gameKey = request.GameKey });
-    }
-
-    [HttpPost("{gameKey}/comment/update")]
-    public async Task<ActionResult> UpdateCommentAsync(CommentUpdateRequestModel request)
-    {
-        var updateModel = _mapper.Map<CommentUpdateModel>(request);
-        
-        await _commentService.UpdateAsync(updateModel);
-
-        return RedirectToAction("GetComments", new { gameKey = request.GameKey });
-    }
-
-    [HttpPost("{gameKey}/comment/delete")]
-    public async Task<ActionResult> DeleteCommentAsync(Guid id, string gameKey)
-    {
-        await _commentService.DeleteAsync(id);
-
-        return RedirectToAction("GetComments", new { gameKey });
-    }
-
-    [HttpGet("{gameKey}/comments")]
-    public async Task<ActionResult<ICollection<CommentViewModel>>> GetCommentsAsync([FromRoute] string gameKey)
-    {
-        var comments = await _commentService.GetCommentsByGameKeyAsync(gameKey);
-        var result = _mapper.Map<ICollection<CommentViewModel>>(comments);
-
-        return View(result);
     }
 
     [HttpGet("{gameKey}/update")]
@@ -176,26 +137,38 @@ public class GamesController : Controller
     {
         await FillViewData();
 
-        var gameToUpdate = await _gameService.GetByKeyAsync(gameKey);
+        var gameToUpdate = await _searchService.GetProductDtoByGameKeyOrDefaultAsync(gameKey);
         var mapped = _mapper.Map<GameUpdateRequestModel>(gameToUpdate);
         
         return View(mapped);
     }
 
     [HttpPost("{gameKey}/update")]
-    public async Task<ActionResult> UpdateAsync(GameUpdateRequestModel request)
+    public async Task<ActionResult> UpdateAsync(GameUpdateRequestModel request, string gameKey)
     {
+        if (await _gameService.IsGameKeyAlreadyExists(request.Key))
+        {
+            ModelState.AddModelError(nameof(request.Key), "Same game key already exists");
+        }
+        
+        if (ModelState.IsValid == false)
+        {
+            await FillViewData();
+            return View(request);
+        }
+        
         var updateModel = _mapper.Map<GameUpdateModel>(request);
-        updateModel.File = await GetBytesFromFormFile();
-        await _gameService.UpdateAsync(updateModel);
+        updateModel.OldGameKey = gameKey;
+        
+        await _gameService.UpdateFromEndpointAsync(updateModel);
 
         return RedirectToAction("GetWithDetails", "Games", new { gameKey = request.Key });
     }
 
-    [HttpPost("remove")]
-    public async Task<ActionResult> DeleteAsync(Guid id)
+    [HttpPost("{gameKey}/remove")]
+    public async Task<ActionResult> DeleteAsync(string gameKey, int database)
     {
-        await _gameService.DeleteAsync(id);
+        await _gameService.DeleteAsync(gameKey, (Database)database);
 
         return RedirectToAction("GetAll", "Games");
     }
@@ -203,26 +176,17 @@ public class GamesController : Controller
     [HttpPost("key/{name}")]
     public async Task<ActionResult> GenerateKeyAsync([FromRoute] string name)
     {
-        return new JsonResult(new { key = _gameKeyAliasCraft.CreateAlias(name) });
+        var key = Regex.Replace(name.Trim().ToLower(), @"\s{2,}", " ").Replace(' ', '-');
+        return new JsonResult(new { key });
     }
 
-    private async Task IncreaseViews(Game game)
+    private async Task IncreaseViews(ProductDto product)
     {
-        game.Views++;
-        var updateModel = _mapper.Map<GameUpdateModel>(game);
+        product.Views++;
+        
+        var updateModel = _mapper.Map<GameUpdateModel>(product);
+
         await _gameService.UpdateAsync(updateModel);
-    }
-
-    private async Task<byte[]> GetBytesFromFormFile()
-    {
-        var file = HttpContext.Request.Form.Files.FirstOrDefault()
-                   ?? throw new ArgumentException("Form file must be added");
-
-        await using var bytes = new MemoryStream();
-        await file.CopyToAsync(bytes);
-        var fileBytes = bytes.ToArray();
-
-        return fileBytes;
     }
 
     private async Task FillViewData()
@@ -265,7 +229,7 @@ public class GamesController : Controller
                     Text = enumElement.GetDisplayName()
                 }),
             nameof(SelectListItem.Value), nameof(SelectListItem.Text),
-            filterRequest.OrderBy);
+            filterRequest.OrderByState);
 
         ViewData["OrderBy"] = orderBySelectList;
     }
@@ -289,7 +253,7 @@ public class GamesController : Controller
     private async Task<SelectList> GetPublishersSelectList()
     {
         var publishers = await _publisherService.GetAllAsync();
-        var publishersSelectList = new SelectList(publishers, nameof(Publisher.Id), nameof(Publisher.Name));
+        var publishersSelectList = new SelectList(publishers, nameof(Publisher.Name), nameof(Publisher.Name));
         
         return publishersSelectList;
     }

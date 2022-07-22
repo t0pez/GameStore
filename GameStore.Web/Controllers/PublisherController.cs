@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
@@ -49,9 +48,14 @@ public class PublisherController : Controller
     [HttpPost("new")]
     public async Task<ActionResult> CreateAsync(PublisherCreateRequestModel request)
     {
+        if (await _publisherService.IsCompanyNameAlreadyExists(request.Name))
+        {
+            ModelState.AddModelError(nameof(request.Name), "Company name already exists");
+        }
+        
         if (ModelState.IsValid == false)
         {
-            return View("Error");
+            return View(request);
         }
         
         var createModel = _mapper.Map<PublisherCreateModel>(request);
@@ -61,7 +65,7 @@ public class PublisherController : Controller
         return RedirectToAction("GetWithDetails", "Publisher", new { companyName = publisher.Name });
     }
 
-    [HttpGet("update/{companyName}")]
+    [HttpGet("{companyName}/update")]
     public async Task<ActionResult<PublisherUpdateRequestModel>> UpdateAsync([FromRoute] string companyName)
     {
         var publisherToUpdate = await _publisherService.GetByCompanyNameAsync(companyName);
@@ -70,19 +74,31 @@ public class PublisherController : Controller
         return View(mapped);
     }
     
-    [HttpPost("update/{companyName}")]
-    public async Task<ActionResult> UpdateAsync(PublisherUpdateRequestModel request)
+    [HttpPost("{companyName}/update")]
+    public async Task<ActionResult> UpdateAsync(PublisherUpdateRequestModel request, string companyName)
     {
+        if (await _publisherService.IsCompanyNameAlreadyExists(request.Name))
+        {
+            ModelState.AddModelError(nameof(request.Name), "Company name already exists");
+        }
+        
+        if (ModelState.IsValid == false)
+        {
+            return View(request);
+        }
+        
         var updateModel = _mapper.Map<PublisherUpdateModel>(request);
+        updateModel.OldName = companyName;
+        
         await _publisherService.UpdateAsync(updateModel);
 
         return RedirectToAction("GetWithDetails", "Publisher", new { companyName = request.Name });
     }
     
-    [HttpPost("delete")]
-    public async Task<ActionResult> DeleteAsync(Guid id)
+    [HttpPost("{companyName}/delete")]
+    public async Task<ActionResult> DeleteAsync(string companyName)
     {
-        await _publisherService.DeleteAsync(id);
+        await _publisherService.DeleteAsync(companyName);
 
         return RedirectToAction("GetAll", "Publisher");
     }
