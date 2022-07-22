@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
+using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Comments.Specifications;
 using GameStore.Core.Models.Games;
@@ -28,17 +29,18 @@ public class CommentServiceTests
     public CommentServiceTests()
     {
         var loggerMock = new Mock<ILogger<CommentService>>();
+        var mongoLoggerMock = new Mock<IMongoLogger>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _gameRepoMock = new Mock<IRepository<Game>>();
         _commentRepoMock = new Mock<IRepository<Comment>>();
         _mapperMock = new Mock<IMapper>();
 
-        _unitOfWorkMock.Setup(unit => unit.GetRepository<Game>())
+        _unitOfWorkMock.Setup(unit => unit.GetEfRepository<Game>())
                        .Returns(_gameRepoMock.Object);
-        _unitOfWorkMock.Setup(unit => unit.GetRepository<Comment>())
+        _unitOfWorkMock.Setup(unit => unit.GetEfRepository<Comment>())
                        .Returns(_commentRepoMock.Object);
 
-        _commentService = new CommentService(_unitOfWorkMock.Object, loggerMock.Object, _mapperMock.Object);
+        _commentService = new CommentService(loggerMock.Object, mongoLoggerMock.Object, _unitOfWorkMock.Object, _mapperMock.Object);
     }
 
     [Fact]

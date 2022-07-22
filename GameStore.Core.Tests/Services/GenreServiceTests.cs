@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using AutoMapper;
 using FluentAssertions;
+using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.ServiceModels.Genres;
@@ -21,14 +22,15 @@ public class GenreServiceTests
 
     public GenreServiceTests()
     {
+        var mongoLogger = new Mock<IMongoLogger>();
         _mapperMock = new Mock<IMapper>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _genreRepoMock = new Mock<IRepository<Genre>>();
 
-        _unitOfWorkMock.Setup(unit => unit.GetRepository<Genre>())
+        _unitOfWorkMock.Setup(unit => unit.GetEfRepository<Genre>())
                        .Returns(_genreRepoMock.Object);
 
-        _genreService = new GenreService(_unitOfWorkMock.Object, _mapperMock.Object);
+        _genreService = new GenreService(mongoLogger.Object, _unitOfWorkMock.Object, _mapperMock.Object);
     }
 
     [Fact]

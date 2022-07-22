@@ -23,7 +23,7 @@ public class OpenedOrderServiceTests
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _openedOrderRepoMock = new Mock<IRepository<OpenedOrder>>();
 
-        _unitOfWorkMock.Setup(unitOfWork => unitOfWork.GetRepository<OpenedOrder>())
+        _unitOfWorkMock.Setup(unitOfWork => unitOfWork.GetEfRepository<OpenedOrder>())
                        .Returns(_openedOrderRepoMock.Object);
         _unitOfWorkMock.Setup(unitOfWork => unitOfWork.SaveChangesAsync())
                        .Verifiable();

@@ -1,6 +1,6 @@
 ﻿using System;
+using GameStore.Core.Models.Dto;
 using GameStore.Core.Models.Games;
-using GameStore.Core.Models.Publishers;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.Infrastructure.Tests.TestData.Repositories;
@@ -24,7 +24,7 @@ public class RepositoryTests
         context.ChangeTracker.Clear();
         
         _context = context;
-        _gameRepository = new Repository<Game>(_context);
+        _gameRepository = new EfRepository<Game>(_context);
     }
 
     [Fact]
@@ -151,8 +151,8 @@ public class RepositoryTests
             Description = "First description",
             File = new byte[] { 0, 0, 0, 1 },
             IsDeleted = false,
-            PublisherId = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7111"),
-            Publisher = new Publisher { Id = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7111") }
+            PublisherName = "First publisher",
+            Publisher = new PublisherDto { Name = "First publisher" }
         };
         var game2 = new Game
         {
@@ -162,8 +162,8 @@ public class RepositoryTests
             Description = "Second description",
             File = new byte[] { 0, 0, 0, 2 }, 
             IsDeleted = false,
-            PublisherId = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7222"),
-            Publisher = new Publisher { Id = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7222") }
+            PublisherName = "First publisher",
+            Publisher = new PublisherDto { Name = "First publisher" }
         };
         var game3 = new Game
         {
@@ -173,8 +173,8 @@ public class RepositoryTests
             Description = "Third description",
             File = new byte[] { 0, 0, 0, 3 }, 
             IsDeleted = false,
-            PublisherId = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7333"),
-            Publisher = new Publisher { Id = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7333") }
+            PublisherName = "Second publisher",
+            Publisher = new PublisherDto { Name = "Second publisher" }
         };
         var game4 = new Game
         {
@@ -184,8 +184,8 @@ public class RepositoryTests
             Description = "Fourth description",
             File = new byte[] { 0, 0, 0, 4 }, 
             IsDeleted = false,
-            PublisherId = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7111"),
-            Publisher = new Publisher { Id = Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7444") }
+            PublisherName = "Second publisher",
+            Publisher = new PublisherDto { Name = "Second publisher" }
         };
 
         context.AddRange(game1, game2, game3, game4);

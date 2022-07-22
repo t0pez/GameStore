@@ -24,7 +24,7 @@ public class UnitOfWorkTests
     [Fact]
     public void GetRepository_Game()
     {
-        var actualResult = _unitOfWork.GetRepository<Game>();
+        var actualResult = _unitOfWork.GetEfRepository<Game>();
         
         Assert.NotNull(actualResult);
     }
@@ -32,7 +32,7 @@ public class UnitOfWorkTests
     [Fact]
     public void GetRepository_GameGenre()
     {
-        var actualResult = _unitOfWork.GetRepository<GameGenre>();
+        var actualResult = _unitOfWork.GetEfRepository<GameGenre>();
         
         Assert.NotNull(actualResult);
     }
@@ -40,7 +40,7 @@ public class UnitOfWorkTests
     [Fact]
     public void GetRepository_Comment()
     {
-        var actualResult = _unitOfWork.GetRepository<Comment>();
+        var actualResult = _unitOfWork.GetEfRepository<Comment>();
         
         Assert.NotNull(actualResult);
     }
@@ -48,7 +48,7 @@ public class UnitOfWorkTests
     [Fact]
     public void GetRepository_NotCorrectModel_RepositoryMethodThrowsException()
     {
-        var repository = _unitOfWork.GetRepository<NotExistingModel>();
+        var repository = _unitOfWork.GetEfRepository<NotExistingModel>();
         
         var function = async () =>
                        {
