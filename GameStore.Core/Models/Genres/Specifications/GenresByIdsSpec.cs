@@ -6,16 +6,14 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Genres.Specifications;
 
-public class GenresByIdsWithDetails : SafeDeleteSpec<Genre>
+public class GenresByIdsSpec : SafeDeleteSpec<Genre>
 {
-    public GenresByIdsWithDetails(IEnumerable<Guid> genresIds)
+    public GenresByIdsSpec(IEnumerable<Guid> genresIds)
     {
         GenresIds = genresIds;
 
         Query
-            .Where(genre => genresIds.Contains(genre.Id))
-            .Include(genre => genre.SubGenres)
-            .ThenInclude(genre => genre.SubGenres);
+            .Where(genre => genresIds.Contains(genre.Id));
     }
 
     public IEnumerable<Guid> GenresIds { get; set; }

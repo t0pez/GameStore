@@ -1,5 +1,6 @@
 ﻿using System;
-using GameStore.Core.Models.Games;
+using System.ComponentModel.DataAnnotations.Schema;
+using GameStore.Core.Models.Dto;
 
 namespace GameStore.Core.Models.Orders;
 
@@ -10,9 +11,12 @@ public class OrderDetails
     public decimal Price { get; set; }
     public decimal Discount { get; set; }
     
-    public Guid GameId { get; set; }
-    public Game Game { get; set; }
+    public string GameKey { get; set; }
+    [NotMapped]
+    public ProductDto Game { get; set; }
 
     public Guid OrderId { get; set; }
     public Order Order { get; set; }
+    
+    public decimal TotalPrice => Price * Quantity - Discount;
 }

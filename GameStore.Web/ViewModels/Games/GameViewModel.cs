@@ -8,7 +8,7 @@ namespace GameStore.Web.ViewModels.Games;
 
 public class GameViewModel
 {
-    public Guid Id { get; set; }
+    public string Id { get; set; }
     
     public string Key { get; set; }
     public string Name { get; set; }
@@ -21,6 +21,6 @@ public class GameViewModel
     public int Views { get; set; }
 
     public PublisherInGameViewModel Publisher { get; set; }
-    public List<GenreListViewModel> Genres { get; set; }
-    public List<PlatformTypeListViewModel> Platforms { get; set; }
+    public List<GenreListViewModel> Genres { get; set; } = new();
+    public List<PlatformTypeListViewModel> Platforms { get; set; } = new();
 }

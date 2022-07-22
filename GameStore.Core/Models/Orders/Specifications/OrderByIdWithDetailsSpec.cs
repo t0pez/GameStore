@@ -8,7 +8,6 @@ public class OrderByIdWithDetailsSpec : OrderByIdSpec
     public OrderByIdWithDetailsSpec(Guid id) : base(id)
     {
         Query
-            .Include(order => order.OrderDetails)
-            .ThenInclude(details => details.Game);
+            .Include(order => order.OrderDetails);
     }
 }

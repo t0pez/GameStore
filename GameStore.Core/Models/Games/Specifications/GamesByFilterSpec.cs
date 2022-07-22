@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using Ardalis.Specification;
 using GameStore.Core.Models.Games.Specifications.Filters;
 using GameStore.SharedKernel.Specifications;
@@ -13,103 +14,75 @@ public class GamesByFilterSpec : SafeDeleteSpec<Game>
 
         if (string.IsNullOrEmpty(filter.Name) == false)
         {
-            EnableNameFilter(filter);
+            Query
+                .Where(game => game.Name.ToLower().Contains(filter.Name.ToLower()));
         }
 
         if (filter.GenresIds.Any())
         {
-           EnableGenresFilter();
+            Query
+                .Where(game => game.Genres.Any(gg => Filter.GenresIds.Any(genreId => gg.GenreId == genreId)));
         }
         
         if (filter.PlatformsIds.Any())
         {
-            EnablePlatformsFilter();
+            Query
+                .Where(game => game.Platforms.Any(gp => Filter.PlatformsIds.Any(platformId => gp.PlatformId == platformId)));
         }
 
-        if (filter.PublishersIds.Any())
+        if (filter.PublishersNames.Any())
         {
-            EnablePublishersFilter();
+            Query
+                .Where(game => Filter.PublishersNames.Any(name => game.PublisherName == name));
         }
 
         if (Filter.MinPrice is not null)
         {
-            EnableLowerPriceFilter();
+            Query
+                .Where(game => game.Price >= Filter.MinPrice);
         }
 
         if (Filter.MaxPrice is not null)
         {
-            EnableHighestPriceFilter();
+            Query
+                .Where(game => game.Price <= Filter.MaxPrice);
         }
 
-        EnableSorting();
+        if (Filter.PublishedAtState != GameSearchFilterPublishedAtState.Default)
+        {
+            EnablePublishedAtFilter();
+        }
     }
 
     public GameSearchFilter Filter { get; set; }
 
 
-    private void EnableNameFilter(GameSearchFilter filter)
+    private void EnablePublishedAtFilter()
     {
-        Query
-            .Where(game => game.Name.ToLower().Contains(filter.Name.ToLower()));
-    }
-
-    private void EnableGenresFilter()
-    {
-        Query
-            .Where(game => game.Genres.Any(gg => Filter.GenresIds.Any(genreId => gg.GenreId == genreId)));
-    }
-
-    private void EnablePlatformsFilter()
-    {
-        Query
-            .Where(game => game.Platforms.Any(gp => Filter.PlatformsIds.Any(platformId => gp.PlatformId == platformId)));
-    }
-
-    private void EnablePublishersFilter()
-    {
-        Query
-            .Where(game => Filter.PublishersIds.Any(publisherId => game.PublisherId == publisherId));
-    }
-
-    private void EnableLowerPriceFilter()
-    {
-        Query
-            .Where(game => game.Price >= Filter.MinPrice);
-    }
-    
-    private void EnableHighestPriceFilter()
-    {
-        Query
-            .Where(game => game.Price <= Filter.MaxPrice);
-    }
-
-    private void EnableSorting()
-    {
-        switch (Filter.OrderBy)
+        switch (Filter.PublishedAtState)
         {
-            case GameSearchFilterOrderByState.MostPopular:
+            case GameSearchFilterPublishedAtState.OneWeek:
                 Query
-                    .OrderBy(game => game.Views);
+                    .Where(game => game.PublishedAt >= DateTime.UtcNow.AddDays(-7));
                 break;
-            case GameSearchFilterOrderByState.MostCommented:
+            case GameSearchFilterPublishedAtState.OneMonth:
                 Query
-                    .OrderBy(game => game.Comments.Count(comment => comment.IsDeleted == false));
+                    .Where(game => game.PublishedAt >= DateTime.UtcNow.AddMonths(-1));
                 break;
-            case GameSearchFilterOrderByState.PriceAscending:
+            case GameSearchFilterPublishedAtState.OneYear:
                 Query
-                    .OrderBy(game => game.Price);
+                    .Where(game => game.PublishedAt >= DateTime.UtcNow.AddYears(-1));
                 break;
-            case GameSearchFilterOrderByState.PriceDescending:
+            case GameSearchFilterPublishedAtState.TwoYears:
                 Query
-                    .OrderByDescending(game => game.Price);
+                    .Where(game => game.PublishedAt >= DateTime.UtcNow.AddYears(-2));
                 break;
-            case GameSearchFilterOrderByState.New:
+            case GameSearchFilterPublishedAtState.ThreeYears:
                 Query
-                    .OrderBy(game => game.AddedToStoreAt);
+                    .Where(game => game.PublishedAt >= DateTime.UtcNow.AddYears(-3));
                 break;
-            case GameSearchFilterOrderByState.Default:
             default:
-                return;
+                throw new ArgumentOutOfRangeException();
         }
     }
 }

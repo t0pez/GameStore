@@ -7,10 +7,6 @@ namespace GameStore.Core.Models.Comments;
 
 public class Comment : ISafeDelete
 {
-    public Comment()
-    {
-    }
-
     public Guid Id { get; set; }
     public string Name { get; set; }
     public string Body { get; set; }

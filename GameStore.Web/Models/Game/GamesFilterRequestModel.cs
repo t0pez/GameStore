@@ -19,7 +19,7 @@ public class GamesFilterRequestModel
     public SelectList Publishers { get; set; }
     public List<string> SelectedPublishers { get; set; } = new();
     
-    public GameSearchFilterOrderByState OrderBy { get; set; } = GameSearchFilterOrderByState.Default;
+    public GameSearchFilterOrderByState OrderByState { get; set; } = GameSearchFilterOrderByState.Default;
 
     public int CurrentPage { get; set; }
     public int PageSize { get; set; }
@@ -30,5 +30,5 @@ public class GamesFilterRequestModel
                            SelectedGenres.Any() == false &&
                            SelectedPlatforms.Any() == false &&
                            SelectedPublishers.Any() == false &&
-                           OrderBy == GameSearchFilterOrderByState.Default;
+                           OrderByState == GameSearchFilterOrderByState.Default;
 }

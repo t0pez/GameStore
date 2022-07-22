@@ -3,9 +3,9 @@ using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Publishers.Specifications;
 
-public class PublisherByCompanyNameSpec : SafeDeleteSpec<Publisher>
+public class PublisherByNameSpec : SafeDeleteSpec<Publisher>
 {
-    public PublisherByCompanyNameSpec(string companyName)
+    public PublisherByNameSpec(string companyName)
     {
         Name = companyName;
 

@@ -1,11 +1,11 @@
-﻿using System;
-
-namespace GameStore.Core.Models.ServiceModels.Publishers;
+﻿namespace GameStore.Core.Models.ServiceModels.Publishers;
 
 public class PublisherUpdateModel
 {
-    public Guid Id { get; set; }
     public string Name { get; set; }
+    public string OldName { get; set; }
     public string Description { get; set; }
     public string HomePage { get; set; }
+    
+    public bool IsNameChanged => OldName != Name;
 }

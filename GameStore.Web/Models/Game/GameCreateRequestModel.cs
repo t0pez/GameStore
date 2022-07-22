@@ -10,7 +10,7 @@ public class GameCreateRequestModel
     [Required] [MinLength(5)] public string Key { get; set; }
     [Required] [MinLength(10)] public string Description { get; set; }
     public decimal Price { get; set; }
-    public Guid PublisherId { get; set; }
+    public string PublisherName { get; set; }
 
     [DataType(DataType.Date)]
     [Display(Name = "Date of release")]

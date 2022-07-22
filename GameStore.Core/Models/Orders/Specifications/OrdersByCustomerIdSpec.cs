@@ -1,11 +1,10 @@
-﻿using System;
-using Ardalis.Specification;
+﻿using Ardalis.Specification;
 
 namespace GameStore.Core.Models.Orders.Specifications;
 
 public class OrdersByCustomerIdSpec : Specification<Order>
 {
-    public OrdersByCustomerIdSpec(Guid customerId)
+    public OrdersByCustomerIdSpec(string customerId)
     {
         CustomerId = customerId;
 
@@ -13,5 +12,5 @@ public class OrdersByCustomerIdSpec : Specification<Order>
             .Where(order => order.CustomerId == customerId);
     }
 
-    public Guid CustomerId { get; }
+    public string CustomerId { get; }
 }

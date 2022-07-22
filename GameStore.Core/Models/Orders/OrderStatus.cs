@@ -1,9 +1,11 @@
-﻿namespace GameStore.Core.Models.Orders;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace GameStore.Core.Models.Orders;
 
 public enum OrderStatus
 {
-    Created,
-    Pending,
-    Cancelled,
-    Completed
+    [Display(Name = "Created")] Created,
+    [Display(Name = "Pending")] InProcess,
+    [Display(Name = "Cancelled")] Cancelled,
+    [Display(Name = "Completed")] Completed
 }

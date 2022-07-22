@@ -9,6 +9,8 @@ public class Genre : ISafeDelete
 {
     public Guid Id { get; set; }
     public string Name { get; set; }
+    public string Description { get; set; }
+    public int? CategoryId { get; set; }
 
     public Guid? ParentId { get; set; }
     public Genre Parent { get; set; }
