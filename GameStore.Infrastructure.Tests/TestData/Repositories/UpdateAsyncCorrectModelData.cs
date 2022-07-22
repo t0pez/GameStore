@@ -30,7 +30,7 @@ public class UpdateAsyncCorrectModelData : DataAttribute
                 Name = "Second game with changes",
                 Key = "second-game",
                 Description = "Second description with a new text here",
-                File = new byte[] { 1, 0, 0, 2 }, 
+                File = new byte[] { 1, 0, 0, 2 },
                 IsDeleted = false
             }
         };
@@ -42,7 +42,7 @@ public class UpdateAsyncCorrectModelData : DataAttribute
                 Name = "[Updated] Third game",
                 Key = "Third-game",
                 Description = "Updated Third description",
-                File = new byte[] { 1, 0, 0, 3 }, 
+                File = new byte[] { 1, 0, 0, 3 },
                 IsDeleted = false
             }
         };
@@ -54,7 +54,7 @@ public class UpdateAsyncCorrectModelData : DataAttribute
                 Name = "New Fourth game",
                 Key = "fourth-game",
                 Description = "Updated Fourth description",
-                File = new byte[] { 1, 0, 0, 4 }, 
+                File = new byte[] { 1, 0, 0, 4 },
                 IsDeleted = false
             }
         };

@@ -32,7 +32,7 @@ public class OpenedOrderService : IOpenedOrderService
         await OpenedOrderRepository.AddAsync(openedOrder);
         await _unitOfWork.SaveChangesAsync();
     }
-    
+
     public async Task UpdateAsync(OpenedOrder updated)
     {
         var openedOrder =
@@ -40,15 +40,16 @@ public class OpenedOrderService : IOpenedOrderService
             ?? throw new ItemNotFoundException(typeof(OpenedOrder), updated.OrderId, nameof(updated.OrderId));
 
         openedOrder.TimeOutDate = updated.TimeOutDate;
-        
+
         await OpenedOrderRepository.UpdateAsync(openedOrder);
         await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task DeleteByOrderIdAsync(Guid orderId)
     {
-        var openedOrder = await OpenedOrderRepository.GetSingleOrDefaultBySpecAsync(new OpenedOrderByOrderIdSpec(orderId))
-                          ?? throw new ItemNotFoundException(typeof(OpenedOrder), orderId);
+        var openedOrder =
+            await OpenedOrderRepository.GetSingleOrDefaultBySpecAsync(new OpenedOrderByOrderIdSpec(orderId))
+            ?? throw new ItemNotFoundException(typeof(OpenedOrder), orderId);
 
         await OpenedOrderRepository.DeleteAsync(openedOrder);
         await _unitOfWork.SaveChangesAsync();

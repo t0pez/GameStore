@@ -16,6 +16,6 @@ public class OrderUpdateRequestModel
     public string ShipName { get; set; }
     public string ShipPostalCode { get; set; }
     public string ShipRegion { get; set; }
-    
+
     public List<OrderDetails> OrderDetails { get; set; }
 }

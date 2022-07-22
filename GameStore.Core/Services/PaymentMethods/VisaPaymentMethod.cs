@@ -12,7 +12,7 @@ public class VisaPaymentMethod : IPaymentMethod
         {
             TotalSum = createModel.Order.TotalSum
         };
-        
+
         return paymentGetaway;
     }
 }

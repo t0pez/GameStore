@@ -8,11 +8,11 @@ namespace GameStore.Core.Models.Mongo.Suppliers;
 [MongoCollectionName("suppliers")]
 public class Supplier
 {
-    [BsonId] 
+    [BsonId]
     [BsonElement("_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
-    
+
     [NavigationId]
     [BsonElement("SupplierID")]
     public int SupplierId { get; set; }
@@ -26,11 +26,10 @@ public class Supplier
     public string ContactTitle { get; set; }
     public string Phone { get; set; }
     public string Fax { get; set; }
-    
+
     public string Country { get; set; }
     public string PostalCode { get; set; }
     public string Region { get; set; }
 
-    [BsonIgnore]
-    public Database Database { get; set; } = Database.Mongo;
+    [BsonIgnore] public Database Database { get; set; } = Database.Mongo;
 }

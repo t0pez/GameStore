@@ -10,15 +10,15 @@ namespace GameStore.Web.Controllers;
 [Route("pay")]
 public class PaymentController : Controller
 {
-    private readonly IPaymentService _paymentService;
     private readonly IOrderService _orderService;
+    private readonly IPaymentService _paymentService;
 
     public PaymentController(IPaymentService paymentService, IOrderService orderService)
     {
         _paymentService = paymentService;
         _orderService = orderService;
     }
-    
+
     [HttpPost("visa")]
     public async Task<ActionResult> VisaPayAsync(Guid orderId)
     {
@@ -27,7 +27,7 @@ public class PaymentController : Controller
 
         return View("VisaPaymentStub", result);
     }
-    
+
     [HttpGet("bank")]
     public async Task<FileContentResult> BankPayAsync(Guid orderId)
     {
@@ -36,7 +36,7 @@ public class PaymentController : Controller
 
         return File(result.InvoiceFileContent, "application/pdf", "invoice-file.pdf");
     }
-    
+
     [HttpPost("ibox")]
     public async Task<ActionResult> IboxPayAsync(Guid orderId)
     {
@@ -45,7 +45,7 @@ public class PaymentController : Controller
 
         return View("IboxPaymentStub", result);
     }
-    
+
     [HttpPost("payment-result")]
     public async Task<ActionResult> ResultStubAsync(VisaPaymentGetaway paymentGetaway)
     {
@@ -58,5 +58,5 @@ public class PaymentController : Controller
         var paymentGateway = await _paymentService.GetPaymentGateway(order, paymentType);
 
         return paymentGateway;
-    } 
+    }
 }

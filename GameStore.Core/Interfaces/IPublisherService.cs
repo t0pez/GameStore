@@ -14,5 +14,4 @@ public interface IPublisherService
     public Task UpdateAsync(PublisherUpdateModel updateModel);
     public Task DeleteAsync(string companyName);
     public Task<bool> IsCompanyNameAlreadyExists(string companyName);
-    
 }

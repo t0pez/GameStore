@@ -1,11 +1,11 @@
-﻿using Ardalis.Specification;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Ardalis.Specification;
 using Ardalis.Specification.EntityFrameworkCore;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using Microsoft.EntityFrameworkCore;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace GameStore.Infrastructure.Data.Repositories;
 
@@ -23,7 +23,9 @@ public class EfRepository<TModel> : IRepository<TModel> where TModel : class
     public Task<List<TModel>> GetBySpecAsync(ISpecification<TModel> spec = null)
     {
         if (spec is null)
+        {
             return Set.ToListAsync();
+        }
 
         var specificationResult = ApplySpecifications(spec);
 
@@ -68,12 +70,12 @@ public class EfRepository<TModel> : IRepository<TModel> where TModel : class
 
     public Task DeleteAsync(TModel model)
     {
-       return Task.Run(() => Set.Remove(model));
+        return Task.Run(() => Set.Remove(model));
     }
-    
+
     public Task DeleteRangeAsync(IEnumerable<TModel> models)
     {
-       return Task.Run(() => Set.RemoveRange(models));
+        return Task.Run(() => Set.RemoveRange(models));
     }
 
     public Task<bool> AnyAsync(ISpecification<TModel> spec)
@@ -86,8 +88,10 @@ public class EfRepository<TModel> : IRepository<TModel> where TModel : class
     public Task<int> CountAsync(ISpecification<TModel> spec = null)
     {
         if (spec is null)
+        {
             return Set.CountAsync();
-        
+        }
+
         var specResult = ApplySpecifications(spec);
         return specResult.CountAsync();
     }
@@ -98,7 +102,7 @@ public class EfRepository<TModel> : IRepository<TModel> where TModel : class
 
         return specEvaluator.GetQuery(Set.AsQueryable(), specification);
     }
-    
+
     private IQueryable<TResult> ApplySelectSpecifications<TResult>(ISpecification<TModel, TResult> specification)
     {
         var specEvaluator = new SpecificationEvaluator();

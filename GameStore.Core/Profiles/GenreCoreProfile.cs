@@ -10,7 +10,7 @@ public class GenreCoreProfile : Profile
     public GenreCoreProfile()
     {
         CreateMap<Category, Genre>().ReverseMap();
-        
+
         CreateMap<GenreCreateModel, Genre>();
     }
 }

@@ -15,7 +15,7 @@ public class OrdersByFilterSpec : PagedSpec<Order>
             Query
                 .Where(order => order.OrderDate >= filter.StartDate);
         }
-        
+
         if (filter.EndDate.HasValue)
         {
             Query

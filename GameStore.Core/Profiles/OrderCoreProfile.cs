@@ -18,22 +18,22 @@ public class OrderCoreProfile : Profile
 
         CreateMap<OrderMongo, Order>()
             .ForMember(order => order.Id,
-                expression => expression.Ignore());
+                       expression => expression.Ignore());
         CreateMap<OrderDetailsMongo, OrderDetails>()
             .ForMember(orderDetails => orderDetails.Id,
                        expression => expression.Ignore())
             .ForMember(orderDetails => orderDetails.OrderId,
                        expression => expression.Ignore());
-        
+
         CreateMap<OrderMongo, OrderDto>();
         CreateMap<OrderDetailsMongo, OrderDetailsDto>()
             .ForMember(dto => dto.TotalPrice,
-                expression => expression.MapFrom(mongo => mongo.TotalPrice));
-        
+                       expression => expression.MapFrom(mongo => mongo.TotalPrice));
+
         CreateMap<Order, OrderDto>();
         CreateMap<OrderDetails, OrderDetailsDto>()
             .ForMember(dto => dto.TotalPrice,
-                expression => expression.MapFrom(mongo => mongo.TotalPrice));
+                       expression => expression.MapFrom(mongo => mongo.TotalPrice));
 
         CreateMap<AllOrdersFilter, OrdersFilter>();
         CreateMap<AllOrdersFilter, MongoOrdersFilter>();

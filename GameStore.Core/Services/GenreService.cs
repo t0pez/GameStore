@@ -15,9 +15,9 @@ namespace GameStore.Core.Services;
 
 public class GenreService : IGenreService
 {
+    private readonly IMapper _mapper;
     private readonly IMongoLogger _mongoLogger;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public GenreService(IMongoLogger mongoLogger, IUnitOfWork unitOfWork, IMapper mapper)
     {
@@ -27,7 +27,7 @@ public class GenreService : IGenreService
     }
 
     private IRepository<Genre> Repository => _unitOfWork.GetEfRepository<Genre>();
-    
+
     public async Task<ICollection<Genre>> GetAllAsync()
     {
         var result = await Repository.GetBySpecAsync(new GenresListSpec());
@@ -58,7 +58,7 @@ public class GenreService : IGenreService
         var genre = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdSpec(updateModel.Id))
                     ?? throw new ItemNotFoundException(typeof(Genre), updateModel.Id, nameof(updateModel.Id));
         var oldGenreVersion = genre.ToBsonDocument();
-        
+
         UpdateValues(updateModel, genre);
 
         await Repository.UpdateAsync(genre);
@@ -70,11 +70,11 @@ public class GenreService : IGenreService
     public async Task DeleteAsync(Guid id)
     {
         var genre = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdSpec(id))
-                                 ?? throw new ItemNotFoundException(typeof(Genre), id);
+                    ?? throw new ItemNotFoundException(typeof(Genre), id);
 
         await SetNewParentForChildrenGenres(genre);
         genre.IsDeleted = true;
-        
+
         await Repository.UpdateAsync(genre);
         await _unitOfWork.SaveChangesAsync();
 
@@ -91,13 +91,13 @@ public class GenreService : IGenreService
     private async Task SetNewParentForChildrenGenres(Genre genre)
     {
         var children = await Repository.GetBySpecAsync(new GenresByParentIdSpec(genre.Id));
-        
+
         var newParentId = genre.ParentId;
 
         foreach (var child in children)
         {
             var oldGenreVersion = child.ToBsonDocument();
-            
+
             child.ParentId = newParentId;
             await Repository.UpdateAsync(child);
 

@@ -15,9 +15,9 @@ namespace GameStore.Core.Services;
 
 public class PlatformTypeService : IPlatformTypeService
 {
+    private readonly IMapper _mapper;
     private readonly IMongoLogger _mongoLogger;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public PlatformTypeService(IMongoLogger mongoLogger, IUnitOfWork unitOfWork, IMapper mapper)
     {
@@ -26,7 +26,7 @@ public class PlatformTypeService : IPlatformTypeService
         _mapper = mapper;
     }
 
-    private IRepository<PlatformType> Repository => _unitOfWork.GetEfRepository<PlatformType>(); 
+    private IRepository<PlatformType> Repository => _unitOfWork.GetEfRepository<PlatformType>();
 
     public async Task<ICollection<PlatformType>> GetAllAsync()
     {
@@ -39,7 +39,7 @@ public class PlatformTypeService : IPlatformTypeService
     {
         var result = await Repository.GetSingleOrDefaultBySpecAsync(new PlatformTypeByIdSpec(id))
                      ?? throw new ItemNotFoundException(typeof(PlatformType), id);
-        
+
         return result;
     }
 
@@ -59,7 +59,7 @@ public class PlatformTypeService : IPlatformTypeService
                            ?? throw new ItemNotFoundException(typeof(PlatformType), updateModel.Id,
                                                               nameof(updateModel.Id));
         var oldPlatformVersion = platformType.ToBsonDocument();
-        
+
         UpdateValues(updateModel, platformType);
 
         await Repository.UpdateAsync(platformType);

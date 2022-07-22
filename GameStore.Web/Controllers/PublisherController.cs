@@ -12,8 +12,8 @@ namespace GameStore.Web.Controllers;
 [Route("publisher")]
 public class PublisherController : Controller
 {
-    private readonly IPublisherService _publisherService;
     private readonly IMapper _mapper;
+    private readonly IPublisherService _publisherService;
 
     public PublisherController(IPublisherService publisherService, IMapper mapper)
     {
@@ -29,22 +29,22 @@ public class PublisherController : Controller
 
         return View(result);
     }
-    
+
     [HttpGet("{companyName}")]
     public async Task<ActionResult<PublisherViewModel>> GetWithDetailsAsync([FromRoute] string companyName)
     {
         var publisher = await _publisherService.GetByCompanyNameAsync(companyName);
         var result = _mapper.Map<PublisherViewModel>(publisher);
-        
+
         return View(result);
     }
-    
+
     [HttpGet("new")]
     public async Task<ActionResult> CreateAsync()
     {
         return View(new PublisherCreateRequestModel());
     }
-    
+
     [HttpPost("new")]
     public async Task<ActionResult> CreateAsync(PublisherCreateRequestModel request)
     {
@@ -52,12 +52,12 @@ public class PublisherController : Controller
         {
             ModelState.AddModelError(nameof(request.Name), "Company name already exists");
         }
-        
+
         if (ModelState.IsValid == false)
         {
             return View(request);
         }
-        
+
         var createModel = _mapper.Map<PublisherCreateModel>(request);
 
         var publisher = await _publisherService.CreateAsync(createModel);
@@ -73,7 +73,7 @@ public class PublisherController : Controller
 
         return View(mapped);
     }
-    
+
     [HttpPost("{companyName}/update")]
     public async Task<ActionResult> UpdateAsync(PublisherUpdateRequestModel request, string companyName)
     {
@@ -81,20 +81,20 @@ public class PublisherController : Controller
         {
             ModelState.AddModelError(nameof(request.Name), "Company name already exists");
         }
-        
+
         if (ModelState.IsValid == false)
         {
             return View(request);
         }
-        
+
         var updateModel = _mapper.Map<PublisherUpdateModel>(request);
         updateModel.OldName = companyName;
-        
+
         await _publisherService.UpdateAsync(updateModel);
 
         return RedirectToAction("GetWithDetails", "Publisher", new { companyName = request.Name });
     }
-    
+
     [HttpPost("{companyName}/delete")]
     public async Task<ActionResult> DeleteAsync(string companyName)
     {

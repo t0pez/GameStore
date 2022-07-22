@@ -13,8 +13,8 @@ namespace GameStore.Web.Controllers;
 [Route("platforms")]
 public class PlatformTypesController : Controller
 {
-    private readonly IPlatformTypeService _platformTypeService;
     private readonly IMapper _mapper;
+    private readonly IPlatformTypeService _platformTypeService;
 
     public PlatformTypesController(IPlatformTypeService platformTypeService, IMapper mapper)
     {
@@ -30,7 +30,7 @@ public class PlatformTypesController : Controller
 
         return View(result);
     }
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<PlatformTypeViewModel>> GetWithDetailsAsync([FromRoute] Guid id)
     {

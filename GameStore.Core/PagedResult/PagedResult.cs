@@ -15,7 +15,7 @@ public class PagedResult<T>
         CurrentPage = paginationFilter.CurrentPage;
         PageSize = paginationFilter.PageSize;
     }
-    
+
     public IEnumerable<T> Result { get; set; }
     public int TotalPagesCount { get; set; }
     public int CurrentPage { get; set; }

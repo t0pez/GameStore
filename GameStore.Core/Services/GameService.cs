@@ -1,18 +1,17 @@
-using GameStore.Core.Exceptions;
-using GameStore.Core.Interfaces;
-using GameStore.Core.Models.Games;
-using GameStore.Core.Models.Games.Specifications;
-using GameStore.SharedKernel.Interfaces.DataAccess;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Events.Notifications;
+using GameStore.Core.Exceptions;
 using GameStore.Core.Extensions;
+using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
 using GameStore.Core.Models.Dto;
+using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Games.Specifications;
 using GameStore.Core.Models.Games.Specifications.Filters;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Genres.Specifications;
@@ -24,6 +23,7 @@ using GameStore.Core.Models.RelationalModels.Specifications;
 using GameStore.Core.Models.ServiceModels.Enums;
 using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.Core.PagedResult;
+using GameStore.SharedKernel.Interfaces.DataAccess;
 using GameStore.SharedKernel.Specifications.Extensions;
 using MediatR;
 using MongoDB.Bson;
@@ -33,14 +33,14 @@ namespace GameStore.Core.Services;
 public class GameService : IGameService
 {
     private static readonly DateTime AddedToStoreAtForMongo = new(2022, 6, 2);
-
-    private readonly ISearchService _searchService;
     private readonly IRelationshipModelService<GameGenre> _gameGenreService;
     private readonly IRelationshipModelService<GamePlatformType> _gamePlatformService;
+    private readonly IMapper _mapper;
     private readonly IMediator _mediator;
     private readonly IMongoLogger _mongoLogger;
+
+    private readonly ISearchService _searchService;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public GameService(ISearchService searchService,
                        IRelationshipModelService<GameGenre> gameGenreService,
@@ -66,7 +66,7 @@ public class GameService : IGameService
         var game = await CreateGameAsync(model, DateTime.UtcNow);
 
         await _mongoLogger.LogCreateAsync(game);
-        
+
         return game;
     }
 
@@ -95,7 +95,7 @@ public class GameService : IGameService
         var games = await GameRepository.GetBySpecAsync(new GamesByFilterSpec(filter).EnablePaging(filter));
 
         var result = new PagedResult<Game>(games, totalGamesCount, filter);
-        
+
         return result;
     }
 
@@ -103,7 +103,7 @@ public class GameService : IGameService
     {
         var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeyWithDetailsSpec(gameKey))
                      ?? throw new ItemNotFoundException(typeof(Game), gameKey);
-        
+
         return result;
     }
 
@@ -111,7 +111,7 @@ public class GameService : IGameService
     {
         var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdSpec(id))
                      ?? throw new ItemNotFoundException(typeof(Game), id);
-        
+
         return result;
     }
 
@@ -148,8 +148,8 @@ public class GameService : IGameService
     public async Task DeleteAsync(string gameKey, Database database)
     {
         var game = await _searchService.GetProductDtoByGameKeyOrDefaultAsync(gameKey)
-            ?? throw new ItemNotFoundException(typeof(Game), gameKey);
-        
+                   ?? throw new ItemNotFoundException(typeof(Game), gameKey);
+
         game.IsDeleted = true;
         var updateModel = _mapper.Map<GameUpdateModel>(game);
 
@@ -184,12 +184,12 @@ public class GameService : IGameService
         var product = await _searchService.GetProductDtoByGameKeyOrDefaultAsync(updateModel.OldGameKey);
 
         var oldVersionOfProduct = product.ToBsonDocument();
-        
+
         var createModel = _mapper.Map<GameCreateModel>(product);
-        
+
         var game = _mapper.Map<Game>(createModel);
         game.AddedToStoreAt = AddedToStoreAtForMongo;
-        
+
         await UpdateGameValues(game, updateModel);
 
         updateModel.Id = product.Id;
@@ -225,7 +225,7 @@ public class GameService : IGameService
         var product = _mapper.Map<Product>(updateModel);
 
         await ProductsRepository.UpdateAsync(product);
-        
+
         await EnsureUpdateNotificationPublishedAsync(updateModel);
     }
 
@@ -244,14 +244,14 @@ public class GameService : IGameService
 
         await GameRepository.AddAsync(game);
         await _unitOfWork.SaveChangesAsync();
-        
+
         return game;
     }
 
     private async Task<IEnumerable<Guid>> GetGenresWithChildrenAsync(IEnumerable<Guid> genresIds)
     {
         var genres = await GenreRepository.GetBySpecAsync(new GenresByIdsWithDetailsSpec(genresIds));
-        var allChildren= GetAllChildrenGenres(genres);
+        var allChildren = GetAllChildrenGenres(genres);
 
         var result = allChildren.Select(genre => genre.Id);
 
@@ -265,7 +265,7 @@ public class GameService : IGameService
         foreach (var genre in genres)
         {
             var children = GetAllChildrenGenres(genre.SubGenres);
-            result.AddRange(children);   
+            result.AddRange(children);
         }
 
         return result;
@@ -285,7 +285,7 @@ public class GameService : IGameService
         game.File = updateModel.File;
         game.PublisherName = updateModel.PublisherName;
         game.Views = updateModel.Views;
-        
+
         if (updateModel.IsDeleted.HasValue)
         {
             game.IsDeleted = updateModel.IsDeleted.Value;
@@ -295,15 +295,23 @@ public class GameService : IGameService
     private async Task AssertGenresExistsAsync(IEnumerable<Guid> genresIds)
     {
         foreach (var genreId in genresIds)
+        {
             if (await GenreRepository.AnyAsync(new GenreByIdSpec(genreId)) == false)
+            {
                 throw new ItemNotFoundException(typeof(Genre), genreId);
+            }
+        }
     }
 
     private async Task AssertPlatformsExistsAsync(IEnumerable<Guid> platformsIds)
     {
         foreach (var platformId in platformsIds)
+        {
             if (await PlatformTypesRepository.AnyAsync(new PlatformTypeByIdSpec(platformId)) == false)
+            {
                 throw new ItemNotFoundException(typeof(PlatformType), platformId);
+            }
+        }
     }
 
     private async Task UpdateGameRelationshipModelsAsync(GameUpdateModel updateModel)

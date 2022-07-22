@@ -13,9 +13,11 @@ internal static class DataSeeder
 {
     internal static void SeedData(this ApplicationContext context)
     {
-        if(context.Set<Genre>().Any() || context.Set<PlatformType>().Any())
+        if (context.Set<Genre>().Any() || context.Set<PlatformType>().Any())
+        {
             return;
-        
+        }
+
         var strategyGenre = new Genre
         {
             Id = Guid.NewGuid(),
@@ -98,7 +100,7 @@ internal static class DataSeeder
             IsDeleted = false,
             Games = new List<GamePlatformType>()
         };
-        
+
         var publisher1 = new Publisher
         {
             Id = Guid.NewGuid(),
@@ -188,7 +190,7 @@ internal static class DataSeeder
             GameId = game2.Id,
             PlatformId = xboxPlatform.Id
         };
-        
+
         context.Add(strategyGenre);
         context.Add(rtsGenre);
         context.Add(cityBuilderGenre);
@@ -197,7 +199,7 @@ internal static class DataSeeder
         context.Add(tpsGenre);
         context.Add(actionGenre);
         context.SaveChanges();
-        
+
         context.AddRange(pcPlatform, psPlatform, xboxPlatform);
         context.SaveChanges();
 

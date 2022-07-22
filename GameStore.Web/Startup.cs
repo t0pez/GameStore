@@ -1,19 +1,19 @@
 using GameStore.Core.Events.Notifications;
+using GameStore.Core.Profiles;
 using GameStore.Infrastructure;
+using GameStore.Infrastructure.Data.Configurations;
 using GameStore.Infrastructure.Data.Context;
+using GameStore.Web.Filters;
+using GameStore.Web.Infrastructure;
 using GameStore.Web.Middlewares;
 using GameStore.Web.Profiles;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using GameStore.Core.Profiles;
-using GameStore.Infrastructure.Data.Configurations;
-using GameStore.Web.Filters;
-using GameStore.Web.Infrastructure;
-using MediatR;
 using Newtonsoft.Json;
 using Quartz;
 

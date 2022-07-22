@@ -27,10 +27,10 @@ public class OrderDetailsGameKeyUpdatedHandler : INotificationHandler<GameKeyUpd
         foreach (var orderDetail in orderDetails)
         {
             orderDetail.GameKey = notification.NewGameKey;
-            
+
             await OrderDetailsRepository.UpdateAsync(orderDetail);
         }
-        
+
         await _unitOfWork.SaveChangesAsync();
     }
 }

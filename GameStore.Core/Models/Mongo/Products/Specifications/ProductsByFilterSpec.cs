@@ -10,7 +10,7 @@ public class ProductsByFilterSpec : PagedSpec<Product>
     public ProductsByFilterSpec(ProductFilter filter)
     {
         Filter = filter;
-        
+
         if (filter.GameKeysToIgnore.Any())
         {
             Query
@@ -22,7 +22,7 @@ public class ProductsByFilterSpec : PagedSpec<Product>
                     .Where(product => product.GameKey != gameKey);
             }
         }
-        
+
         if (string.IsNullOrEmpty(filter.Name) == false)
         {
             Query
@@ -34,7 +34,7 @@ public class ProductsByFilterSpec : PagedSpec<Product>
             Query
                 .Where(product => product.UnitPrice >= filter.MinPrice);
         }
-        
+
         if (filter.MaxPrice.HasValue)
         {
             Query
@@ -46,7 +46,7 @@ public class ProductsByFilterSpec : PagedSpec<Product>
             Query
                 .Where(product => filter.CategoriesIds.Contains(product.CategoryId));
         }
-        
+
         if (filter.SuppliersIds.Any())
         {
             Query

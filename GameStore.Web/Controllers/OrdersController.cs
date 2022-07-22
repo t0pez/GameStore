@@ -19,11 +19,11 @@ namespace GameStore.Web.Controllers;
 [Route("orders")]
 public class OrdersController : Controller
 {
+    private readonly IMapper _mapper;
     private readonly IOrderService _orderService;
     private readonly IShipperService _shipperService;
     private readonly IOrderTimeOutService _timeOutService;
     private readonly IUserCookieService _userCookieService;
-    private readonly IMapper _mapper;
 
     public OrdersController(IOrderService orderService, IShipperService shipperService,
                             IOrderTimeOutService timeOutService,
@@ -38,7 +38,8 @@ public class OrdersController : Controller
     }
 
     [HttpGet("history")]
-    public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetByFilterAsync(AllOrdersFilterRequestModel filterRequest)
+    public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetByFilterAsync(
+        AllOrdersFilterRequestModel filterRequest)
     {
         var filter = _mapper.Map<AllOrdersFilter>(filterRequest);
         var orders = await _orderService.GetByFilterAsync(filter);
@@ -47,7 +48,7 @@ public class OrdersController : Controller
 
         return View(result);
     }
-    
+
     [HttpGet("customer/{customerId}")]
     public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetByCustomerIdAsync(string customerId)
     {
@@ -57,7 +58,7 @@ public class OrdersController : Controller
 
         return View(result);
     }
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<OrderViewModel>> GetWithDetailsAsync(Guid id)
     {
@@ -67,7 +68,7 @@ public class OrdersController : Controller
 
         return View(result);
     }
-    
+
     [HttpGet("basket")]
     public async Task<ActionResult<OrderViewModel>> GetCurrentBasketAsync()
     {
@@ -84,12 +85,12 @@ public class OrdersController : Controller
         {
             return RedirectToAction("Payment", "Orders", new { orderId = order.Id });
         }
-        
+
         ViewData["HasActiveOrder"] = await _orderService.IsCustomerHasActiveOrder(customerId);
 
         return View(result);
     }
-    
+
     [HttpPost("/games/{gameKey}/buy")]
     public async Task<ActionResult> AddToBasketAsync(string gameKey, int quantity)
     {
@@ -104,20 +105,20 @@ public class OrdersController : Controller
             GameKey = gameKey,
             Quantity = quantity
         };
-        
+
         await _orderService.AddToOrderAsync(customerId, basketItem);
 
         return RedirectToAction("GetWithDetails", "Games", new { gameKey });
     }
-    
+
     [HttpGet("{orderId}/make-order")]
     public async Task<ActionResult> MakeOrderAsync(Guid orderId)
     {
         await _orderService.MakeOrder(orderId);
 
-        return RedirectToAction("UpdateShipInfo", "Orders", new { orderId = orderId });
+        return RedirectToAction("UpdateShipInfo", "Orders", new { orderId });
     }
-    
+
     [HttpGet("{orderId}/ship-info")]
     public async Task<ActionResult<ActiveOrderCreateRequestModel>> UpdateShipInfoAsync(Guid orderId)
     {
@@ -128,33 +129,33 @@ public class OrdersController : Controller
 
         return View(new ActiveOrderCreateRequestModel { OrderId = orderId });
     }
-    
+
     [HttpPost("{orderId}/ship-info")]
     public async Task<ActionResult> UpdateShipInfoAsync(ActiveOrderCreateRequestModel requestModel)
     {
         var createModel = _mapper.Map<ActiveOrderCreateModel>(requestModel);
-        
+
         await _orderService.FillShippersAsync(createModel);
 
         return RedirectToAction("Payment", "Orders", new { requestModel.OrderId });
     }
-    
-    [HttpGet("{orderId}/payment")] 
+
+    [HttpGet("{orderId}/payment")]
     public async Task<ActionResult> PaymentAsync(Guid orderId)
     {
         var order = await _orderService.GetByIdAsync(orderId);
         var orderViewModel = _mapper.Map<OrderViewModel>(order);
-        
+
         return View("Checkout", orderViewModel);
     }
-    
+
     [HttpPost("{orderId}/payment")]
     public async Task<ActionResult> PaymentAsync(Guid orderId, PaymentType paymentType)
     {
         var order = await _orderService.GetByIdAsync(orderId);
-        
+
         await _timeOutService.CreateOpenedOrderAsync(order);
-        
+
         return RedirectToPayment(orderId, paymentType);
     }
 
@@ -172,12 +173,12 @@ public class OrdersController : Controller
     public async Task<ActionResult<OrderViewModel>> UpdateAsync(OrderUpdateRequestModel requestModel)
     {
         var updateModel = _mapper.Map<OrderUpdateModel>(requestModel);
-        
+
         if (updateModel.Status is OrderStatus.Completed or OrderStatus.Cancelled)
         {
             await _timeOutService.RemoveOpenedOrderByOrderIdAsync(updateModel.Id);
         }
-        
+
         await _orderService.UpdateAsync(updateModel);
 
         return RedirectToAction("GetWithDetails", "Orders", new { id = requestModel.Id });

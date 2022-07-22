@@ -5,7 +5,7 @@ namespace GameStore.Core.Models.ServiceModels.Orders;
 public class ActiveOrderCreateModel
 {
     public Guid OrderId { get; set; }
-    
+
     public decimal Freight { get; set; }
     public string ShipAddress { get; set; }
     public string ShipCity { get; set; }

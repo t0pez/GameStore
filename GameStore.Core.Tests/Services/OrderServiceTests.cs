@@ -22,12 +22,12 @@ namespace GameStore.Core.Tests.Services;
 
 public class OrderServiceTests
 {
+    private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IRepository<OrderMongo>> _orderMongoRepoMock;
+    private readonly Mock<IRepository<Order>> _orderRepoMock;
     private readonly OrderService _orderService;
     private readonly Mock<ISearchService> _searchServiceMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<IMapper> _mapperMock;
-    private readonly Mock<IRepository<Order>> _orderRepoMock;
-    private readonly Mock<IRepository<OrderMongo>> _orderMongoRepoMock;
 
     public OrderServiceTests()
     {
@@ -42,8 +42,9 @@ public class OrderServiceTests
                        .Returns(_orderRepoMock.Object);
         _unitOfWorkMock.Setup(unitOfWork => unitOfWork.GetMongoRepository<OrderMongo>())
                        .Returns(_orderMongoRepoMock.Object);
-        
-        _orderService = new OrderService(_searchServiceMock.Object, mongoLogger.Object, _unitOfWorkMock.Object, _mapperMock.Object);
+
+        _orderService = new OrderService(_searchServiceMock.Object, mongoLogger.Object, _unitOfWorkMock.Object,
+                                         _mapperMock.Object);
     }
 
     [Fact]
@@ -53,7 +54,7 @@ public class OrderServiceTests
         var filter = new AllOrdersFilter();
         var serverFilter = new OrdersFilter();
         var mongoFilter = new MongoOrdersFilter();
-        
+
         var expectedServerItems = new List<Order>
         {
             new()
@@ -101,8 +102,9 @@ public class OrderServiceTests
 
         _orderRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<OrdersByFilterSpec>()))
                       .ReturnsAsync(expectedServerItems);
-        _orderMongoRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<MongoOrdersByFilterWithDetailsSpec>()))
-                      .ReturnsAsync(expectedMongoItems);
+        _orderMongoRepoMock
+            .Setup(repository => repository.GetBySpecAsync(It.IsAny<MongoOrdersByFilterWithDetailsSpec>()))
+            .ReturnsAsync(expectedMongoItems);
         _mapperMock.Setup(mapper => mapper.Map<IEnumerable<OrderDto>>(expectedServerItems))
                    .Returns(mappedServerItems);
         _mapperMock.Setup(mapper => mapper.Map<IEnumerable<OrderDto>>(expectedMongoItems))
@@ -111,13 +113,13 @@ public class OrderServiceTests
                    .Returns(serverFilter);
         _mapperMock.Setup(mapper => mapper.Map<MongoOrdersFilter>(filter))
                    .Returns(mongoFilter);
-        
+
 
         var actualResult = await _orderService.GetByFilterAsync(filter);
 
         actualResult.Count.Should().Be(expectedCount);
     }
-    
+
     [Fact]
     public async void GetByIdAsync_ExistingOrderId_ReturnsCorrectResult()
     {
@@ -133,7 +135,7 @@ public class OrderServiceTests
 
         actualResult.Id.Should().Be(orderId);
     }
-    
+
     [Fact]
     public async void GetByCustomerIdAsync_ExistingCustomer_ReturnsCorrectResult()
     {
@@ -141,7 +143,9 @@ public class OrderServiceTests
         var customerId = Guid.NewGuid().ToString();
         var expectedResult = new List<Order>(new Order[expectedCount]);
 
-        _orderRepoMock.Setup(repository => repository.GetBySpecAsync(It.Is<OrdersByCustomerIdSpec>(spec => spec.CustomerId == customerId)))
+        _orderRepoMock.Setup(repository =>
+                                 repository.GetBySpecAsync(
+                                     It.Is<OrdersByCustomerIdSpec>(spec => spec.CustomerId == customerId)))
                       .ReturnsAsync(expectedResult);
 
         var actualResult = await _orderService.GetByCustomerIdAsync(customerId);
@@ -154,7 +158,7 @@ public class OrderServiceTests
     {
         const string customerId = "customerId";
         const bool customerHasActiveOrder = false;
-        
+
         var orderCreateModel = new OrderCreateModel { CustomerId = customerId };
         var order = new Order { CustomerId = customerId };
 
@@ -172,7 +176,7 @@ public class OrderServiceTests
         _orderRepoMock.Verify(repository => repository.AddAsync(order), Times.Once);
         _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync(), Times.Once);
     }
-    
+
     [Fact]
     public async void UpdateAsync_CorrectValues_UpdatesOrder()
     {
@@ -187,7 +191,7 @@ public class OrderServiceTests
                       .ReturnsAsync(order);
 
         await _orderService.UpdateAsync(orderUpdateModel);
-        
+
         _orderRepoMock.Verify(repository => repository.UpdateAsync(order), Times.Once);
         _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync(), Times.Once);
     }

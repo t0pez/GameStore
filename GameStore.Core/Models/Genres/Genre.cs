@@ -14,9 +14,9 @@ public class Genre : ISafeDelete
 
     public Guid? ParentId { get; set; }
     public Genre Parent { get; set; }
-    
+
     public ICollection<Genre> SubGenres { get; set; } = new List<Genre>();
     public ICollection<GameGenre> Games { get; set; } = new List<GameGenre>();
-        
+
     public bool IsDeleted { get; set; }
 }

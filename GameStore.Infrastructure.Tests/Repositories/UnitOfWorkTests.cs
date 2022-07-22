@@ -12,8 +12,8 @@ namespace GameStore.Infrastructure.Tests.Repositories;
 
 public class UnitOfWorkTests
 {
-    private readonly IUnitOfWork _unitOfWork;
     private readonly ApplicationContext _context;
+    private readonly IUnitOfWork _unitOfWork;
 
     public UnitOfWorkTests()
     {
@@ -25,23 +25,23 @@ public class UnitOfWorkTests
     public void GetRepository_Game()
     {
         var actualResult = _unitOfWork.GetEfRepository<Game>();
-        
+
         Assert.NotNull(actualResult);
     }
-    
+
     [Fact]
     public void GetRepository_GameGenre()
     {
         var actualResult = _unitOfWork.GetEfRepository<GameGenre>();
-        
+
         Assert.NotNull(actualResult);
     }
-    
+
     [Fact]
     public void GetRepository_Comment()
     {
         var actualResult = _unitOfWork.GetEfRepository<Comment>();
-        
+
         Assert.NotNull(actualResult);
     }
 
@@ -49,22 +49,19 @@ public class UnitOfWorkTests
     public void GetRepository_NotCorrectModel_RepositoryMethodThrowsException()
     {
         var repository = _unitOfWork.GetEfRepository<NotExistingModel>();
-        
-        var function = async () =>
-                       {
-                           await repository.AnyAsync(null);
-                       };
+
+        var function = async () => { await repository.AnyAsync(null); };
 
         Assert.ThrowsAsync<InvalidOperationException>(function);
     }
-    
+
     private ApplicationContext GetInMemoryContext()
     {
         var dbOptionBuilder = new DbContextOptionsBuilder<ApplicationContext>();
         dbOptionBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString())
                        .EnableDetailedErrors()
                        .EnableSensitiveDataLogging();
-        
+
         var context = new ApplicationContext(dbOptionBuilder.Options);
 
         return context;

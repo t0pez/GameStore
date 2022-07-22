@@ -28,13 +28,13 @@ namespace GameStore.Web.Tests.Controllers;
 public class GameControllerTests
 {
     private readonly GamesController _gameController;
-    private readonly Mock<ISearchService> _searchServiceMock;
     private readonly Mock<IGameService> _gameServiceMock;
-    private readonly Mock<IPublisherService> _publisherServiceMock;
     private readonly Mock<IGenreService> _genreServiceMock;
-    private readonly Mock<IPlatformTypeService> _platformServiceMock;
     private readonly Mock<IMapper> _mapperMock;
-    private Mock<IUserCookieService> _userCookieServiceMock;
+    private readonly Mock<IPlatformTypeService> _platformServiceMock;
+    private readonly Mock<IPublisherService> _publisherServiceMock;
+    private readonly Mock<ISearchService> _searchServiceMock;
+    private readonly Mock<IUserCookieService> _userCookieServiceMock;
 
     public GameControllerTests()
     {
@@ -49,12 +49,12 @@ public class GameControllerTests
 
         _gameController = new GamesController(_searchServiceMock.Object, _gameServiceMock.Object,
                                               _publisherServiceMock.Object, _genreServiceMock.Object,
-                                              _platformServiceMock.Object, _mapperMock.Object, orderServiceMock.Object, _userCookieServiceMock.Object);
+                                              _platformServiceMock.Object, _mapperMock.Object, orderServiceMock.Object,
+                                              _userCookieServiceMock.Object);
         _gameController.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()
         };
-
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class GameControllerTests
         _platformServiceMock.Setup(service => service.GetAllAsync())
                             .ReturnsAsync(new List<PlatformType>());
         _publisherServiceMock.Setup(service => service.GetAllAsync())
-                            .ReturnsAsync(new List<PublisherDto>());
+                             .ReturnsAsync(new List<PublisherDto>());
 
         var actualResult = await _gameController.GetAllAsync(filterRequestModel, currentPage, pageSize);
 
@@ -102,12 +102,12 @@ public class GameControllerTests
                             .ReturnsAsync(new List<PlatformType>());
         _publisherServiceMock.Setup(service => service.GetAllAsync())
                              .ReturnsAsync(new List<PublisherDto>());
-        
+
         var actualResult = await _gameController.CreateAsync();
 
         actualResult.Should().BeAssignableTo<ViewResult>();
     }
-    
+
     [Fact]
     public async void CreateAsync_CorrectParameters_ReturnsRedirect()
     {
@@ -120,11 +120,12 @@ public class GameControllerTests
         {
             Key = gameKey
         };
-        
+
         var fileCollection = new FormFileCollection { new FormFile(Stream.Null, 0, 0, "", "") };
         _gameController.ControllerContext = new ControllerContext();
         _gameController.ControllerContext.HttpContext = new DefaultHttpContext();
-        _gameController.ControllerContext.HttpContext.Request.Form = new FormCollection(new Dictionary<string, StringValues>(), fileCollection);
+        _gameController.ControllerContext.HttpContext.Request.Form =
+            new FormCollection(new Dictionary<string, StringValues>(), fileCollection);
 
         _mapperMock.Setup(mapper => mapper.Map<GameCreateModel>(requestModel))
                    .Returns(createModel);
@@ -146,27 +147,28 @@ public class GameControllerTests
         var actualJsonResult = Assert.IsType<JsonResult>(actualResult);
         Assert.Equal(expectedJsonValue, actualJsonResult.Value.ToString());
     }
-    
+
     [Fact]
     public async void GetWithDetailsAsync_ExistingKey_ReturnsGameView()
     {
         const string gameKey = "existing-game-key";
 
         _searchServiceMock.Setup(service => service.GetProductDtoByGameKeyOrDefaultAsync(gameKey))
-                        .ReturnsAsync(new ProductDto { Key = gameKey});
+                          .ReturnsAsync(new ProductDto { Key = gameKey });
         _mapperMock.Setup(mapper => mapper.Map<GameViewModel>(It.IsAny<ProductDto>()))
-                   .Returns(new GameViewModel { Key = gameKey});
+                   .Returns(new GameViewModel { Key = gameKey });
         string a = null!;
-        _userCookieServiceMock.Setup(service => service.TryGetCookiesUserId(It.IsAny<IRequestCookieCollection>(), out a))
-                              .Returns(false);
+        _userCookieServiceMock
+            .Setup(service => service.TryGetCookiesUserId(It.IsAny<IRequestCookieCollection>(), out a))
+            .Returns(false);
 
         var actualResult = await _gameController.GetWithDetailsAsync(gameKey);
-        
+
         actualResult.Result.Should().BeOfType<ViewResult>()
                     .Which.Model.Should().BeOfType<GameViewModel>()
                     .Which.Key.Should().Be(gameKey);
     }
-    
+
     [Fact]
     public async void GetWithDetailsAsync_NotExistingKey_ThrowsNotFoundException()
     {
@@ -174,12 +176,12 @@ public class GameControllerTests
 
         _searchServiceMock.Setup(service => service.GetProductDtoByGameKeyOrDefaultAsync(gameKey))
                           .ThrowsAsync(new ItemNotFoundException());
-        
+
         var operation = async () => await _gameController.GetWithDetailsAsync(gameKey);
 
         await Assert.ThrowsAsync<ItemNotFoundException>(operation);
     }
-    
+
     [Fact]
     public async void GetFileAsync_ExistingKey_ReturnsFile()
     {
@@ -188,12 +190,12 @@ public class GameControllerTests
 
         _gameServiceMock.Setup(service => service.GetFileAsync(gameKey))
                         .ReturnsAsync(expectedResult);
-        
+
         var actualResult = await _gameController.GetFileAsync(gameKey);
         var actualFileResult = Assert.IsType<FileContentResult>(actualResult);
         Assert.Equal(expectedResult, actualFileResult.FileContents);
     }
-    
+
     [Fact]
     public async void GetFileAsync_NotExistingKey_ThrowsNotFoundException()
     {
@@ -201,7 +203,7 @@ public class GameControllerTests
 
         _gameServiceMock.Setup(service => service.GetFileAsync(gameKey))
                         .ThrowsAsync(new ItemNotFoundException());
-        
+
         var operation = async () => await _gameController.GetFileAsync(gameKey);
 
         await Assert.ThrowsAsync<ItemNotFoundException>(operation);
@@ -211,7 +213,7 @@ public class GameControllerTests
     public async void UpdateAsync_NoParameters_ReturnsView()
     {
         const string gameKey = "game-key";
-        
+
         _genreServiceMock.Setup(service => service.GetAllAsync())
                          .ReturnsAsync(new List<Genre>());
         _platformServiceMock.Setup(service => service.GetAllAsync())
@@ -219,12 +221,12 @@ public class GameControllerTests
         _publisherServiceMock.Setup(service => service.GetAllAsync())
                              .ReturnsAsync(new List<PublisherDto>());
 
-        
+
         var actualResult = await _gameController.UpdateAsync(gameKey);
 
         actualResult.Should().BeAssignableTo<ViewResult>();
     }
-    
+
     [Fact]
     public async void UpdateAsync_CorrectValues_ReturnsRedirect()
     {
@@ -234,7 +236,8 @@ public class GameControllerTests
         var fileCollection = new FormFileCollection { new FormFile(Stream.Null, 0, 0, "", "") };
         _gameController.ControllerContext = new ControllerContext();
         _gameController.ControllerContext.HttpContext = new DefaultHttpContext();
-        _gameController.ControllerContext.HttpContext.Request.Form = new FormCollection(new Dictionary<string, StringValues>(), fileCollection);
+        _gameController.ControllerContext.HttpContext.Request.Form =
+            new FormCollection(new Dictionary<string, StringValues>(), fileCollection);
 
         var updateRequestModel = new GameUpdateRequestModel();
 
@@ -249,7 +252,7 @@ public class GameControllerTests
     {
         const string gameKey = "game-key";
         const Database database = Database.Server;
-        
+
         var actualResult = await _gameController.DeleteAsync(gameKey, (int)database);
 
         Assert.IsType<RedirectToActionResult>(actualResult);

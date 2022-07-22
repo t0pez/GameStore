@@ -11,11 +11,11 @@ public class Shipper
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
-    
+
     [NavigationId]
     [BsonElement("ShipperID")]
     public int ShipperId { get; set; }
-    
+
     public string CompanyName { get; set; }
     public string Phone { get; set; }
 }

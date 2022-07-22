@@ -23,14 +23,14 @@ public class ProductDto
     public DateTime? AddedToStoreAt { get; set; }
     public byte[] File { get; set; }
     public int? Views { get; set; }
-    
+
     public List<Genre> Genres { get; set; } = new();
     public List<PlatformType> Platforms { get; set; } = new();
 
     public string PublisherName { get; set; } = string.Empty;
     public PublisherDto Publisher { get; set; }
     public IEnumerable<Comment> Comments { get; set; } = new List<Comment>();
-    
+
     public Database Database { get; set; }
     public bool? IsDeleted { get; set; }
 }

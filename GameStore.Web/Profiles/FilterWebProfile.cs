@@ -24,7 +24,7 @@ public class FilterWebProfile : Profile
                        expression =>
                            expression.MapFrom(
                                request => request.SelectedPublishers));
-        
+
         CreateMap<GamesFilterRequestModel, GameSearchFilter>()
             .ForMember(searchFilter => searchFilter.GenresIds,
                        expression =>

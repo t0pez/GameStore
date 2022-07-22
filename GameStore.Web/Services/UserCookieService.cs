@@ -8,7 +8,7 @@ public class UserCookieService : IUserCookieService
 {
     private const string UserCookieName = "_userId";
     private readonly CookieOptions _cookieOptions = new() { Expires = DateTimeOffset.UtcNow.AddYears(2) };
-    
+
     public bool IsCookiesContainsUserId(IRequestCookieCollection cookies)
     {
         return cookies.ContainsKey(UserCookieName);

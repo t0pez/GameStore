@@ -13,12 +13,12 @@ namespace GameStore.Core.Services;
 public class OrderTimeOutService : IOrderTimeOutService
 {
     private const int OrderTimeOutOffsetInDays = 3;
+    private readonly IGameService _gameService;
+    private readonly IMapper _mapper;
+    private readonly IOpenedOrderService _openedOrderService;
+    private readonly IOrderService _orderService;
 
     private readonly ISearchService _searchService;
-    private readonly IGameService _gameService;
-    private readonly IOrderService _orderService;
-    private readonly IOpenedOrderService _openedOrderService;
-    private readonly IMapper _mapper;
 
     public OrderTimeOutService(ISearchService searchService, IGameService gameService, IOrderService orderService,
                                IOpenedOrderService openedOrderService, IMapper mapper)
@@ -43,18 +43,8 @@ public class OrderTimeOutService : IOrderTimeOutService
             await _openedOrderService.UpdateAsync(openedOrder);
             return;
         }
-        
+
         await CreateAsync(order, openedOrder);
-    }
-
-    private async Task CreateAsync(Order order, OpenedOrder openedOrder)
-    {
-        foreach (var orderDetail in order.OrderDetails)
-        {
-            await ReduceGameQuantity(orderDetail.GameKey, orderDetail.Quantity);
-        }
-
-        await _openedOrderService.CreateAsync(openedOrder);
     }
 
     public async Task RemoveOpenedOrderByOrderIdAsync(Guid orderId)
@@ -68,7 +58,17 @@ public class OrderTimeOutService : IOrderTimeOutService
 
         await _openedOrderService.DeleteByOrderIdAsync(orderId);
     }
-    
+
+    private async Task CreateAsync(Order order, OpenedOrder openedOrder)
+    {
+        foreach (var orderDetail in order.OrderDetails)
+        {
+            await ReduceGameQuantity(orderDetail.GameKey, orderDetail.Quantity);
+        }
+
+        await _openedOrderService.CreateAsync(openedOrder);
+    }
+
     private async Task ReduceGameQuantity(string gameKey, int quantity)
     {
         await UpdateGameUnitsInStock(gameKey, game => game.UnitsInStock -= quantity);
@@ -84,7 +84,7 @@ public class OrderTimeOutService : IOrderTimeOutService
         var game = await _searchService.GetProductDtoByGameKeyOrDefaultAsync(gameKey)
                    ?? throw new ItemNotFoundException(typeof(Game), gameKey);
         updateMethod(game);
-        
+
         var updateModel = _mapper.Map<GameUpdateModel>(game);
 
         await _gameService.UpdateAsync(updateModel);

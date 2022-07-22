@@ -14,9 +14,9 @@ namespace GameStore.Core.Tests.Services;
 
 public class OpenedOrderServiceTests
 {
+    private readonly Mock<IRepository<OpenedOrder>> _openedOrderRepoMock;
     private readonly OpenedOrderService _openedOrderService;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<IRepository<OpenedOrder>> _openedOrderRepoMock;
 
     public OpenedOrderServiceTests()
     {
@@ -27,7 +27,7 @@ public class OpenedOrderServiceTests
                        .Returns(_openedOrderRepoMock.Object);
         _unitOfWorkMock.Setup(unitOfWork => unitOfWork.SaveChangesAsync())
                        .Verifiable();
-        
+
         _openedOrderService = new OpenedOrderService(_unitOfWorkMock.Object);
     }
 
@@ -36,7 +36,7 @@ public class OpenedOrderServiceTests
     {
         const int expectedCount = 4;
         var expectedResult = new List<OpenedOrder>(new OpenedOrder[expectedCount]);
-        
+
         _openedOrderRepoMock.Setup(repository => repository.GetBySpecAsync(null))
                             .ReturnsAsync(expectedResult);
 
@@ -58,16 +58,16 @@ public class OpenedOrderServiceTests
                             .Verifiable();
 
         await _openedOrderService.CreateAsync(openedOrder);
-        
+
         _openedOrderRepoMock.Verify(repository => repository.AddAsync(openedOrder));
         _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync());
     }
-    
+
     [Fact]
     public async void DeleteByOrderIdAsync_ExistingOpenedOrder_DeletesOpenedOrder()
     {
         var openedOrderId = Guid.NewGuid();
-        
+
         var openedOrder = new OpenedOrder
         {
             OrderId = openedOrderId,
@@ -82,11 +82,11 @@ public class OpenedOrderServiceTests
                             .Verifiable();
 
         await _openedOrderService.DeleteByOrderIdAsync(openedOrderId);
-        
+
         _openedOrderRepoMock.Verify(repository => repository.DeleteAsync(openedOrder));
         _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync());
     }
-    
+
     [Fact]
     public async void DeleteByOrderIdAsync_NotExistingOpenedOrder_ThrowsException()
     {

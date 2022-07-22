@@ -22,11 +22,11 @@ public class Order : ISafeDelete
     public string ShipPostalCode { get; set; }
     public string ShipRegion { get; set; }
     public int ShipperId { get; set; }
-    [NotMapped]
-    public Shipper Shipper { get; set; }
+
+    [NotMapped] public Shipper Shipper { get; set; }
 
     public ICollection<OrderDetails> OrderDetails { get; set; } = new List<OrderDetails>();
+    public decimal TotalSum => OrderDetails.Sum(details => details.TotalPrice);
 
     public bool IsDeleted { get; set; }
-    public decimal TotalSum => OrderDetails.Sum(details => details.TotalPrice);
 }

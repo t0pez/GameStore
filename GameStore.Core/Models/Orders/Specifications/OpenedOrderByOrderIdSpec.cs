@@ -8,7 +8,7 @@ public class OpenedOrderByOrderIdSpec : Specification<OpenedOrder>
     public OpenedOrderByOrderIdSpec(Guid orderId)
     {
         OrderId = orderId;
-        
+
         Query
             .Where(openedOrder => openedOrder.OrderId == orderId);
     }

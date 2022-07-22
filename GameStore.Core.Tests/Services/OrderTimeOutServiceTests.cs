@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Dto;
-using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Orders;
 using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.Core.Services;
@@ -14,12 +13,12 @@ namespace GameStore.Core.Tests.Services;
 
 public class OrderTimeOutServiceTests
 {
-    private readonly OrderTimeOutService _timeOutService;
     private readonly Mock<IGameService> _gameServiceMock;
-    private readonly Mock<ISearchService> _searchServiceMock;
-    private readonly Mock<IOrderService> _orderServiceMock;
-    private readonly Mock<IOpenedOrderService> _openedOrderServiceMock;
     private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IOpenedOrderService> _openedOrderServiceMock;
+    private readonly Mock<IOrderService> _orderServiceMock;
+    private readonly Mock<ISearchService> _searchServiceMock;
+    private readonly OrderTimeOutService _timeOutService;
 
     public OrderTimeOutServiceTests()
     {
@@ -42,8 +41,8 @@ public class OrderTimeOutServiceTests
         const string gameKey = "game-key";
 
         var game = new ProductDto { Key = gameKey, UnitsInStock = 100 };
-        var gameUpdateModel = new GameUpdateModel { Key = gameKey};
-        
+        var gameUpdateModel = new GameUpdateModel { Key = gameKey };
+
         var orderDetail = new OrderDetails { GameKey = gameKey, Quantity = 1 };
         var orderDetails = new List<OrderDetails> { orderDetail };
         var order = new Order
@@ -54,14 +53,15 @@ public class OrderTimeOutServiceTests
         };
 
         _searchServiceMock.Setup(service => service.GetProductDtoByGameKeyOrDefaultAsync(gameKey))
-                        .ReturnsAsync(game);
+                          .ReturnsAsync(game);
         _mapperMock.Setup(mapper => mapper.Map<GameUpdateModel>(game))
                    .Returns(gameUpdateModel);
 
         await _timeOutService.CreateOpenedOrderAsync(order);
-        
+
         _gameServiceMock.Verify(service => service.UpdateAsync(gameUpdateModel), Times.Once);
-        _openedOrderServiceMock.Verify(service => service.CreateAsync(It.Is<OpenedOrder>(openedOrder => openedOrder.OrderId == orderId)));
+        _openedOrderServiceMock.Verify(
+            service => service.CreateAsync(It.Is<OpenedOrder>(openedOrder => openedOrder.OrderId == orderId)));
     }
 
     [Fact]
@@ -71,8 +71,8 @@ public class OrderTimeOutServiceTests
         const string gameKey = "game-key";
 
         var game = new ProductDto { Key = gameKey, UnitsInStock = 100 };
-        var gameUpdateModel = new GameUpdateModel { Key = gameKey};
-        
+        var gameUpdateModel = new GameUpdateModel { Key = gameKey };
+
         var orderDetail = new OrderDetails { GameKey = gameKey, Quantity = 1 };
         var orderDetails = new List<OrderDetails> { orderDetail };
         var order = new Order
@@ -89,7 +89,7 @@ public class OrderTimeOutServiceTests
                    .Returns(gameUpdateModel);
 
         await _timeOutService.RemoveOpenedOrderByOrderIdAsync(orderId);
-        
+
         _gameServiceMock.Verify(service => service.UpdateAsync(gameUpdateModel), Times.Once);
         _openedOrderServiceMock.Verify(service => service.DeleteByOrderIdAsync(orderId), Times.Once);
     }

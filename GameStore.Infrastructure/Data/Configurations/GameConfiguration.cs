@@ -10,7 +10,7 @@ internal class GameConfiguration : IEntityTypeConfiguration<Game>
     {
         builder.HasKey(game => game.Id);
         builder.HasIndex(game => game.Key).IsUnique();
-        
+
         builder.Property(game => game.Name).IsRequired();
         builder.Property(game => game.Description).IsRequired();
         builder.Property(game => game.File).IsRequired();
@@ -19,9 +19,5 @@ internal class GameConfiguration : IEntityTypeConfiguration<Game>
         builder.HasMany(game => game.Comments)
                .WithOne(comment => comment.Game)
                .HasForeignKey(comment => comment.GameId);
-
-        // builder.HasOne(game => game.Publisher)
-        //        .WithMany(publisher => publisher.Games)
-        //        .HasForeignKey(game => game.PublisherId);
     }
 }

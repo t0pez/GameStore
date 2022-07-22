@@ -23,7 +23,7 @@ public class GameUpdateModel
     public ICollection<Guid> PlatformsIds { get; set; } = new List<Guid>();
 
     public bool? IsDeleted { get; set; }
-    
+
     public Database Database { get; set; }
 
     public bool IsGameKeyChanged => OldGameKey != Key;

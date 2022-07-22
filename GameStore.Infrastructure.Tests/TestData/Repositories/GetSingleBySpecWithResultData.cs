@@ -25,7 +25,7 @@ public class GetSingleBySpecWithResultData : DataAttribute
             new GameByIdSpec(Guid.Parse("6fd6d158-7ffd-472a-b974-08da067d7601")),
             Guid.Parse("6fd6d158-7ffd-472a-b974-08da067d7601")
         };
-        
+
         yield return new object[]
         {
             new GameByIdWithDetailsSpec(Guid.Parse("6fd6d158-7ffd-472a-b971-08da067d7601")),
@@ -41,7 +41,7 @@ public class GetSingleBySpecWithResultData : DataAttribute
             new GameByIdWithDetailsSpec(Guid.Parse("6fd6d158-7ffd-472a-b974-08da067d7601")),
             Guid.Parse("6fd6d158-7ffd-472a-b974-08da067d7601")
         };
-        
+
         yield return new object[]
         {
             new GameByKeySpec("first-game"),
@@ -57,7 +57,7 @@ public class GetSingleBySpecWithResultData : DataAttribute
             new GameByKeySpec("fourth-game"),
             Guid.Parse("6fd6d158-7ffd-472a-b974-08da067d7601")
         };
-        
+
         yield return new object[]
         {
             new GameByKeyWithDetailsSpec("first-game"),

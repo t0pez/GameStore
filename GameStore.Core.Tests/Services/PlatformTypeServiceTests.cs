@@ -14,10 +14,10 @@ namespace GameStore.Core.Tests.Services;
 
 public class PlatformTypeServiceTests
 {
-    private readonly PlatformTypeService _platformService;
     private readonly Mock<IMapper> _mapperMock;
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IRepository<PlatformType>> _platformRepoMock;
+    private readonly PlatformTypeService _platformService;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
 
     public PlatformTypeServiceTests()
     {

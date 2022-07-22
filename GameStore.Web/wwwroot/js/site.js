@@ -87,7 +87,7 @@ function removeCommentReplyingStatus() {
 function submitOrderPaymentType(type) {
     let form = document.getElementById("SubmitForm")
     let paymentTypeElement = document.getElementById("PaymentType")
-    
+
     paymentTypeElement.value = type
     form.submit()
 }

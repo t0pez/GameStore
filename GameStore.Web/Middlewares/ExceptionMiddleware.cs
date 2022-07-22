@@ -1,16 +1,16 @@
-﻿using GameStore.Core.Exceptions;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Net;
 using System.Threading.Tasks;
+using GameStore.Core.Exceptions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 
 namespace GameStore.Web.Middlewares;
 
 public class ExceptionMiddleware
 {
-    private readonly RequestDelegate _next;
     private readonly ILogger<ExceptionMiddleware> _logger;
+    private readonly RequestDelegate _next;
 
     public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
     {
@@ -57,7 +57,7 @@ public class ExceptionMiddleware
     private static void AddErrorToResponse(HttpContext context, Exception e)
     {
         var exceptionName = e.GetType().Name;
-        
+
         context.Response.Headers.Add("exception", exceptionName);
         context.Response.Headers.Add("exceptionMessage", e.Message);
     }

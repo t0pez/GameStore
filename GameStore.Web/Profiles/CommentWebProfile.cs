@@ -13,7 +13,7 @@ public class CommentWebProfile : Profile
         CreateMap<CommentCreateRequestModel, CommentCreateModel>().ReverseMap();
         CreateMap<CommentCreateRequestModel, ReplyCreateModel>().ReverseMap();
         CreateMap<CommentUpdateRequestModel, CommentUpdateModel>().ReverseMap();
-        
+
         CreateMap<Comment, CommentViewModel>()
             .ForMember(model => model.GameKey,
                        expression => expression.MapFrom(comment => comment.Game.Key))

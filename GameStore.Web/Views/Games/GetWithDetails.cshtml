@@ -10,8 +10,8 @@
 
 <div>
 
-    <hr />
-    
+    <hr/>
+
     <div class="row">
 
         <div class="col-6">
@@ -31,22 +31,22 @@
                     @Html.LabelFor(model => model.Price, "Price:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Price)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.PublishedAt, "Date of release:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.PublishedAt)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.AddedToStoreAt, "Date of adding to store:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.AddedToStoreAt)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.Views, "Views:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Views)
                 </div>
-                
+
                 <div>
                     <label class="form-label">Genres: </label>
                     <table class="table">
@@ -58,7 +58,7 @@
                                 </td>
 
                                 <td>
-                                    @Html.ActionLink("Checkout",  "GetWithDetails", "Genres", new { id = item.Id })
+                                    @Html.ActionLink("Checkout", "GetWithDetails", "Genres", new { id = item.Id })
                                 </td>
                             </tr>
                         }
@@ -97,17 +97,17 @@
             <div class="mb-3">
                 @Html.ActionLink("Download", "GetFile", new { gameKey = Model.Key }, new { @class = "btn btn-outline-secondary" })
             </div>
-            
+
             @if (Model.Database != Database.Mongo)
             {
                 <div class="mb-3">
                     @Html.ActionLink("View comments", "GetComments", "Comments", new { gameKey = Model.Key }, new { @class = "btn btn-outline-secondary" })
                 </div>
             }
-            
+
             <div class="mb-3">
                 <label>Publisher:</label>
-                @if(Model.Publisher is not null)
+                @if (Model.Publisher is not null)
                 {
                     <p>
                         @Html.ActionLink(Model.Publisher.Name, "GetWithDetails", "Publisher", new { companyName = Model.Publisher.Name })
@@ -144,10 +144,10 @@
                     </form>
                 </div>
             }
-            
+
         </div>
     </div>
 </div>
 <p>
-    @Html.ActionLink("Back to List", "GetAll", new {}, new{ @class="btn btn-outline-secondary" })
+    @Html.ActionLink("Back to List", "GetAll", new { }, new { @class = "btn btn-outline-secondary" })
 </p>

@@ -37,7 +37,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
         var query = ApplySpecification(Collection.AsQueryable(), spec);
 
         var result = await query.ToListAsync();
-        
+
         if (spec.IncludeExpressions.Any())
         {
             foreach (var model in result)
@@ -45,7 +45,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
                 AddIncludeProperties(model, spec);
             }
         }
-        
+
         return result;
     }
 
@@ -102,11 +102,14 @@ public class MongoRepository<T> : IRepository<T> where T : class
         UpdateDefinition<T> updateDefinition = null;
 
         var existEntity = Collection.Find(filter).SingleOrDefault()
-            ?? throw new ItemNotFoundException();
+                          ?? throw new ItemNotFoundException();
 
         var entityType = updated.GetType();
 
-        foreach (var propertyInfo in entityType.GetProperties().Where(info => info.GetCustomAttribute<UpdatablePropertyAttribute>() is not null))
+        foreach (var propertyInfo in entityType.GetProperties()
+                                               .Where(info =>
+                                                          info.GetCustomAttribute<UpdatablePropertyAttribute>() is not
+                                                              null))
         {
             var updatingEntityProperty = propertyInfo.GetValue(updated);
             if (updatingEntityProperty is null)
@@ -169,14 +172,14 @@ public class MongoRepository<T> : IRepository<T> where T : class
 
         return specResult;
     }
-    
+
     private IQueryable<TResult> ApplySelectSpecification<TResult>(IQueryable<T> query, ISpecification<T, TResult> spec)
     {
         if (spec.Selector is null)
         {
             throw new InvalidOperationException();
         }
-        
+
         var evaluator = new SpecificationEvaluator(true);
         var specResult = evaluator.GetQuery(query, spec);
 
@@ -200,21 +203,25 @@ public class MongoRepository<T> : IRepository<T> where T : class
                 .Select(info => info.LambdaExpression);
 
         var singleIncludeStrings = singleIncludeExpressions
-            .Select(includeExpression =>
-                        includeExpression.Body.GetMemberExpressions().First().Member.Name).ToList();
+                                   .Select(includeExpression =>
+                                               includeExpression.Body.GetMemberExpressions().First().Member.Name)
+                                   .ToList();
         var multiIncludeStrings = multiIncludeExpressions
-            .Select(includeExpression =>
-                        includeExpression.Body.GetMemberExpressions().First().Member.Name).ToList();
+                                  .Select(includeExpression =>
+                                              includeExpression.Body.GetMemberExpressions().First().Member.Name)
+                                  .ToList();
 
         if (singleIncludeStrings.Any())
         {
-            var singleNavProps = typeof(T).GetProperties().Where(propInfo => singleIncludeStrings.Contains(propInfo.Name));
+            var singleNavProps = typeof(T).GetProperties()
+                                          .Where(propInfo => singleIncludeStrings.Contains(propInfo.Name));
             AddSingleIncludeProperties(model, singleNavProps);
         }
 
         if (multiIncludeStrings.Any())
         {
-            var multiNavProps = typeof(T).GetProperties().Where(propInfo => multiIncludeStrings.Contains(propInfo.Name));
+            var multiNavProps =
+                typeof(T).GetProperties().Where(propInfo => multiIncludeStrings.Contains(propInfo.Name));
             AddManyIncludeProperties(model, multiNavProps);
         }
     }
@@ -295,18 +302,20 @@ public class MongoRepository<T> : IRepository<T> where T : class
         var getCollectionMethod = typeof(MongoDatabaseBase).GetMethod(nameof(MongoDatabaseBase.GetCollection));
         var getCollectionGenericMethod = getCollectionMethod?.MakeGenericMethod(targetEntityType);
         var collection = getCollectionGenericMethod?.Invoke(_database, new object[] { mongoCollectionName, null });
-        
+
         return collection;
     }
 
     private static object GetQuery(Type targetEntityType, object mongoCollection)
     {
         var asQueryableMethod = typeof(IMongoCollectionExtensions).GetMethods()
-                                                                  .First(info => info.Name == nameof(IMongoCollectionExtensions.AsQueryable) &&
+                                                                  .First(info => info.Name ==
+                                                                             nameof(IMongoCollectionExtensions
+                                                                                 .AsQueryable) &&
                                                                              info.GetParameters().Length == 2);
         var asQueryableGenericMethod = asQueryableMethod.MakeGenericMethod(targetEntityType);
         var query = asQueryableGenericMethod.Invoke(null, new[] { mongoCollection, null });
-        
+
         return query;
     }
 
@@ -318,7 +327,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
         var navIdExpression = Expression.Constant(sourceNavIdValue);
         var equalExpression = Expression.Equal(navPropertyExpression, navIdExpression);
         var lambda = Expression.Lambda(equalExpression, parameterExpression);
-        
+
         return lambda;
     }
 }

@@ -30,9 +30,9 @@ namespace GameStore.Core.Services;
 public class SearchService : ISearchService
 {
     private static readonly DateTime AddedToStoreAtForMongo = new(2022, 6, 2);
+    private readonly IMapper _mapper;
 
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public SearchService(IUnitOfWork unitOfWork, IMapper mapper)
     {
@@ -88,7 +88,7 @@ public class SearchService : ISearchService
         {
             var product =
                 await ProductsRepository.GetFirstOrDefaultBySpecAsync(new ProductByGameKeyWithDetailsSpec(gameKey));
-            
+
             if (IsProductFoundInMongo(product))
             {
                 result = _mapper.Map<ProductDto>(product);
@@ -154,7 +154,7 @@ public class SearchService : ISearchService
         var isPlatformFilterEnabled = filter.PlatformsIds.Any();
         var orderByDatabase = isPlatformFilterEnabled || isPublishedAtFilterEnabled;
         var sortedItems = new ProductDtoSortSpec(filter.OrderByState, orderByDatabase).Evaluate(uniqueItems);
-        
+
         return sortedItems;
     }
 
@@ -196,15 +196,33 @@ public class SearchService : ISearchService
         return result;
     }
 
-    private bool IsProductFoundInMongo(Product product) => product is not null;
+    private bool IsProductFoundInMongo(Product product)
+    {
+        return product is not null;
+    }
 
-    private bool IsGameNotFoundInServer(Game game) => game is null;
+    private bool IsGameNotFoundInServer(Game game)
+    {
+        return game is null;
+    }
 
-    private bool IsGameFoundInServer(Game game) => game is not null;
+    private bool IsGameFoundInServer(Game game)
+    {
+        return game is not null;
+    }
 
-    private bool IsPublisherFoundInServer(Publisher publisher) => publisher is not null;
+    private bool IsPublisherFoundInServer(Publisher publisher)
+    {
+        return publisher is not null;
+    }
 
-    private bool IsPublisherNotFoundInServer(Publisher publisher) => publisher is null;
+    private bool IsPublisherNotFoundInServer(Publisher publisher)
+    {
+        return publisher is null;
+    }
 
-    private bool IsSupplierFoundInMongo(Supplier supplier) => supplier is not null;
+    private bool IsSupplierFoundInMongo(Supplier supplier)
+    {
+        return supplier is not null;
+    }
 }

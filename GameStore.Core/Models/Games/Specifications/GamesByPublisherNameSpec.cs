@@ -12,6 +12,6 @@ public class GamesByPublisherNameSpec : SafeDeleteSpec<Game>
         Query
             .Where(game => game.PublisherName == publisherName);
     }
-    
+
     public string PublisherName { get; set; }
 }

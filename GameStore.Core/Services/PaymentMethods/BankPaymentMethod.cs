@@ -20,8 +20,7 @@ public class BankPaymentMethod : IPaymentMethod
 
         var fileContent = _invoiceFileGenerator.GetFile(createModel.Order);
         getaway.InvoiceFileContent = fileContent;
-        
+
         return getaway;
     }
 }
-

@@ -13,6 +13,12 @@ namespace GameStore.Infrastructure.Data.Context;
 
 public sealed class ApplicationContext : DbContext
 {
+    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
+    {
+        Database.EnsureCreated();
+        this.SeedData();
+    }
+
     public DbSet<Game> Games { get; set; }
     public DbSet<Genre> Genres { get; set; }
     public DbSet<PlatformType> PlatformTypes { get; set; }
@@ -23,14 +29,8 @@ public sealed class ApplicationContext : DbContext
 
     public DbSet<GameGenre> GameGenres { get; set; }
     public DbSet<GamePlatformType> GamePlatformTypes { get; set; }
-    
-    public DbSet<OpenedOrder> OpenedOrders { get; set; }
 
-    public ApplicationContext(DbContextOptions<ApplicationContext> options) : base(options)
-    {
-        Database.EnsureCreated();
-        this.SeedData();
-    }
+    public DbSet<OpenedOrder> OpenedOrders { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

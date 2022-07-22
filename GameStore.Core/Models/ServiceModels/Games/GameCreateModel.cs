@@ -11,7 +11,7 @@ public class GameCreateModel
     public decimal Price { get; set; }
     public byte[] File { get; set; }
     public string PublisherName { get; set; } = string.Empty;
-    
+
     public DateTime PublishedAt { get; set; }
     public ICollection<Guid> GenresIds { get; set; }
     public ICollection<Guid> PlatformsIds { get; set; }

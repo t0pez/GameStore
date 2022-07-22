@@ -9,8 +9,8 @@
 <div class="mt-5">
 
     <h2>@Model.Name</h2>
-    
-    <hr />
+
+    <hr/>
 
     <div class="row">
 
@@ -21,7 +21,7 @@
                     @Html.LabelFor(model => model.Name, "Name:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Name)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.HomePage, "Home page:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.HomePage)
@@ -31,47 +31,47 @@
                     @Html.LabelFor(model => model.Description, "Description:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Description)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.Address, "Address:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Address)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.City, "City:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.City)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.ContactName, "Contact name:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.ContactName)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.ContactTitle, "Contact title:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.ContactTitle)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.Phone, "Phone:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Phone)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.Fax, "Fax:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Fax)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.Country, "Country:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Country)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.PostalCode, "Postal code:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.PostalCode)
                 </div>
-                
+
                 <div>
                     @Html.LabelFor(model => model.Region, "Region:", new { @class = "form-label fw-bolder" })
                     @Html.DisplayFor(model => model.Region)
@@ -79,7 +79,7 @@
             </div>
 
         </div>
-        
+
         <div class="col-6">
             @if (Model.Database != Database.Mongo)
             {
@@ -96,5 +96,5 @@
         </div>
 
     </div>
-    
+
 </div>

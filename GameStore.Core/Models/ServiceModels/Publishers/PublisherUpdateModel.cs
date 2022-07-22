@@ -6,6 +6,6 @@ public class PublisherUpdateModel
     public string OldName { get; set; }
     public string Description { get; set; }
     public string HomePage { get; set; }
-    
+
     public bool IsNameChanged => OldName != Name;
 }

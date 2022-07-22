@@ -11,16 +11,14 @@ public class Category
     [BsonElement("_id")]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
-    
+
     [NavigationId]
     [BsonElement("CategoryID")]
     public int CategoryId { get; set; }
 
-    [BsonElement("CategoryName")]
-    public string Name { get; set; }
-    
+    [BsonElement("CategoryName")] public string Name { get; set; }
+
     public string Description { get; set; }
-    
-    [BsonIgnore]
-    public byte[] Picture { get; set; }
+
+    [BsonIgnore] public byte[] Picture { get; set; }
 }

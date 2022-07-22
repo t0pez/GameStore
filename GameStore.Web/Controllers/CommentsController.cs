@@ -43,7 +43,7 @@ public class CommentsController : Controller
     public async Task<ActionResult> UpdateCommentAsync(CommentUpdateRequestModel request)
     {
         var updateModel = _mapper.Map<CommentUpdateModel>(request);
-        
+
         await _commentService.UpdateAsync(updateModel);
 
         return RedirectToAction("GetComments", new { gameKey = request.GameKey });

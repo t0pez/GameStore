@@ -8,8 +8,8 @@ namespace GameStore.Web.Models.Game;
 
 public class GamesFilterRequestModel
 {
-    [MinLength(3)]
-    public string Name { get; set; }
+    [MinLength(3)] public string Name { get; set; }
+
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
     public SelectList Genres { get; set; }
@@ -18,7 +18,7 @@ public class GamesFilterRequestModel
     public List<string> SelectedPlatforms { get; set; } = new();
     public SelectList Publishers { get; set; }
     public List<string> SelectedPublishers { get; set; } = new();
-    
+
     public GameSearchFilterOrderByState OrderByState { get; set; } = GameSearchFilterOrderByState.Default;
 
     public int CurrentPage { get; set; }

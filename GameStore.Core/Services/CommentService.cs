@@ -1,18 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
+using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Comments.Specifications;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
-using GameStore.SharedKernel.Interfaces.DataAccess;
-using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using AutoMapper;
-using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.ServiceModels.Comments;
+using GameStore.SharedKernel.Interfaces.DataAccess;
 using GameStore.SharedKernel.Specifications.Extensions;
+using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
 namespace GameStore.Core.Services;
@@ -20,9 +20,9 @@ namespace GameStore.Core.Services;
 public class CommentService : ICommentService
 {
     private readonly ILogger<CommentService> _logger;
+    private readonly IMapper _mapper;
     private readonly IMongoLogger _mongoLogger;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public CommentService(ILogger<CommentService> logger, IMongoLogger mongoLogger, IUnitOfWork unitOfWork,
                           IMapper mapper)
@@ -40,7 +40,7 @@ public class CommentService : ICommentService
     {
         var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeySpec(model.GameKey))
                    ?? throw new ItemNotFoundException(typeof(Game), model.GameKey, nameof(model.GameKey));
-        
+
         var comment = _mapper.Map<Comment>(model);
         comment.GameId = game.Id;
         comment.DateOfCreation = DateTime.UtcNow;
@@ -76,7 +76,7 @@ public class CommentService : ICommentService
 
         var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeySpec(createModel.GameKey))
                    ?? throw new ItemNotFoundException(typeof(Game), createModel.GameKey, nameof(createModel.GameKey));
-        
+
         var reply = _mapper.Map<Comment>(createModel);
         reply.GameId = game.Id;
         reply.DateOfCreation = DateTime.UtcNow;
@@ -93,7 +93,7 @@ public class CommentService : ICommentService
     public async Task UpdateAsync(CommentUpdateModel updateModel)
     {
         var comment = await CommentRepository.GetSingleOrDefaultBySpecAsync(new CommentByIdSpec(updateModel.Id));
-        
+
         var oldCommentVersion = comment.ToBsonDocument();
 
         UpdateValues(comment, updateModel);
@@ -109,7 +109,7 @@ public class CommentService : ICommentService
         var comment = await CommentRepository.GetSingleOrDefaultBySpecAsync(new CommentByIdSpec(id));
 
         comment.IsDeleted = true;
-        
+
         await CommentRepository.UpdateAsync(comment);
         await _unitOfWork.SaveChangesAsync();
 

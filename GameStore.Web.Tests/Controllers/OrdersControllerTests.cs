@@ -20,12 +20,12 @@ namespace GameStore.Web.Tests.Controllers;
 
 public class OrdersControllerTests
 {
+    private readonly Mock<IMapper> _mapperMock;
     private readonly OrdersController _ordersController;
     private readonly Mock<IOrderService> _orderServiceMock;
     private readonly Mock<IShipperService> _shipperServiceMock;
     private readonly Mock<IOrderTimeOutService> _timeOutServiceMock;
     private readonly Mock<IUserCookieService> _userCookieServiceMock;
-    private readonly Mock<IMapper> _mapperMock;
 
     public OrdersControllerTests()
     {
@@ -37,7 +37,7 @@ public class OrdersControllerTests
         _ordersController = new OrdersController(_orderServiceMock.Object, _shipperServiceMock.Object,
                                                  _timeOutServiceMock.Object, _userCookieServiceMock.Object,
                                                  _mapperMock.Object);
-        
+
         _ordersController.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext()
@@ -53,7 +53,7 @@ public class OrdersControllerTests
 
         var filter = new AllOrdersFilterRequestModel();
         var ordersFilter = new AllOrdersFilter();
-        
+
         _orderServiceMock.Setup(service => service.GetByFilterAsync(ordersFilter))
                          .ReturnsAsync(expectedOrders);
         _mapperMock.Setup(mapper => mapper.Map<IEnumerable<OrderListViewModel>>(expectedOrders))
@@ -126,19 +126,19 @@ public class OrdersControllerTests
                    .Returns(orderUpdateRequestModel);
 
         var actualResult = await _ordersController.UpdateAsync(orderId);
-        
+
         actualResult.Result.Should().BeOfType<ViewResult>()
                     .Which.Model.Should().BeOfType<OrderUpdateRequestModel>()
                     .And.Subject.As<OrderUpdateRequestModel>().Id.Should().Be(orderId);
     }
-    
+
     [Fact]
     public async void UpdateAsync_CorrectValues_ReturnsRedirect()
     {
         var orderId = Guid.NewGuid();
         var orderUpdateRequestModel = new OrderUpdateRequestModel { Id = orderId };
         var orderUpdateModel = new OrderUpdateModel { Id = orderId };
-        
+
         _mapperMock.Setup(mapper => mapper.Map<OrderUpdateModel>(orderUpdateRequestModel))
                    .Returns(orderUpdateModel);
 

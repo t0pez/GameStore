@@ -13,16 +13,16 @@ namespace GameStore.Infrastructure.Tests.Repositories;
 
 public class RepositoryTests
 {
-    private readonly IRepository<Game> _gameRepository;
     private readonly ApplicationContext _context;
+    private readonly IRepository<Game> _gameRepository;
 
     public RepositoryTests()
     {
         var context = GetInMemoryContext();
-        
+
         SetTestContextData(context);
         context.ChangeTracker.Clear();
-        
+
         _context = context;
         _gameRepository = new EfRepository<Game>(_context);
     }
@@ -38,17 +38,17 @@ public class RepositoryTests
         Assert.Equal(expectedResultCount, actualResultCount);
     }
 
-    [Theory] 
+    [Theory]
     [GetBySpecAsyncData]
     public async void GetBySpecAsync_NotNullSpec_ReturnsCorrectModels(
         SafeDeleteSpec<Game> spec, int expectedCount)
     {
         var actualResult = await _gameRepository.GetBySpecAsync(spec);
         var actualCount = actualResult.Count;
-        
+
         Assert.Equal(expectedCount, actualCount);
     }
-    
+
     [Theory]
     [GetSingleBySpecWithResultData]
     public async void GetSingleBySpecAsync_ExistingModel_ReturnsCorrectModels(
@@ -56,10 +56,10 @@ public class RepositoryTests
     {
         var actualResult = await _gameRepository.GetSingleOrDefaultBySpecAsync(spec);
         var actualResultId = actualResult.Id;
-        
-        Assert.Equal(expectedId,actualResultId);
+
+        Assert.Equal(expectedId, actualResultId);
     }
-    
+
     [Theory]
     [GetSingleBySpecWithoutResultData]
     public async void GetSingleBySpecAsync_NotExistingModel_ReturnsNull(
@@ -68,7 +68,7 @@ public class RepositoryTests
         const Game expectedResult = null!;
 
         var actualResult = await _gameRepository.GetSingleOrDefaultBySpecAsync(spec);
-        
+
         Assert.Same(expectedResult, actualResult);
     }
 
@@ -78,7 +78,7 @@ public class RepositoryTests
         Game model)
     {
         const int expectedCount = 7;
-        
+
         await _gameRepository.AddAsync(model);
         await _context.SaveChangesAsync();
         var actualResult = await _gameRepository.GetBySpecAsync();
@@ -86,32 +86,26 @@ public class RepositoryTests
 
         Assert.Equal(expectedCount, actualResultCount);
     }
-    
+
     [Theory]
     [AddAsyncIncorrectModelData]
     public async void AddAsync_ExistingModel_SaveChangesMethodThrowsException(
         Game model)
     {
         await _gameRepository.AddAsync(model);
-        var saveChangesAfterAddMethod = async () =>
-                        {
-                            await _context.SaveChangesAsync();
-                        };
+        var saveChangesAfterAddMethod = async () => { await _context.SaveChangesAsync(); };
 
         await Assert.ThrowsAsync<ArgumentException>(saveChangesAfterAddMethod);
     }
-    
+
     [Theory]
     [UpdateAsyncIncorrectModelData]
     public async void UpdateAsync_NotExistingModel_SaveChangesThrowsException(
         Game updated)
     {
         await _gameRepository.UpdateAsync(updated);
-        var saveChangesAfterUpdateMethod = async () =>
-                           {
-                               await _context.SaveChangesAsync();
-                           };
-        
+        var saveChangesAfterUpdateMethod = async () => { await _context.SaveChangesAsync(); };
+
         await Assert.ThrowsAsync<DbUpdateConcurrencyException>(saveChangesAfterUpdateMethod);
     }
 
@@ -125,7 +119,7 @@ public class RepositoryTests
         await _context.SaveChangesAsync();
         var actualResult = await _gameRepository.GetBySpecAsync();
         var actualResultCount = actualResult.Count;
-        
+
         Assert.Equal(expectedCount, actualResultCount);
     }
 
@@ -135,7 +129,7 @@ public class RepositoryTests
         dbOptionBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString())
                        .EnableDetailedErrors()
                        .EnableSensitiveDataLogging();
-        
+
         var context = new ApplicationContext(dbOptionBuilder.Options);
 
         return context;
@@ -160,7 +154,7 @@ public class RepositoryTests
             Name = "Second game",
             Key = "second-game",
             Description = "Second description",
-            File = new byte[] { 0, 0, 0, 2 }, 
+            File = new byte[] { 0, 0, 0, 2 },
             IsDeleted = false,
             PublisherName = "First publisher",
             Publisher = new PublisherDto { Name = "First publisher" }
@@ -171,7 +165,7 @@ public class RepositoryTests
             Name = "Third game",
             Key = "Third-game",
             Description = "Third description",
-            File = new byte[] { 0, 0, 0, 3 }, 
+            File = new byte[] { 0, 0, 0, 3 },
             IsDeleted = false,
             PublisherName = "Second publisher",
             Publisher = new PublisherDto { Name = "Second publisher" }
@@ -182,7 +176,7 @@ public class RepositoryTests
             Name = "Fourth game",
             Key = "fourth-game",
             Description = "Fourth description",
-            File = new byte[] { 0, 0, 0, 4 }, 
+            File = new byte[] { 0, 0, 0, 4 },
             IsDeleted = false,
             PublisherName = "Second publisher",
             Publisher = new PublisherDto { Name = "Second publisher" }
@@ -191,5 +185,4 @@ public class RepositoryTests
         context.AddRange(game1, game2, game3, game4);
         context.SaveChanges();
     }
-
 }

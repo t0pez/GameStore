@@ -13,8 +13,8 @@ namespace GameStore.Web.Tests.Controllers;
 
 public class PaymentControllerTests
 {
-    private readonly PaymentController _paymentController;
     private readonly Mock<IOrderService> _orderServiceMock;
+    private readonly PaymentController _paymentController;
     private readonly Mock<IPaymentService> _paymentServiceMock;
 
     public PaymentControllerTests()
@@ -47,12 +47,12 @@ public class PaymentControllerTests
                     .Which.Model.Should().BeOfType<VisaPaymentGetaway>()
                     .And.Subject.As<VisaPaymentGetaway>().TotalSum.Should().Be(expectedTotalSum);
     }
-    
+
     [Fact]
     public async void BankPayAsync_ReturnsFileResult()
     {
         const PaymentType paymentType = PaymentType.Bank;
-        
+
         var orderId = Guid.NewGuid();
         var order = new Order
         {
@@ -68,7 +68,7 @@ public class PaymentControllerTests
 
         actualResult.Should().BeOfType<FileContentResult>();
     }
-    
+
     [Fact]
     public async void IboxPayAsync_ReturnsGetawayView()
     {

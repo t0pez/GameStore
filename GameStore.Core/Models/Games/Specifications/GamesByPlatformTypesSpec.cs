@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using Ardalis.Specification;
 using System.Linq;
+using Ardalis.Specification;
 using GameStore.SharedKernel.Specifications;
 
 namespace GameStore.Core.Models.Games.Specifications;

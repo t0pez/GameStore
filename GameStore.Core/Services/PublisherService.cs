@@ -20,11 +20,11 @@ namespace GameStore.Core.Services;
 
 public class PublisherService : IPublisherService
 {
-    private readonly ISearchService _searchService;
+    private readonly IMapper _mapper;
     private readonly IMediator _mediator;
     private readonly IMongoLogger _mongoLogger;
+    private readonly ISearchService _searchService;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly IMapper _mapper;
 
     public PublisherService(ISearchService searchService, IMediator mediator, IMongoLogger mongoLogger,
                             IUnitOfWork unitOfWork, IMapper mapper)
@@ -75,11 +75,12 @@ public class PublisherService : IPublisherService
 
     public async Task UpdateAsync(PublisherUpdateModel updateModel)
     {
-        var publisher = await PublishersRepository.GetSingleOrDefaultBySpecAsync(new PublisherByNameSpec(updateModel.OldName))
-                        ?? throw new ItemNotFoundException(typeof(Publisher), updateModel.OldName, nameof(updateModel.OldName));
+        var publisher =
+            await PublishersRepository.GetSingleOrDefaultBySpecAsync(new PublisherByNameSpec(updateModel.OldName))
+            ?? throw new ItemNotFoundException(typeof(Publisher), updateModel.OldName, nameof(updateModel.OldName));
 
         var oldPublisherVersion = publisher.ToBsonDocument();
-        
+
         UpdatePublisherValues(publisher, updateModel);
 
         await PublishersRepository.UpdateAsync(publisher);

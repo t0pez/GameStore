@@ -24,15 +24,15 @@ namespace GameStore.Core.Tests.Services;
 
 public class GameServiceTests
 {
-    private readonly IGameService _gameService;
-    private readonly Mock<ISearchService> _searchServiceMock;
-    private readonly Mock<IMediator> _mediatorMock;
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<IRepository<Game>> _gameRepoMock;
-    private readonly Mock<IRepository<Product>> _productRepoMock;
-    private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<IRelationshipModelService<GameGenre>> _gameGenreServiceMock;
     private readonly Mock<IRelationshipModelService<GamePlatformType>> _gamePlatformServiceMock;
+    private readonly Mock<IRepository<Game>> _gameRepoMock;
+    private readonly IGameService _gameService;
+    private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IMediator> _mediatorMock;
+    private readonly Mock<IRepository<Product>> _productRepoMock;
+    private readonly Mock<ISearchService> _searchServiceMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
 
     public GameServiceTests()
     {
@@ -89,7 +89,7 @@ public class GameServiceTests
 
         await Assert.ThrowsAsync<ItemNotFoundException>(operation);
     }
-    
+
     [Fact]
     public async void GetByKeyAsync_ExistingKey_ReturnsGames()
     {
@@ -201,7 +201,7 @@ public class GameServiceTests
         _gameRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<GamesListSpec>()))
                      .ReturnsAsync(expectedServerItems);
         _productRepoMock.Setup(repository => repository.GetBySpecAsync(null))
-                     .ReturnsAsync(expectedMongoItems);
+                        .ReturnsAsync(expectedMongoItems);
         _mapperMock.Setup(mapper => mapper.Map<IEnumerable<ProductDto>>(expectedServerItems))
                    .Returns(mappedServerItems);
         _mapperMock.Setup(mapper => mapper.Map<IEnumerable<ProductDto>>(expectedMongoItems))
@@ -233,7 +233,7 @@ public class GameServiceTests
             Key = gameKey,
             IsDeleted = true
         };
-        
+
         _searchServiceMock.Setup(service => service.GetProductDtoByGameKeyOrDefaultAsync(gameKey))
                           .ReturnsAsync(dto);
         _mapperMock.Setup(mapper => mapper.Map<GameUpdateModel>(
@@ -261,8 +261,8 @@ public class GameServiceTests
         ProductDto gameByKey = null!;
 
         _searchServiceMock.Setup(service =>
-                                service.GetProductDtoByGameKeyOrDefaultAsync(notExistingKey))
-                     .ReturnsAsync(gameByKey);
+                                     service.GetProductDtoByGameKeyOrDefaultAsync(notExistingKey))
+                          .ReturnsAsync(gameByKey);
 
         var operation = async () => await _gameService.DeleteAsync(notExistingKey, Database.Server);
 

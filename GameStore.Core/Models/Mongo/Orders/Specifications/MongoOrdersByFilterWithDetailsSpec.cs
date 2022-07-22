@@ -9,13 +9,13 @@ public class MongoOrdersByFilterWithDetailsSpec : PagedSpec<OrderMongo>
     public MongoOrdersByFilterWithDetailsSpec(MongoOrdersFilter filter)
     {
         Filter = filter;
-        
+
         if (filter.StartDate.HasValue)
         {
             Query
                 .Where(order => order.OrderDate >= filter.StartDate);
         }
-        
+
         if (filter.EndDate.HasValue)
         {
             Query

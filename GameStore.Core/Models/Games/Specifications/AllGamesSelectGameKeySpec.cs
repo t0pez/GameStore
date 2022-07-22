@@ -8,5 +8,5 @@ public class AllGamesSelectGameKeySpec : Specification<Game, string>
     {
         Query
             .Select(game => game.Key);
-    }    
+    }
 }

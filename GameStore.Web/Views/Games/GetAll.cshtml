@@ -13,7 +13,7 @@
             await Html.RenderPartialAsync("GetAllFilterPartialView", Model.Filter);
         }
     </div>
-    
+
     <div class="col-8">
         <table class="table">
             <tr>
@@ -26,7 +26,8 @@
                 <th></th>
             </tr>
 
-            @foreach (var game in Model.GamesPaged.Result) {
+            @foreach (var game in Model.GamesPaged.Result)
+            {
                 <tr>
                     <td>
                         @Html.DisplayFor(modelItem => game.Name)
@@ -40,7 +41,7 @@
                 </tr>
             }
         </table>
-        
+
         <div>
             <label>Page size: </label>
             <a asp-action="GetAll" asp-route-pageSize="10" asp-route-currentPage="1">10</a>
@@ -49,7 +50,7 @@
             <a asp-action="GetAll" asp-route-pageSize="100" asp-route-currentPage="1">100</a>
             <a asp-action="GetAll" asp-route-pageSize="0" asp-route-currentPage="1">All</a>
         </div>
-        
+
         <div>
             <a class="btn @(Model.GamesPaged.HasPreviousPage ? "" : "disabled")" onclick="previousPage()">Previous</a>
 

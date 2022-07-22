@@ -23,11 +23,12 @@ public class GamesByFilterSpec : SafeDeleteSpec<Game>
             Query
                 .Where(game => game.Genres.Any(gg => Filter.GenresIds.Any(genreId => gg.GenreId == genreId)));
         }
-        
+
         if (filter.PlatformsIds.Any())
         {
             Query
-                .Where(game => game.Platforms.Any(gp => Filter.PlatformsIds.Any(platformId => gp.PlatformId == platformId)));
+                .Where(game => game.Platforms.Any(
+                           gp => Filter.PlatformsIds.Any(platformId => gp.PlatformId == platformId)));
         }
 
         if (filter.PublishersNames.Any())

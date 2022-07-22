@@ -17,7 +17,7 @@ public class MongoLogger : IMongoLogger
     }
 
     private IRepository<MongoLog> LogsRepository => _unitOfWork.GetMongoRepository<MongoLog>();
-    
+
     public async Task LogCreateAsync<T>(T entity)
     {
         var versionOfObject = entity.ToBsonDocument();
@@ -29,7 +29,7 @@ public class MongoLogger : IMongoLogger
     {
         await LogAsync(type, LogOperation.Update, entity, updated);
     }
-    
+
     public async Task LogDeleteAsync<T>(T entity)
     {
         var versionOfObject = entity.ToBsonDocument();

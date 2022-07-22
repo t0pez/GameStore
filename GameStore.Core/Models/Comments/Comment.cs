@@ -1,7 +1,7 @@
-﻿using GameStore.Core.Models.Games;
-using GameStore.SharedKernel.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using GameStore.Core.Models.Games;
+using GameStore.SharedKernel.Interfaces;
 
 namespace GameStore.Core.Models.Comments;
 

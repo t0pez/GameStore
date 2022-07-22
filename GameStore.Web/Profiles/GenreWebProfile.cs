@@ -13,10 +13,10 @@ public class GenreWebProfile : Profile
     {
         CreateMap<GenreCreateRequestModel, GenreCreateModel>().ReverseMap();
         CreateMap<GenreUpdateRequestModel, GenreUpdateModel>().ReverseMap();
-        
+
         CreateMap<Genre, GenreViewModel>();
         CreateMap<Genre, GenreListViewModel>();
-        
+
         CreateMap<GameGenre, GenreViewModel>()
             .ForMember(viewModel => viewModel.Id,
                        expression => expression.MapFrom(gameGenre => gameGenre.GenreId))
@@ -29,5 +29,5 @@ public class GenreWebProfile : Profile
                        expression => expression.MapFrom(gameGenre => gameGenre.GenreId))
             .ForMember(viewModel => viewModel.Name,
                        expression => expression.MapFrom(gameGenre => gameGenre.Genre.Name));
-    }   
+    }
 }

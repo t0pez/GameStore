@@ -19,7 +19,7 @@ public class ProductDtoSortSpec : PagedSpec<ProductDto>
                 SortBy(product => product.Views, thenByDatabase);
                 break;
             case GameSearchFilterOrderByState.MostCommented:
-                SortBy(product => product.Comments.Count(comment => comment.IsDeleted == false), 
+                SortBy(product => product.Comments.Count(comment => comment.IsDeleted == false),
                        thenByDatabase);
                 break;
             case GameSearchFilterOrderByState.PriceAscending:

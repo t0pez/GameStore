@@ -14,19 +14,19 @@ public class GameWebProfile : Profile
     {
         CreateMap<GameCreateRequestModel, GameCreateModel>().ReverseMap();
         CreateMap<GameUpdateRequestModel, GameUpdateModel>().ReverseMap();
-        
+
         CreateMap<Game, GameUpdateModel>()
             .ForMember(updateModel => updateModel.GenresIds,
                        expression => expression.MapFrom(game => game.Genres.Select(gg => gg.GenreId)))
             .ForMember(updateModel => updateModel.PlatformsIds,
                        expression => expression.MapFrom(game => game.Platforms.Select(gp => gp.PlatformId)));
-        
+
         CreateMap<Game, GameViewModel>();
         CreateMap<Game, GameListViewModel>();
         CreateMap<Game, GameInBasketViewModel>();
         CreateMap<Game, GameInOrderDetailsViewModel>();
         CreateMap<Game, GameUpdateRequestModel>();
-        
+
         CreateMap<ProductDto, GameViewModel>();
         CreateMap<ProductDto, GameInOrderDetailsViewModel>();
         CreateMap<ProductDto, GameUpdateRequestModel>();

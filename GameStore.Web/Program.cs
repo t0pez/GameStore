@@ -1,9 +1,10 @@
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
 using NLog.Web;
-using System;
+using LogLevel = Microsoft.Extensions.Logging.LogLevel;
 
 namespace GameStore.Web;
 
@@ -29,14 +30,14 @@ public class Program
         }
     }
 
-    public static IHostBuilder CreateHostBuilder(string[] args) =>
-        Host.CreateDefaultBuilder(args)
-            .ConfigureWebHostDefaults(webBuilder =>
-            {
-                webBuilder.UseStartup<Startup>();
-            }).ConfigureLogging(log =>
-            {
-                log.ClearProviders();
-                log.SetMinimumLevel(Microsoft.Extensions.Logging.LogLevel.Trace);
-            }).UseNLog();
+    public static IHostBuilder CreateHostBuilder(string[] args)
+    {
+        return Host.CreateDefaultBuilder(args)
+                   .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); }).ConfigureLogging(
+                       log =>
+                       {
+                           log.ClearProviders();
+                           log.SetMinimumLevel(LogLevel.Trace);
+                       }).UseNLog();
+    }
 }

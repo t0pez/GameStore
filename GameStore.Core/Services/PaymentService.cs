@@ -12,9 +12,9 @@ namespace GameStore.Core.Services;
 
 public class PaymentService : IPaymentService
 {
+    private readonly IMapper _mapper;
     private readonly IOrderService _orderService;
     private readonly IPaymentMethodFactory _paymentMethodFactory;
-    private readonly IMapper _mapper;
     private IPaymentMethod _paymentMethod;
 
     public PaymentService(IOrderService orderService, IPaymentMethodFactory paymentMethodFactory, IMapper mapper)
@@ -36,11 +36,11 @@ public class PaymentService : IPaymentService
         {
             Order = order
         };
-        
+
         var paymentResult = _paymentMethod.GetPaymentGetaway(getawayCreateModel);
 
         order.Status = OrderStatus.InProcess;
-        
+
         var updateModel = _mapper.Map<OrderUpdateModel>(order);
         await _orderService.UpdateAsync(updateModel);
 

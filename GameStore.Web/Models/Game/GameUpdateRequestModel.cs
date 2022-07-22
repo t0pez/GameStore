@@ -9,8 +9,9 @@ public class GameUpdateRequestModel
 {
     public string Id { get; set; }
     [Required] [MinLength(3)] public string Name { get; set; }
-    [Required] [MinLength(3)]
-    public string Key { get; set; }
+
+    [Required] [MinLength(3)] public string Key { get; set; }
+
     [Required] [MinLength(10)] public string Description { get; set; }
 
     public int UnitsInStock { get; set; }

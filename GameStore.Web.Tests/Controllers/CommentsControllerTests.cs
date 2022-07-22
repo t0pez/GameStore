@@ -27,7 +27,7 @@ public class CommentsControllerTests
 
         _commentsController = new CommentsController(_commentServiceMock.Object, _mapperMock.Object);
     }
-    
+
     [Fact]
     public async void GetCommentsAsync_ExistingGameKey_ReturnsCommentsView()
     {
@@ -39,7 +39,7 @@ public class CommentsControllerTests
         var actualResult = await _commentsController.GetCommentsAsync("");
         Assert.IsType<ActionResult<ICollection<CommentViewModel>>>(actualResult);
     }
-    
+
     [Fact]
     public async void CommentGameAsync_CorrectValue_ReturnsRedirect()
     {
@@ -47,13 +47,13 @@ public class CommentsControllerTests
 
         _mapperMock.Setup(mapper => mapper.Map<CommentCreateModel>(It.IsAny<CommentCreateRequestModel>()))
                    .Returns(new CommentCreateModel());
-        
+
         var actualResult = await _commentsController.CreateCommentAsync(createModel);
 
         Assert.IsType<RedirectToActionResult>(actualResult);
         _commentServiceMock.Verify(service => service.CommentGameAsync(It.IsAny<CommentCreateModel>()), Times.Once);
     }
-    
+
     [Fact]
     public async void UpdateCommentAsync_CorrectValue_ReturnsRedirect()
     {
@@ -62,31 +62,31 @@ public class CommentsControllerTests
 
         _mapperMock.Setup(mapper => mapper.Map<CommentUpdateModel>(updateRequest))
                    .Returns(updateModel);
-        
+
         var actualResult = await _commentsController.UpdateCommentAsync(updateRequest);
 
         actualResult.Should().BeAssignableTo<RedirectToActionResult>();
         _commentServiceMock.Verify(service => service.UpdateAsync(updateModel), Times.Once);
     }
-    
+
     [Fact]
     public async void DeleteCommentAsync_CorrectValue_ReturnsRedirect()
     {
         var commentId = Guid.NewGuid();
         const string gameKey = "game-key";
-        
+
         var actualResult = await _commentsController.DeleteCommentAsync(commentId, gameKey);
 
         actualResult.Should().BeAssignableTo<RedirectToActionResult>();
         _commentServiceMock.Verify(service => service.DeleteAsync(commentId), Times.Once);
     }
-    
+
     [Fact]
     public async void DeleteCommentAsync_NotCorrectValue_ThrowsException()
     {
         var commentId = Guid.NewGuid();
         const string gameKey = "game-key";
-        
+
         var actualResult = await _commentsController.DeleteCommentAsync(commentId, gameKey);
 
         actualResult.Should().BeAssignableTo<RedirectToActionResult>();

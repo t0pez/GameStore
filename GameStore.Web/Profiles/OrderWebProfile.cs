@@ -14,7 +14,7 @@ public class OrderWebProfile : Profile
     {
         CreateMap<Order, OrderViewModel>();
         CreateMap<Order, OrderListViewModel>();
-        
+
         CreateMap<OrderDto, OrderViewModel>();
         CreateMap<OrderDto, OrderListViewModel>();
 

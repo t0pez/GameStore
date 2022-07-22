@@ -1,8 +1,8 @@
-﻿@using GameStore.Web.ViewModels.Comments
-@using Microsoft.AspNetCore.Routing
+﻿@using Microsoft.AspNetCore.Routing
+@using GameStore.Web.ViewModels.Comments
 @using GameStore.Web.Models.Comment
 @using GameStore.Core.Models.Comments
-@model ICollection<CommentViewModel>
+@model ICollection<GameStore.Web.ViewModels.Comments.CommentViewModel>
 
 @{
     ViewBag.Title = "Comments";
@@ -22,7 +22,10 @@
                     <a href="#" class="btn-link text-decoration-none media-heading box-inline">@comment.AuthorName</a>
                     <p class="text-muted text-sm">@comment.DateOfCreation</p>
                 </div>
-                <p>@{ RenderCommentReplyState(comment); } @{ RenderBody(comment);}</p>
+                <p>
+                    @{ RenderCommentReplyState(comment); }
+                    @{ RenderBody(comment); }
+                </p>
                 <div class="row ps-1">
                     <div class="col-4">
                         <button type="button" class="btn btn-sm btn-default btn-hover-primary" onclick="addCommentReply('@comment.AuthorName', '@comment.Id')">Reply</button>
@@ -68,7 +71,7 @@
     {
         <span class="fw-bolder">@comment.Parent.AuthorName,</span>
     }
-    
+
     void RenderCommentQuote(CommentViewModel comment)
     {
         var quoteText = comment.Parent.MessageIsDeleted == false ? comment.Parent.Body : "Comment was deleted";
@@ -83,7 +86,7 @@
         var body = comment.MessageIsDeleted == false ? comment.Body : "Comment was deleted";
         <span>@body</span>
     }
-    
+
     void RenderReplies(CommentViewModel parentComment)
     {
         foreach (var reply in parentComment.Replies)
@@ -105,18 +108,18 @@
             }
         </div>
     </div>
-    
+
     <div>
         @{
             var requestModel = new CommentCreateRequestModel();
-            
+
             var routeData = Context.GetRouteData();
             var gameKey = routeData.Values["gameKey"].ToString();
         }
-        
+
         <form method="post" asp-controller="Comments" asp-action="CreateComment" asp-route-gameKey="@gameKey">
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-            
+
             <div>
                 <h4 class="mb-3">Leave your comment</h4>
 
@@ -128,7 +131,7 @@
                     </div>
                     <button class="btn btn-danger col-4 my-2" type="button" onclick="removeCommentReplyingStatus()">Cancel</button>
                 </div>
-                
+
                 <div class="row">
                     <div class="form-floating mb-3 col-4">
                         <input class="form-control form-control-lg" placeholder="Author"
@@ -156,7 +159,7 @@
             </div>
         </form>
     </div>
-    
+
     <div class="modal fade" id="editModal" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -183,7 +186,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="modal fade" id="deleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -203,7 +206,7 @@
             </div>
         </div>
     </div>
-    
+
     <div class="modal fade" id="banModal" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -227,7 +230,7 @@
             </div>
         </div>
     </div>
-    
+
     <script>
     let editModal = document.getElementById('editModal')
     editModal.addEventListener('show.bs.modal', function (event) {

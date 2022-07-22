@@ -18,12 +18,12 @@ namespace GameStore.Core.Tests.Services;
 
 public class PublisherServiceTests
 {
+    private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IRepository<Publisher>> _publisherRepoMock;
     private readonly PublisherService _publisherService;
     private readonly Mock<ISearchService> _searchServiceMock;
-    private readonly Mock<IMapper> _mapperMock;
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<IRepository<Publisher>> _publisherRepoMock;
     private readonly Mock<IRepository<Supplier>> _supplierRepoMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
 
     public PublisherServiceTests()
     {
@@ -73,7 +73,7 @@ public class PublisherServiceTests
         _publisherRepoMock.Setup(repository => repository.GetBySpecAsync(It.IsAny<PublishersListSpec>()))
                           .ReturnsAsync(publishers);
         _supplierRepoMock.Setup(repository => repository.GetBySpecAsync(null))
-                          .ReturnsAsync(suppliers);
+                         .ReturnsAsync(suppliers);
         _mapperMock.Setup(mapper => mapper.Map<IEnumerable<PublisherDto>>(publishers))
                    .Returns(mappedPublishers);
         _mapperMock.Setup(mapper => mapper.Map<IEnumerable<PublisherDto>>(suppliers))
@@ -137,9 +137,9 @@ public class PublisherServiceTests
                           .Verifiable();
 
         await _publisherService.UpdateAsync(updateModel);
-        
+
         updatedPublisher.Name.Should().Be(publisher.Name);
-        
+
         _publisherRepoMock.Verify(
             repository =>
                 repository.UpdateAsync(It.Is<Publisher>(pub => pub.Name == expectedName)),
