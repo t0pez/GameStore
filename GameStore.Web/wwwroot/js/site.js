@@ -16,21 +16,21 @@ function generateKey() {
         .then(json => document.getElementById("Key").value = json.key)
 }
 
-function resetPage(){
+function resetPage() {
     let currentPageInput = document.getElementById("CurrentPage")
     currentPageInput.value = 1
 }
 
-function nextPage(){
+function nextPage() {
     let currentPageInput = document.getElementById("CurrentPage")
     let currentPage = parseInt(currentPageInput.value)
     currentPage++
     currentPageInput.value = currentPage
-    
+
     executeFilterForm()
 }
 
-function previousPage(){
+function previousPage() {
     let currentPageInput = document.getElementById("CurrentPage")
     let currentPage = parseInt(currentPageInput.value)
     currentPage--
@@ -39,7 +39,7 @@ function previousPage(){
     executeFilterForm()
 }
 
-function executeFilterForm(){
+function executeFilterForm() {
     let filterForm = document.getElementById("FilterForm")
     filterForm.submit()
 }
@@ -53,7 +53,7 @@ function addCommentReply(name, id) {
     sectionText.innerText = "You are replying to " + name
     status.value = 1 // ReplyState
     parentId.value = id
-    
+
     section.hidden = false
 }
 
@@ -81,4 +81,13 @@ function removeCommentReplyingStatus() {
     parentId.value = null
 
     section.hidden = true
+}
+
+
+function submitOrderPaymentType(type) {
+    let form = document.getElementById("SubmitForm")
+    let paymentTypeElement = document.getElementById("PaymentType")
+    
+    paymentTypeElement.value = type
+    form.submit()
 }

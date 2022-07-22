@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using GameStore.Core.Models.ServiceModels.Enums;
 using GameStore.Web.ViewModels.Genres;
 using GameStore.Web.ViewModels.PlatformTypes;
 using GameStore.Web.ViewModels.Publisher;
@@ -23,4 +24,6 @@ public class GameViewModel
     public PublisherInGameViewModel Publisher { get; set; }
     public List<GenreListViewModel> Genres { get; set; } = new();
     public List<PlatformTypeListViewModel> Platforms { get; set; } = new();
+
+    public Database Database { get; set; }
 }
