@@ -1,42 +1,61 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
+using GameStore.Core.Events.Notifications;
 using GameStore.Core.Exceptions;
+using GameStore.Core.Extensions;
 using GameStore.Core.Interfaces;
+using GameStore.Core.Interfaces.Loggers;
+using GameStore.Core.Models.Dto;
+using GameStore.Core.Models.Mongo.Suppliers;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.Publishers.Specifications;
 using GameStore.Core.Models.ServiceModels.Publishers;
 using GameStore.SharedKernel.Interfaces.DataAccess;
-using Microsoft.Extensions.Logging;
+using MediatR;
+using MongoDB.Bson;
 
 namespace GameStore.Core.Services;
 
 public class PublisherService : IPublisherService
 {
+    private readonly ISearchService _searchService;
+    private readonly IMediator _mediator;
+    private readonly IMongoLogger _mongoLogger;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
-    private readonly ILogger<PublisherService> _logger;
 
-    public PublisherService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<PublisherService> logger)
+    public PublisherService(ISearchService searchService, IMediator mediator, IMongoLogger mongoLogger,
+                            IUnitOfWork unitOfWork, IMapper mapper)
     {
+        _searchService = searchService;
+        _mediator = mediator;
+        _mongoLogger = mongoLogger;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
-        _logger = logger;
     }
 
-    private IRepository<Publisher> Repository => _unitOfWork.GetRepository<Publisher>();
+    private IRepository<Publisher> PublishersRepository => _unitOfWork.GetEfRepository<Publisher>();
+    private IRepository<Supplier> SuppliersRepository => _unitOfWork.GetMongoRepository<Supplier>();
 
-    public async Task<ICollection<Publisher>> GetAllAsync()
+    public async Task<ICollection<PublisherDto>> GetAllAsync()
     {
-        var result = await Repository.GetBySpecAsync(new PublishersListSpec());
+        var filteredPublishers = await PublishersRepository.GetBySpecAsync(new PublishersListSpec());
+        var filteredSuppliers = await SuppliersRepository.GetBySpecAsync();
 
-        return result;
+        var mappedPublishers = _mapper.Map<IEnumerable<PublisherDto>>(filteredPublishers);
+        var mappedSuppliers = _mapper.Map<IEnumerable<PublisherDto>>(filteredSuppliers);
+
+        var result = mappedPublishers.Concat(mappedSuppliers);
+        result = result.DistinctBy(dto => dto.Name);
+
+        return result.ToList();
     }
 
-    public async Task<Publisher> GetByCompanyNameAsync(string companyName)
+    public async Task<PublisherDto> GetByCompanyNameAsync(string companyName)
     {
-        var result = await Repository.GetSingleOrDefaultBySpecAsync(new PublisherByCompanyNameSpec(companyName))
+        var result = await _searchService.GetPublisherDtoByCompanyNameOrDefaultAsync(companyName)
                      ?? throw new ItemNotFoundException(typeof(Publisher), companyName);
 
         return result;
@@ -46,35 +65,53 @@ public class PublisherService : IPublisherService
     {
         var publisher = _mapper.Map<Publisher>(createModel);
 
-        await Repository.AddAsync(publisher);
+        await PublishersRepository.AddAsync(publisher);
         await _unitOfWork.SaveChangesAsync();
+
+        await _mongoLogger.LogCreateAsync(publisher);
 
         return publisher;
     }
 
     public async Task UpdateAsync(PublisherUpdateModel updateModel)
     {
-        var publisher = await Repository.GetSingleOrDefaultBySpecAsync(new PublisherByIdWithDetailsSpec(updateModel.Id))
-                        ?? throw new ItemNotFoundException(typeof(Publisher), updateModel.Id, nameof(updateModel.Id));
+        var publisher = await PublishersRepository.GetSingleOrDefaultBySpecAsync(new PublisherByNameSpec(updateModel.OldName))
+                        ?? throw new ItemNotFoundException(typeof(Publisher), updateModel.OldName, nameof(updateModel.OldName));
 
-        await UpdatePublisherValues(publisher, updateModel);
+        var oldPublisherVersion = publisher.ToBsonDocument();
+        
+        UpdatePublisherValues(publisher, updateModel);
 
-        await Repository.UpdateAsync(publisher);
+        await PublishersRepository.UpdateAsync(publisher);
         await _unitOfWork.SaveChangesAsync();
+
+        await _mongoLogger.LogUpdateAsync(typeof(Publisher), oldPublisherVersion, publisher.ToBsonDocument());
+
+        if (updateModel.IsNameChanged)
+        {
+            await _mediator.Publish(new PublisherNameUpdatedNotification(updateModel.OldName, updateModel.Name));
+        }
     }
 
-    public async Task DeleteAsync(Guid id)
+    public async Task DeleteAsync(string companyName)
     {
-        var publisher = await Repository.GetSingleOrDefaultBySpecAsync(new PublisherByIdSpec(id))
-                        ?? throw new ItemNotFoundException(typeof(Publisher), id);
+        var publisher = await PublishersRepository.GetSingleOrDefaultBySpecAsync(new PublisherByNameSpec(companyName))
+                        ?? throw new ItemNotFoundException(typeof(Publisher), companyName);
 
         publisher.IsDeleted = true;
 
-        await Repository.UpdateAsync(publisher);
+        await PublishersRepository.UpdateAsync(publisher);
         await _unitOfWork.SaveChangesAsync();
+
+        await _mongoLogger.LogDeleteAsync(publisher);
     }
-    
-    private async Task UpdatePublisherValues(Publisher publisher, PublisherUpdateModel updateModel)
+
+    public async Task<bool> IsCompanyNameAlreadyExists(string companyName)
+    {
+        return await PublishersRepository.AnyAsync(new PublisherByNameSpec(companyName));
+    }
+
+    private void UpdatePublisherValues(Publisher publisher, PublisherUpdateModel updateModel)
     {
         publisher.Name = updateModel.Name;
         publisher.Description = updateModel.Description;

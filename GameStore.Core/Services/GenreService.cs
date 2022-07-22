@@ -4,25 +4,29 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
+using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.ServiceModels.Genres;
 using GameStore.SharedKernel.Interfaces.DataAccess;
+using MongoDB.Bson;
 
 namespace GameStore.Core.Services;
 
 public class GenreService : IGenreService
 {
+    private readonly IMongoLogger _mongoLogger;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public GenreService(IUnitOfWork unitOfWork, IMapper mapper)
+    public GenreService(IMongoLogger mongoLogger, IUnitOfWork unitOfWork, IMapper mapper)
     {
+        _mongoLogger = mongoLogger;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
-    private IRepository<Genre> Repository => _unitOfWork.GetRepository<Genre>();
+    private IRepository<Genre> Repository => _unitOfWork.GetEfRepository<Genre>();
     
     public async Task<ICollection<Genre>> GetAllAsync()
     {
@@ -45,17 +49,22 @@ public class GenreService : IGenreService
 
         await Repository.AddAsync(genre);
         await _unitOfWork.SaveChangesAsync();
+
+        await _mongoLogger.LogCreateAsync(genre);
     }
 
     public async Task UpdateAsync(GenreUpdateModel updateModel)
     {
         var genre = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdSpec(updateModel.Id))
                     ?? throw new ItemNotFoundException(typeof(Genre), updateModel.Id, nameof(updateModel.Id));
-
+        var oldGenreVersion = genre.ToBsonDocument();
+        
         UpdateValues(updateModel, genre);
 
         await Repository.UpdateAsync(genre);
         await _unitOfWork.SaveChangesAsync();
+
+        await _mongoLogger.LogUpdateAsync(typeof(Genre), oldGenreVersion, genre.ToBsonDocument());
     }
 
     public async Task DeleteAsync(Guid id)
@@ -68,6 +77,8 @@ public class GenreService : IGenreService
         
         await Repository.UpdateAsync(genre);
         await _unitOfWork.SaveChangesAsync();
+
+        await _mongoLogger.LogDeleteAsync(genre);
     }
 
     private void UpdateValues(GenreUpdateModel updateModel, Genre genre)
@@ -85,8 +96,12 @@ public class GenreService : IGenreService
 
         foreach (var child in children)
         {
+            var oldGenreVersion = child.ToBsonDocument();
+            
             child.ParentId = newParentId;
             await Repository.UpdateAsync(child);
+
+            await _mongoLogger.LogUpdateAsync(typeof(Genre), oldGenreVersion, child.ToBsonDocument());
         }
     }
 }

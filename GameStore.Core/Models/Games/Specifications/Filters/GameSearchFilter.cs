@@ -12,7 +12,8 @@ public class GameSearchFilter : PaginationFilter
 
     public IEnumerable<Guid> GenresIds { get; set; } = new List<Guid>();
     public IEnumerable<Guid> PlatformsIds { get; set; } = new List<Guid>();
-    public IEnumerable<Guid> PublishersIds { get; set; } = new List<Guid>();
+    public IEnumerable<string> PublishersNames { get; set; } = new List<string>();
 
+    public GameSearchFilterPublishedAtState PublishedAtState { get; set; }
     public GameSearchFilterOrderByState OrderBy { get; set; }
 }

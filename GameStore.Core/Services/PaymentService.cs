@@ -39,7 +39,7 @@ public class PaymentService : IPaymentService
         
         var paymentResult = _paymentMethod.GetPaymentGetaway(getawayCreateModel);
 
-        order.Status = OrderStatus.Pending;
+        order.Status = OrderStatus.InProcess;
         
         var updateModel = _mapper.Map<OrderUpdateModel>(order);
         await _orderService.UpdateAsync(updateModel);
