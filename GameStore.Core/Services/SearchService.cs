@@ -30,9 +30,8 @@ namespace GameStore.Core.Services;
 public class SearchService : ISearchService
 {
     private static readonly DateTime AddedToStoreAtForMongo = new(2022, 6, 2);
-    private readonly IMapper _mapper;
-
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMapper _mapper;
 
     public SearchService(IUnitOfWork unitOfWork, IMapper mapper)
     {

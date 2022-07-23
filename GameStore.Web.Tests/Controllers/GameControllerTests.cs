@@ -70,30 +70,6 @@ public class GameControllerTests
     }
 
     [Fact]
-    public async void GetAllAsync_EmptyFilter_CreatesDefaultFilter()
-    {
-        GamesFilterRequestModel filterRequestModel = null!;
-        int? currentPage = null;
-        int? pageSize = null;
-
-        _mapperMock.Setup(mapper => mapper.Map<GameSearchFilter>(filterRequestModel))
-                   .Returns(new GameSearchFilter { CurrentPage = 1, PageSize = 10 });
-        _gameServiceMock.Setup(service => service.GetByFilterAsync(It.IsAny<GameSearchFilter>()))
-                        .ReturnsAsync(new PagedResult<Game>(new List<Game>(), 1,
-                                                            new PaginationFilter { CurrentPage = 1, PageSize = 10 }));
-        _genreServiceMock.Setup(service => service.GetAllAsync())
-                         .ReturnsAsync(new List<Genre>());
-        _platformServiceMock.Setup(service => service.GetAllAsync())
-                            .ReturnsAsync(new List<PlatformType>());
-        _publisherServiceMock.Setup(service => service.GetAllAsync())
-                             .ReturnsAsync(new List<PublisherDto>());
-
-        var actualResult = await _gameController.GetAllAsync(filterRequestModel, currentPage, pageSize);
-
-        actualResult.Result.Should().BeAssignableTo<ViewResult>();
-    }
-
-    [Fact]
     public async void CreateAsync_NoParameters_ReturnsView()
     {
         _genreServiceMock.Setup(service => service.GetAllAsync())

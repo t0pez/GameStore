@@ -4,19 +4,18 @@ using GameStore.Core.Models.Games;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.Infrastructure.Tests.TestData.Repositories;
-using GameStore.SharedKernel.Interfaces.DataAccess;
 using GameStore.SharedKernel.Specifications;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace GameStore.Infrastructure.Tests.Repositories;
 
-public class RepositoryTests
+public class EfRepositoryTests
 {
     private readonly ApplicationContext _context;
-    private readonly IRepository<Game> _gameRepository;
+    private readonly EfRepository<Game> _gameRepository;
 
-    public RepositoryTests()
+    public EfRepositoryTests()
     {
         var context = GetInMemoryContext();
 

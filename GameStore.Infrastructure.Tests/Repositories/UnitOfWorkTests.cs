@@ -1,6 +1,8 @@
 ﻿using System;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Mongo.Products;
+using GameStore.Core.Models.Mongo.Suppliers;
 using GameStore.Core.Models.RelationalModels;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Infrastructure.Data.Repositories;
@@ -18,11 +20,11 @@ public class UnitOfWorkTests
     public UnitOfWorkTests()
     {
         _context = GetInMemoryContext();
-        _unitOfWork = new UnitOfWork(_context, "");
+        _unitOfWork = new UnitOfWork(_context, "mongodb://localhost:27017/Northwind-Test");
     }
 
     [Fact]
-    public void GetRepository_Game()
+    public void GetEfRepository_Game()
     {
         var actualResult = _unitOfWork.GetEfRepository<Game>();
 
@@ -30,7 +32,7 @@ public class UnitOfWorkTests
     }
 
     [Fact]
-    public void GetRepository_GameGenre()
+    public void GetEfRepository_GameGenre()
     {
         var actualResult = _unitOfWork.GetEfRepository<GameGenre>();
 
@@ -38,17 +40,43 @@ public class UnitOfWorkTests
     }
 
     [Fact]
-    public void GetRepository_Comment()
+    public void GetEfRepository_Comment()
     {
         var actualResult = _unitOfWork.GetEfRepository<Comment>();
 
         Assert.NotNull(actualResult);
     }
+    
+    [Fact]
+    public void GetMongoRepository_Product()
+    {
+        var actualResult = _unitOfWork.GetMongoRepository<Product>();
+
+        Assert.NotNull(actualResult);
+    }
 
     [Fact]
-    public void GetRepository_NotCorrectModel_RepositoryMethodThrowsException()
+    public void GetMongoRepository_Supplier()
+    {
+        var actualResult = _unitOfWork.GetMongoRepository<Supplier>();
+
+        Assert.NotNull(actualResult);
+    }
+
+    [Fact]
+    public void GetEfRepository_NotCorrectModel_RepositoryMethodThrowsException()
     {
         var repository = _unitOfWork.GetEfRepository<NotExistingModel>();
+
+        var function = async () => { await repository.AnyAsync(null); };
+
+        Assert.ThrowsAsync<InvalidOperationException>(function);
+    }
+    
+    [Fact]
+    public void GetMongoRepository_NotCorrectModel_RepositoryMethodThrowsException()
+    {
+        var repository = _unitOfWork.GetMongoRepository<NotExistingModel>();
 
         var function = async () => { await repository.AnyAsync(null); };
 
