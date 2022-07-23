@@ -18,7 +18,7 @@ public class UnitOfWorkTests
     public UnitOfWorkTests()
     {
         _context = GetInMemoryContext();
-        _unitOfWork = new UnitOfWork(_context);
+        _unitOfWork = new UnitOfWork(_context, "");
     }
 
     [Fact]

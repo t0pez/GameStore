@@ -9,19 +9,16 @@ namespace GameStore.Infrastructure.Data.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
-    private const string ConnectionString = "mongodb://localhost:27017/Northwind";
-
     private readonly ApplicationContext _context;
     private readonly IMongoDatabase _database;
     private readonly Dictionary<Type, object> _efRepositories = new();
     private readonly Dictionary<Type, object> _mongoRepositories = new();
 
-    public UnitOfWork(ApplicationContext context)
+    public UnitOfWork(ApplicationContext context, string mongoConnectionString)
     {
         _context = context;
-
-        var connection = new MongoUrlBuilder(ConnectionString);
-        var client = new MongoClient(ConnectionString);
+        var connection = new MongoUrlBuilder(mongoConnectionString);
+        var client = new MongoClient(mongoConnectionString);
         _database = client.GetDatabase(connection.DatabaseName);
     }
 

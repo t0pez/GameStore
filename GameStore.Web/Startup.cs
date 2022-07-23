@@ -45,8 +45,6 @@ public class Startup
                            });
         services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
-        services.ConfigureDomainServices();
-        services.ConfigureWebServices();
 
         services.AddScoped<WorkTimeTrackingFilter>();
 
@@ -57,6 +55,10 @@ public class Startup
                                                       options.UseSqlServer(connectionString);
                                                   });
         services.ConfigureNorthwindDatabase();
+        
+        services.ConfigureDomainServices(Configuration);
+        services.ConfigureWebServices();
+        
         services.AddAutoMapper(
             configuration =>
             {
