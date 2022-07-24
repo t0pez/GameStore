@@ -109,8 +109,8 @@ public class SearchServiceTests
     {
         const string gameKey = "game-key";
         const string publisherName = "Publisher Name";
-        var game = new Game { Key = gameKey, PublisherName = publisherName, Database = Database.Server};
-        var productDto = new ProductDto { Key = gameKey, PublisherName = publisherName, Database = Database.Server};
+        var game = new Game { Key = gameKey, PublisherName = publisherName, Database = Database.Server };
+        var productDto = new ProductDto { Key = gameKey, PublisherName = publisherName, Database = Database.Server };
         var publisher = new Publisher { Name = publisherName, Database = Database.Server };
         var publisherDto = new PublisherDto { Name = publisherName, Database = Database.Server };
 
@@ -119,9 +119,9 @@ public class SearchServiceTests
                                     It.Is<GameByKeyWithDetailsSpec>(spec => spec.Key == gameKey)))
                      .ReturnsAsync(game);
         _publisherRepoMock.Setup(repository =>
-                                repository.GetSingleOrDefaultBySpecAsync(
-                                    It.Is<PublisherByNameSpec>(spec => spec.Name == publisherName)))
-                     .ReturnsAsync(publisher);
+                                     repository.GetSingleOrDefaultBySpecAsync(
+                                         It.Is<PublisherByNameSpec>(spec => spec.Name == publisherName)))
+                          .ReturnsAsync(publisher);
 
         _mapperMock.Setup(mapper => mapper.Map<ProductDto>(game)).Returns(productDto);
         _mapperMock.Setup(mapper => mapper.Map<PublisherDto>(publisher)).Returns(publisherDto);
@@ -131,7 +131,7 @@ public class SearchServiceTests
         actualResult.Key.Should().Be(gameKey);
         actualResult.Publisher.Should().Be(publisherDto);
     }
-    
+
     [Fact]
     public async void GetProductDtoByGameKeyOrDefaultAsync_MongoEntityFound_IncludesSupplier()
     {
@@ -142,7 +142,11 @@ public class SearchServiceTests
         Game game = null!;
         var genre = new Genre { CategoryId = categoryId };
         var supplier = new Supplier { SupplierId = supplierId, Database = Database.Mongo };
-        var product = new Product { GameKey = gameKey, CategoryId = categoryId, Supplier = supplier, SupplierId = supplierId, Database = Database.Mongo};
+        var product = new Product
+        {
+            GameKey = gameKey, CategoryId = categoryId, Supplier = supplier, SupplierId = supplierId,
+            Database = Database.Mongo
+        };
         var publisherDto = new PublisherDto { Database = Database.Mongo };
         var productDto = new ProductDto { Key = gameKey, Publisher = publisherDto, Database = Database.Mongo };
 
@@ -151,14 +155,14 @@ public class SearchServiceTests
                                     It.Is<GameByKeyWithDetailsSpec>(spec => spec.Key == gameKey)))
                      .ReturnsAsync(game);
         _productRepoMock.Setup(repository =>
-                                repository.GetFirstOrDefaultBySpecAsync(
-                                    It.Is<ProductByGameKeyWithDetailsSpec>(spec => spec.GameKey == gameKey)))
-                     .ReturnsAsync(product);
+                                   repository.GetFirstOrDefaultBySpecAsync(
+                                       It.Is<ProductByGameKeyWithDetailsSpec>(spec => spec.GameKey == gameKey)))
+                        .ReturnsAsync(product);
         _genreRepoMock.Setup(repository =>
-                                repository.GetSingleOrDefaultBySpecAsync(
-                                    It.Is<GenreByCategoryIdSpec>(spec => spec.CategoryId == categoryId)))
-                     .ReturnsAsync(genre);
-        
+                                 repository.GetSingleOrDefaultBySpecAsync(
+                                     It.Is<GenreByCategoryIdSpec>(spec => spec.CategoryId == categoryId)))
+                      .ReturnsAsync(genre);
+
         _mapperMock.Setup(mapper => mapper.Map<ProductDto>(product)).Returns(productDto);
 
         var actualResult = await _searchService.GetProductDtoByGameKeyOrDefaultAsync(gameKey);

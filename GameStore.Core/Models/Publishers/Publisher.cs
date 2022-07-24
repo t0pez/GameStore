@@ -26,7 +26,8 @@ public class Publisher : ISafeDelete
 
     public ICollection<Game> Games { get; set; }
 
-    [NotMapped] public Database Database { get; set; } = Database.Server;
+    [NotMapped]
+    public Database Database { get; set; } = Database.Server;
 
     public bool IsDeleted { get; set; }
 }

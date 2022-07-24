@@ -39,14 +39,17 @@ public class OrderMongo
 
     public DateTime ShippedDate { set; get; }
 
-    [BsonElement("ShipVia")] public int ShipperId { get; set; }
+    [BsonElement("ShipVia")]
+    public int ShipperId { get; set; }
 
     [NavigationProperty(nameof(ShipperId))]
     public Shipper Shipper { get; set; }
 
-    [BsonElement("EmployeeID")] public int EmployeeId { get; set; }
+    [BsonElement("EmployeeID")]
+    public int EmployeeId { get; set; }
 
-    [BsonElement("CustomerID")] public string CustomerId { get; set; }
+    [BsonElement("CustomerID")]
+    public string CustomerId { get; set; }
 
     [ManyNavigationProperty(nameof(OrderDetailsMongo.OrderId))]
     public List<OrderDetailsMongo> OrderDetails { get; set; }

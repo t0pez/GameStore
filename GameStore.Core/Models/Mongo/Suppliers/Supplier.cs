@@ -31,5 +31,6 @@ public class Supplier
     public string PostalCode { get; set; }
     public string Region { get; set; }
 
-    [BsonIgnore] public Database Database { get; set; } = Database.Mongo;
+    [BsonIgnore]
+    public Database Database { get; set; } = Database.Mongo;
 }

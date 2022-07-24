@@ -19,7 +19,8 @@ public class Product
     [BsonElement("ProductID")]
     public int ProductId { get; set; }
 
-    [UpdatableProperty] public string GameKey { get; set; }
+    [UpdatableProperty]
+    public string GameKey { get; set; }
 
     public string ProductName { get; set; }
     public string QuantityPerUnit { get; set; }
@@ -29,19 +30,24 @@ public class Product
 
     public bool Discontinued { get; set; }
 
-    [UpdatableProperty] public int UnitsInStock { get; set; }
+    [UpdatableProperty]
+    public int UnitsInStock { get; set; }
 
-    [UpdatableProperty] public int Views { get; set; }
+    [UpdatableProperty]
+    public int Views { get; set; }
 
-    [BsonElement("CategoryID")] public int CategoryId { get; set; }
+    [BsonElement("CategoryID")]
+    public int CategoryId { get; set; }
 
     [NavigationProperty(nameof(CategoryId))]
     public Category Category { get; set; }
 
-    [BsonElement("SupplierID")] public int SupplierId { get; set; }
+    [BsonElement("SupplierID")]
+    public int SupplierId { get; set; }
 
     [NavigationProperty(nameof(SupplierId))]
     public Supplier Supplier { get; set; }
 
-    [BsonIgnore] public Database Database { get; set; } = Database.Mongo;
+    [BsonIgnore]
+    public Database Database { get; set; } = Database.Mongo;
 }

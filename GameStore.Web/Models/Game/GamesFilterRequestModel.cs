@@ -8,7 +8,8 @@ namespace GameStore.Web.Models.Game;
 
 public class GamesFilterRequestModel
 {
-    [MinLength(3)] public string Name { get; set; }
+    [MinLength(3)]
+    public string Name { get; set; }
 
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }

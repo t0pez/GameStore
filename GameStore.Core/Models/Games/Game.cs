@@ -20,7 +20,8 @@ public class Game : ISafeDelete
     public bool Discontinued { get; set; }
     public int UnitsInStock { get; set; }
 
-    [BsonIgnore] public byte[] File { get; set; }
+    [BsonIgnore]
+    public byte[] File { get; set; }
 
     public int Views { get; set; }
 
@@ -29,15 +30,21 @@ public class Game : ISafeDelete
 
     public string PublisherName { get; set; }
 
-    [NotMapped] [BsonIgnore] public PublisherDto Publisher { get; set; }
+    [NotMapped]
+    [BsonIgnore]
+    public PublisherDto Publisher { get; set; }
 
-    [BsonIgnore] public ICollection<Comment> Comments { get; set; } = new List<Comment>();
+    [BsonIgnore]
+    public ICollection<Comment> Comments { get; set; } = new List<Comment>();
 
-    [BsonIgnore] public ICollection<GameGenre> Genres { get; set; } = new List<GameGenre>();
+    [BsonIgnore]
+    public ICollection<GameGenre> Genres { get; set; } = new List<GameGenre>();
 
-    [BsonIgnore] public ICollection<GamePlatformType> Platforms { get; set; } = new List<GamePlatformType>();
+    [BsonIgnore]
+    public ICollection<GamePlatformType> Platforms { get; set; } = new List<GamePlatformType>();
 
-    [NotMapped] public Database Database { get; set; } = Database.Server;
+    [NotMapped]
+    public Database Database { get; set; } = Database.Server;
 
     public bool IsDeleted { get; set; }
 }

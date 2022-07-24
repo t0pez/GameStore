@@ -21,14 +21,17 @@ public class OrderDetailsMongo
     [BsonRepresentation(BsonType.Decimal128)]
     public decimal UnitPrice { get; set; }
 
-    [BsonElement("ProductID")] public int ProductId { get; set; }
+    [BsonElement("ProductID")]
+    public int ProductId { get; set; }
 
     [NavigationProperty(nameof(ProductId))]
     public Product Product { get; set; }
 
-    [BsonElement("OrderID")] public int OrderId { get; set; }
+    [BsonElement("OrderID")]
+    public int OrderId { get; set; }
 
-    [NavigationProperty(nameof(OrderId))] public OrderMongo Order { get; set; }
+    [NavigationProperty(nameof(OrderId))]
+    public OrderMongo Order { get; set; }
 
     public decimal TotalPrice => UnitPrice * Quantity - UnitPrice * Quantity * Discount;
 }

@@ -46,7 +46,7 @@ public class UnitOfWorkTests
 
         Assert.NotNull(actualResult);
     }
-    
+
     [Fact]
     public void GetMongoRepository_Product()
     {
@@ -72,7 +72,7 @@ public class UnitOfWorkTests
 
         Assert.ThrowsAsync<InvalidOperationException>(function);
     }
-    
+
     [Fact]
     public void GetMongoRepository_NotCorrectModel_RepositoryMethodThrowsException()
     {

@@ -55,10 +55,10 @@ public class Startup
                                                       options.UseSqlServer(connectionString);
                                                   });
         services.ConfigureNorthwindDatabase();
-        
+
         services.ConfigureDomainServices(Configuration);
         services.ConfigureWebServices();
-        
+
         services.AddAutoMapper(
             configuration =>
             {

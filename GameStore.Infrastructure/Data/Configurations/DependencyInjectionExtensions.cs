@@ -20,7 +20,7 @@ public static class DependencyInjectionExtensions
                                                                  cm.SetIgnoreExtraElements(true);
                                                              });
         }
-        
+
         if (BsonClassMap.IsClassMapRegistered(typeof(OrderMongo)) == false)
         {
             BsonClassMap.RegisterClassMap<OrderMongo>(cm =>
@@ -29,7 +29,7 @@ public static class DependencyInjectionExtensions
                                                           cm.SetIgnoreExtraElements(true);
                                                       });
         }
-        
+
         if (BsonClassMap.IsClassMapRegistered(typeof(Product)) == false)
         {
             BsonClassMap.RegisterClassMap<Product>(cm =>

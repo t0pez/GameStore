@@ -23,7 +23,7 @@ public class MongoRepositoryTests
         SetMongoTestDatabase();
 
         DependencyInjectionExtensions.ConfigureNorthwindDatabase(null);
-        
+
         _repository = new MongoRepository<Product>(_database);
     }
 
@@ -31,35 +31,36 @@ public class MongoRepositoryTests
     public async void GetBySpec_NoParameters_ReturnsAllData()
     {
         const int allProductsCount = 77;
-        
+
         var actualResult = await _repository.GetBySpecAsync();
 
         actualResult.Should().HaveCount(allProductsCount);
     }
-    
+
     [Fact]
     public async void GetBySpec_SpecWithoutInclude_ReturnsCorrectResult()
     {
         const int expectedProductsCount = 24;
-        
+
         var filter = new ProductFilter
         {
-            CategoriesIds = new List<int> {1, 2}
+            CategoriesIds = new List<int> { 1, 2 }
         };
-        
+
         var actualResult = await _repository.GetBySpecAsync(new ProductsByFilterSpec(filter));
 
         actualResult.Should().HaveCount(expectedProductsCount);
     }
-    
+
     [Fact]
     public async void GetFirstOrDefaultBySpec_SpecWithInclude_ReturnsCorrectResult()
     {
         const string expectedGameKey = "game-key";
         const int expectedCategoryId = 2;
         const string expectedCategoryName = "Condiments";
-        
-        var actualResult = await _repository.GetFirstOrDefaultBySpecAsync(new ProductByGameKeyWithDetailsSpec(expectedGameKey));
+
+        var actualResult =
+            await _repository.GetFirstOrDefaultBySpecAsync(new ProductByGameKeyWithDetailsSpec(expectedGameKey));
 
         actualResult.GameKey.Should().Be(expectedGameKey);
         actualResult.CategoryId.Should().Be(expectedCategoryId);
@@ -70,7 +71,7 @@ public class MongoRepositoryTests
     {
         var connection = new MongoUrlBuilder(TestDataConnectionString);
         var client = new MongoClient(TestDataConnectionString);
-        
+
         _database = client.GetDatabase(connection.DatabaseName);
     }
 }

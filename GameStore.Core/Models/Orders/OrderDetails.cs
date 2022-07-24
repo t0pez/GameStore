@@ -13,7 +13,8 @@ public class OrderDetails
 
     public string GameKey { get; set; }
 
-    [NotMapped] public ProductDto Game { get; set; }
+    [NotMapped]
+    public ProductDto Game { get; set; }
 
     public Guid OrderId { get; set; }
     public Order Order { get; set; }
