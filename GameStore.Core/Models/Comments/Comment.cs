@@ -1,16 +1,12 @@
-﻿using GameStore.Core.Models.Games;
-using GameStore.SharedKernel.Interfaces;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using GameStore.Core.Models.Games;
+using GameStore.SharedKernel.Interfaces;
 
 namespace GameStore.Core.Models.Comments;
 
 public class Comment : ISafeDelete
 {
-    public Comment()
-    {
-    }
-
     public Guid Id { get; set; }
     public string Name { get; set; }
     public string Body { get; set; }

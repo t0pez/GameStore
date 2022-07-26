@@ -14,5 +14,4 @@ public static class DisplayExtensions
 
         return displayAttribute is not null ? displayAttribute.Name : string.Empty;
     }
-    
 }

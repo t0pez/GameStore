@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
+using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.Comments;
 using GameStore.Core.Models.Comments.Specifications;
 using GameStore.Core.Models.Games;
@@ -18,27 +19,29 @@ namespace GameStore.Core.Tests.Services;
 
 public class CommentServiceTests
 {
-    private readonly ICommentService _commentService;
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<IRepository<Game>> _gameRepoMock;
     private readonly Mock<IRepository<Comment>> _commentRepoMock;
+    private readonly ICommentService _commentService;
+    private readonly Mock<IRepository<Game>> _gameRepoMock;
     private readonly Mock<IMapper> _mapperMock;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
 
 
     public CommentServiceTests()
     {
         var loggerMock = new Mock<ILogger<CommentService>>();
+        var mongoLoggerMock = new Mock<IMongoLogger>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _gameRepoMock = new Mock<IRepository<Game>>();
         _commentRepoMock = new Mock<IRepository<Comment>>();
         _mapperMock = new Mock<IMapper>();
 
-        _unitOfWorkMock.Setup(unit => unit.GetRepository<Game>())
+        _unitOfWorkMock.Setup(unit => unit.GetEfRepository<Game>())
                        .Returns(_gameRepoMock.Object);
-        _unitOfWorkMock.Setup(unit => unit.GetRepository<Comment>())
+        _unitOfWorkMock.Setup(unit => unit.GetEfRepository<Comment>())
                        .Returns(_commentRepoMock.Object);
 
-        _commentService = new CommentService(_unitOfWorkMock.Object, loggerMock.Object, _mapperMock.Object);
+        _commentService = new CommentService(loggerMock.Object, mongoLoggerMock.Object, _unitOfWorkMock.Object,
+                                             _mapperMock.Object);
     }
 
     [Fact]
@@ -180,11 +183,11 @@ public class CommentServiceTests
                         .ReturnsAsync(comment);
 
         await _commentService.UpdateAsync(commentUpdateModel);
-        
+
         _commentRepoMock.Verify(repository => repository.UpdateAsync(comment));
         _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync());
     }
-    
+
     [Fact]
     public async void DeleteAsync_CorrectValues_CommentMarkedAsDeleted()
     {
@@ -197,7 +200,7 @@ public class CommentServiceTests
                         .ReturnsAsync(comment);
 
         await _commentService.DeleteAsync(commentId);
-        
+
         _commentRepoMock.Verify(repository => repository.UpdateAsync(comment));
         _unitOfWorkMock.Verify(unitOfWork => unitOfWork.SaveChangesAsync());
     }

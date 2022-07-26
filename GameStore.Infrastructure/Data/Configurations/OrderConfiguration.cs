@@ -12,8 +12,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(order => order.IsDeleted)
                .IsRequired();
-        builder.Property(order => order.OrderDate)
-               .IsRequired();
         builder.Property(order => order.CustomerId)
                .IsRequired();
 

@@ -17,8 +17,8 @@ namespace GameStore.Web.Tests.Controllers;
 public class GenreControllerTests
 {
     private readonly GenresController _genresController;
-    private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<IGenreService> _genreServiceMock;
+    private readonly Mock<IMapper> _mapperMock;
 
     public GenreControllerTests()
     {
@@ -34,14 +34,14 @@ public class GenreControllerTests
         const int expectedGenresCount = 5;
 
         _genreServiceMock.Setup(service => service.GetAllAsync())
-                             .ReturnsAsync(new List<Genre>(new Genre[expectedGenresCount]));
+                         .ReturnsAsync(new List<Genre>(new Genre[expectedGenresCount]));
         _mapperMock.Setup(mapper => mapper.Map<IEnumerable<GenreListViewModel>>(It.IsAny<ICollection<Genre>>()))
                    .Returns(new List<GenreListViewModel>(new GenreListViewModel[5]));
 
         var actualResult = await _genresController.GetAllAsync();
         Assert.IsType<ActionResult<IEnumerable<GenreListViewModel>>>(actualResult);
     }
-    
+
     [Fact]
     public async void GetWithDetailsAsync_ExistingGenre_ReturnsGenreView()
     {
@@ -58,7 +58,7 @@ public class GenreControllerTests
         var actualResultModel = Assert.IsType<GenreViewModel>(actualViewResult.Model);
         Assert.Equal(expectedId, actualResultModel.Id);
     }
-    
+
     [Fact]
     public async void CreateAsync_NoParameters_ReturnsView()
     {
@@ -70,7 +70,7 @@ public class GenreControllerTests
         actualResult.Should().BeOfType<ViewResult>()
                     .Which.Model.Should().BeOfType<GenreCreateRequestModel>();
     }
-    
+
     [Fact]
     public async void CreateAsync_CorrectParameters_ReturnsRedirect()
     {
@@ -88,7 +88,7 @@ public class GenreControllerTests
     public async void UpdateAsync_CorrectValues_ReturnsView()
     {
         var currentGenreId = Guid.NewGuid();
-        var allGenres = new List<Genre>()
+        var allGenres = new List<Genre>
         {
             new()
             {
@@ -107,7 +107,7 @@ public class GenreControllerTests
 
         actualResult.Should().BeAssignableTo<ActionResult<GenreUpdateRequestModel>>();
     }
-    
+
     [Fact]
     public async void UpdateAsync_IncorrectValues_ReturnsBadResult()
     {
@@ -137,9 +137,9 @@ public class GenreControllerTests
     public async void DeleteAsync_ExistingGenre_ReturnsRedirect()
     {
         var expectedId = Guid.NewGuid();
-        
+
         _genreServiceMock.Setup(service => service.DeleteAsync(expectedId))
-                             .Verifiable();
+                         .Verifiable();
 
         var actualResult = await _genresController.DeleteAsync(expectedId);
         Assert.IsType<RedirectToActionResult>(actualResult);

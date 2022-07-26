@@ -10,16 +10,16 @@ namespace GameStore.Web.Controllers;
 [Route("pay")]
 public class PaymentController : Controller
 {
-    private readonly IPaymentService _paymentService;
     private readonly IOrderService _orderService;
+    private readonly IPaymentService _paymentService;
 
     public PaymentController(IPaymentService paymentService, IOrderService orderService)
     {
         _paymentService = paymentService;
         _orderService = orderService;
     }
-    
-    [HttpPost("visa")]
+
+    [HttpGet("visa")]
     public async Task<ActionResult> VisaPayAsync(Guid orderId)
     {
         var paymentGetaway = await GetPaymentGetaway(orderId, PaymentType.Visa);
@@ -27,8 +27,8 @@ public class PaymentController : Controller
 
         return View("VisaPaymentStub", result);
     }
-    
-    [HttpPost("bank")]
+
+    [HttpGet("bank")]
     public async Task<FileContentResult> BankPayAsync(Guid orderId)
     {
         var paymentGetaway = await GetPaymentGetaway(orderId, PaymentType.Bank);
@@ -36,8 +36,8 @@ public class PaymentController : Controller
 
         return File(result.InvoiceFileContent, "application/pdf", "invoice-file.pdf");
     }
-    
-    [HttpPost("ibox")]
+
+    [HttpGet("ibox")]
     public async Task<ActionResult> IboxPayAsync(Guid orderId)
     {
         var paymentGetaway = await GetPaymentGetaway(orderId, PaymentType.Ibox);
@@ -45,11 +45,11 @@ public class PaymentController : Controller
 
         return View("IboxPaymentStub", result);
     }
-    
+
     [HttpPost("payment-result")]
     public async Task<ActionResult> ResultStubAsync(VisaPaymentGetaway paymentGetaway)
     {
-        return RedirectToAction("GetAll", "Orders");
+        return RedirectToAction("GetByFilter", "Orders");
     }
 
     private async Task<PaymentGetaway> GetPaymentGetaway(Guid orderId, PaymentType paymentType)
@@ -58,5 +58,5 @@ public class PaymentController : Controller
         var paymentGateway = await _paymentService.GetPaymentGateway(order, paymentType);
 
         return paymentGateway;
-    } 
+    }
 }

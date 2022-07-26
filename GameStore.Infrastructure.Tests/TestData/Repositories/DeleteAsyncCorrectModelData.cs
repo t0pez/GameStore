@@ -18,7 +18,7 @@ public class DeleteAsyncCorrectModelData : DataAttribute
                 Name = "First game",
                 Key = "first-game",
                 Description = "First description",
-                File = new byte[] { 0, 0, 0, 1 }, 
+                File = new byte[] { 0, 0, 0, 1 },
                 IsDeleted = false
             }
         };
@@ -30,7 +30,7 @@ public class DeleteAsyncCorrectModelData : DataAttribute
                 Name = "Second game",
                 Key = "second-game",
                 Description = "Second description",
-                File = new byte[] { 0, 0, 0, 2 }, 
+                File = new byte[] { 0, 0, 0, 2 },
                 IsDeleted = false
             }
         };
@@ -42,10 +42,9 @@ public class DeleteAsyncCorrectModelData : DataAttribute
                 Name = "Third game",
                 Key = "Third-game",
                 Description = "Third description",
-                File = new byte[] { 0, 0, 0, 3 }, 
+                File = new byte[] { 0, 0, 0, 3 },
                 IsDeleted = false
             }
         };
-        
     }
 }

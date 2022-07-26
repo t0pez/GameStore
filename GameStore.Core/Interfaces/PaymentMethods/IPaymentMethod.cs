@@ -7,5 +7,3 @@ public interface IPaymentMethod
 {
     public PaymentGetaway GetPaymentGetaway(PaymentGetawayCreateModel createModel);
 }
-
-

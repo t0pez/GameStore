@@ -15,8 +15,8 @@ public class RelationshipModelService<TModel> : IRelationshipModelService<TModel
         _unitOfWork = unitOfWork;
     }
 
-    private IRepository<TModel> Repository => _unitOfWork.GetRepository<TModel>();
-    
+    private IRepository<TModel> Repository => _unitOfWork.GetEfRepository<TModel>();
+
     public async Task UpdateManyToManyAsync(IEnumerable<TModel> newModels, ISpecification<TModel> deleteSpec)
     {
         await DeleteByPreviousRelationshipsAsync(deleteSpec);

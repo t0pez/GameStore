@@ -2,6 +2,9 @@
 
 public class PaginationFilter
 {
+    public const int DefaultCurrentPage = 1;
+    public const int DefaultPageSize = 10;
+
     public int CurrentPage { get; set; }
     public int PageSize { get; set; }
 

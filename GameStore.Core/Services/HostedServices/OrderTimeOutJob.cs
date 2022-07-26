@@ -11,12 +11,13 @@ namespace GameStore.Core.Services.HostedServices;
 
 public class OrderTimeOutJob : IJob
 {
+    private readonly IMapper _mapper;
+    private readonly IOpenedOrderService _openedOrderService;
     private readonly IOrderService _orderService;
     private readonly IOrderTimeOutService _orderTimeOutService;
-    private readonly IOpenedOrderService _openedOrderService;
-    private readonly IMapper _mapper;
 
-    public OrderTimeOutJob(IOrderTimeOutService orderTimeOutService, IOpenedOrderService openedOrderService, IOrderService orderService, IMapper mapper)
+    public OrderTimeOutJob(IOrderTimeOutService orderTimeOutService, IOpenedOrderService openedOrderService,
+                           IOrderService orderService, IMapper mapper)
     {
         _orderTimeOutService = orderTimeOutService;
         _openedOrderService = openedOrderService;

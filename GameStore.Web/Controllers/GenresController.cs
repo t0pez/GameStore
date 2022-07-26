@@ -49,7 +49,7 @@ public class GenresController : Controller
         var genres = await _genreService.GetAllAsync();
         var genresSelectList = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
         ViewData["Genres"] = genresSelectList;
-        
+
         return View(new GenreCreateRequestModel());
     }
 
@@ -72,12 +72,12 @@ public class GenresController : Controller
         {
             return BadRequest();
         }
-        
+
         var genresSelectList = genres.Except(new[] { currentGenre })
                                      .Select(genre => new SelectListItem(genre.Name, genre.Id.ToString()))
                                      .ToList();
         genresSelectList.Add(new SelectListItem("Empty", Guid.Empty.ToString()));
-        
+
         ViewData["Genres"] = genresSelectList;
 
         return View(new GenreUpdateRequestModel { Id = id });

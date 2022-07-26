@@ -6,9 +6,9 @@ namespace GameStore.Web.Filters;
 
 public class WorkTimeTrackingFilter : IActionFilter
 {
-    private readonly Stopwatch _stopwatch = new();
     private readonly ILogger<WorkTimeTrackingFilter> _logger;
-    
+    private readonly Stopwatch _stopwatch = new();
+
     public WorkTimeTrackingFilter(ILogger<WorkTimeTrackingFilter> logger)
     {
         _logger = logger;

@@ -9,7 +9,7 @@ public class OrderDetailsConfiguration : IEntityTypeConfiguration<OrderDetails>
     public void Configure(EntityTypeBuilder<OrderDetails> builder)
     {
         builder.HasKey(details => details.Id);
-        
+
         builder.Property(details => details.Quantity)
                .IsRequired();
         builder.Property(details => details.Discount)

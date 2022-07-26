@@ -17,4 +17,3 @@ public class IboxPaymentMethod : IPaymentMethod
         return getaway;
     }
 }
-

@@ -13,9 +13,5 @@ internal class PublisherConfiguration : IEntityTypeConfiguration<Publisher>
         builder.Property(publisher => publisher.Name).IsRequired();
         builder.Property(publisher => publisher.Description).IsRequired();
         builder.Property(publisher => publisher.HomePage).IsRequired();
-
-        builder.HasMany(publisher => publisher.Games)
-               .WithOne(game => game.Publisher)
-               .HasForeignKey(game => game.PublisherId);
     }
 }

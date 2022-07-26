@@ -9,6 +9,7 @@ public class OrderDetailsViewModel
     public int Quantity { get; set; }
     public decimal Price { get; set; }
     public decimal Discount { get; set; }
-    
+    public decimal TotalSum { get; set; }
+
     public GameInOrderDetailsViewModel Game { get; set; }
 }

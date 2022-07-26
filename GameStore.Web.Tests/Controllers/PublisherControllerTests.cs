@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AutoMapper;
 using FluentAssertions;
 using GameStore.Core.Interfaces;
+using GameStore.Core.Models.Dto;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.ServiceModels.Publishers;
 using GameStore.Web.Controllers;
@@ -16,8 +17,8 @@ namespace GameStore.Web.Tests.Controllers;
 
 public class PublisherControllerTests
 {
-    private readonly PublisherController _publisherController;
     private readonly Mock<IMapper> _mapperMock;
+    private readonly PublisherController _publisherController;
     private readonly Mock<IPublisherService> _publisherServiceMock;
 
     public PublisherControllerTests()
@@ -34,7 +35,7 @@ public class PublisherControllerTests
         const int expectedPublishersCount = 5;
 
         _publisherServiceMock.Setup(service => service.GetAllAsync())
-                             .ReturnsAsync(new List<Publisher>(new Publisher[expectedPublishersCount]));
+                             .ReturnsAsync(new List<PublisherDto>(new PublisherDto[expectedPublishersCount]));
         _mapperMock.Setup(mapper => mapper.Map<IEnumerable<PublisherListViewModel>>(It.IsAny<ICollection<Publisher>>()))
                    .Returns(new List<PublisherListViewModel>(new PublisherListViewModel[5]));
 
@@ -48,7 +49,7 @@ public class PublisherControllerTests
         const string expectedName = "Name";
 
         _publisherServiceMock.Setup(service => service.GetByCompanyNameAsync(expectedName))
-                             .ReturnsAsync(new Publisher());
+                             .ReturnsAsync(new PublisherDto());
         _mapperMock.Setup(mapper => mapper.Map<PublisherViewModel>(It.IsAny<Publisher>()))
                    .Returns(new PublisherViewModel { Name = expectedName });
 
@@ -64,7 +65,7 @@ public class PublisherControllerTests
         actualResult.Should().BeOfType<ViewResult>()
                     .Which.Model.Should().BeOfType<PublisherCreateRequestModel>();
     }
-    
+
     [Fact]
     public async void CreateAsync_CorrectParameters_ReturnsRedirect()
     {
@@ -80,12 +81,12 @@ public class PublisherControllerTests
         Assert.IsType<RedirectToActionResult>(actualResult);
         _publisherServiceMock.Verify(service => service.CreateAsync(It.IsAny<PublisherCreateModel>()), Times.Once());
     }
-    
+
     [Fact]
     public async void UpdateAsync_NoParameters_ReturnsView()
     {
         const string companyName = "publisher";
-        var publisher = new Publisher
+        var publisher = new PublisherDto
         {
             Name = companyName
         };
@@ -93,9 +94,9 @@ public class PublisherControllerTests
         _publisherServiceMock.Setup(service => service.GetByCompanyNameAsync(companyName))
                              .ReturnsAsync(publisher);
         _mapperMock
-            .Setup(mapper => mapper.Map<PublisherUpdateRequestModel>(It.Is<Publisher>(p => p.Name == companyName)))
+            .Setup(mapper => mapper.Map<PublisherUpdateRequestModel>(It.Is<PublisherDto>(p => p.Name == companyName)))
             .Returns(new PublisherUpdateRequestModel { Name = companyName });
-        
+
         var actualResult = await _publisherController.UpdateAsync(companyName);
 
         actualResult.Result.Should().BeOfType<ViewResult>()
@@ -118,22 +119,24 @@ public class PublisherControllerTests
         _mapperMock.Setup(mapper => mapper.Map<PublisherUpdateModel>(request))
                    .Returns(new PublisherUpdateModel { Name = expectedName });
 
-        var actualResult = await _publisherController.UpdateAsync(request);
+        var actualResult = await _publisherController.UpdateAsync(request, expectedName);
 
         actualResult.Should().BeOfType<RedirectToActionResult>();
-        _publisherServiceMock.Verify(service => service.UpdateAsync(It.Is<PublisherUpdateModel>(model => model.Name == expectedName)), Times.Once());
+        _publisherServiceMock.Verify(
+            service => service.UpdateAsync(It.Is<PublisherUpdateModel>(model => model.Name == expectedName)),
+            Times.Once());
     }
 
     [Fact]
     public async void DeleteAsync_ExistingPublisher_ReturnsRedirect()
     {
-        var expectedId = Guid.NewGuid();
+        var expectedName = Guid.NewGuid().ToString();
 
-        _publisherServiceMock.Setup(service => service.DeleteAsync(expectedId))
+        _publisherServiceMock.Setup(service => service.DeleteAsync(expectedName))
                              .Verifiable();
 
-        var actualResult = await _publisherController.DeleteAsync(expectedId);
+        var actualResult = await _publisherController.DeleteAsync(expectedName);
         Assert.IsType<RedirectToActionResult>(actualResult);
-        _publisherServiceMock.Verify(service => service.DeleteAsync(expectedId), Times.Once);
+        _publisherServiceMock.Verify(service => service.DeleteAsync(expectedName), Times.Once);
     }
 }

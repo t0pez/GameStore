@@ -1,0 +1,42 @@
+﻿@model IEnumerable<GameStore.Web.ViewModels.Order.OrderListViewModel>
+
+@{
+    ViewBag.Title = "Orders";
+    Layout = "_Layout";
+}
+
+<h2 class="mt-3">Orders</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.CustomerId)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.ItemsCount)
+        </th>
+
+        <th>
+            @Html.DisplayNameFor(model => model.TotalSum)
+        </th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.CustomerId)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.ItemsCount)
+            </td>
+
+            <td>
+                @Html.DisplayFor(modelItem => item.TotalSum)
+            </td>
+        </tr>
+    }
+
+</table>

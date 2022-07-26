@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using AutoMapper;
 using FluentAssertions;
+using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.ServiceModels.Genres;
@@ -14,21 +15,22 @@ namespace GameStore.Core.Tests.Services;
 
 public class GenreServiceTests
 {
+    private readonly Mock<IRepository<Genre>> _genreRepoMock;
     private readonly GenreService _genreService;
     private readonly Mock<IMapper> _mapperMock;
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
-    private readonly Mock<IRepository<Genre>> _genreRepoMock;
 
     public GenreServiceTests()
     {
+        var mongoLogger = new Mock<IMongoLogger>();
         _mapperMock = new Mock<IMapper>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _genreRepoMock = new Mock<IRepository<Genre>>();
 
-        _unitOfWorkMock.Setup(unit => unit.GetRepository<Genre>())
+        _unitOfWorkMock.Setup(unit => unit.GetEfRepository<Genre>())
                        .Returns(_genreRepoMock.Object);
 
-        _genreService = new GenreService(_unitOfWorkMock.Object, _mapperMock.Object);
+        _genreService = new GenreService(mongoLogger.Object, _unitOfWorkMock.Object, _mapperMock.Object);
     }
 
     [Fact]
@@ -114,7 +116,7 @@ public class GenreServiceTests
             Id = subGenreId,
             ParentId = genreToDeleteId
         };
-        
+
         var genreToDelete = new Genre
         {
             Id = genreToDeleteId,
@@ -138,8 +140,9 @@ public class GenreServiceTests
 
         genreToDelete.IsDeleted.Should().Be(true);
         subGenre.ParentId.Should().Be(parentGenreToDeleteId);
-        
-        _genreRepoMock.Verify(repository => repository.UpdateAsync(It.Is<Genre>(genre => genre.Id == genreToDeleteId)), Times.Once);
+
+        _genreRepoMock.Verify(repository => repository.UpdateAsync(It.Is<Genre>(genre => genre.Id == genreToDeleteId)),
+                              Times.Once);
         _unitOfWorkMock.Verify(work => work.SaveChangesAsync(), Times.Once);
     }
 }

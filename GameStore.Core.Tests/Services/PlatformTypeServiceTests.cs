@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using AutoMapper;
+using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.PlatformTypes;
 using GameStore.Core.Models.PlatformTypes.Specifications;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
@@ -13,21 +14,22 @@ namespace GameStore.Core.Tests.Services;
 
 public class PlatformTypeServiceTests
 {
-    private readonly PlatformTypeService _platformService;
     private readonly Mock<IMapper> _mapperMock;
-    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<IRepository<PlatformType>> _platformRepoMock;
+    private readonly PlatformTypeService _platformService;
+    private readonly Mock<IUnitOfWork> _unitOfWorkMock;
 
     public PlatformTypeServiceTests()
     {
+        var mongoLogger = new Mock<IMongoLogger>();
         _mapperMock = new Mock<IMapper>();
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _platformRepoMock = new Mock<IRepository<PlatformType>>();
 
-        _unitOfWorkMock.Setup(unit => unit.GetRepository<PlatformType>())
+        _unitOfWorkMock.Setup(unit => unit.GetEfRepository<PlatformType>())
                        .Returns(_platformRepoMock.Object);
 
-        _platformService = new PlatformTypeService(_unitOfWorkMock.Object, _mapperMock.Object);
+        _platformService = new PlatformTypeService(mongoLogger.Object, _unitOfWorkMock.Object, _mapperMock.Object);
     }
 
     [Fact]

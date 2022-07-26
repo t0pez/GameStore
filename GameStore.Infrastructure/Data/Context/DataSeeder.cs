@@ -13,9 +13,11 @@ internal static class DataSeeder
 {
     internal static void SeedData(this ApplicationContext context)
     {
-        if(context.Set<Genre>().Any() || context.Set<PlatformType>().Any())
+        if (context.Set<Genre>().Any() || context.Set<PlatformType>().Any())
+        {
             return;
-        
+        }
+
         var strategyGenre = new Genre
         {
             Id = Guid.NewGuid(),
@@ -98,7 +100,7 @@ internal static class DataSeeder
             IsDeleted = false,
             Games = new List<GamePlatformType>()
         };
-        
+
         var publisher1 = new Publisher
         {
             Id = Guid.NewGuid(),
@@ -125,7 +127,7 @@ internal static class DataSeeder
             Discontinued = false,
             Price = 60,
             UnitsInStock = 100,
-            PublisherId = publisher1.Id,
+            PublisherName = publisher1.Name,
             File = new byte[] { 0, 1, 0, 1, 0 },
             PublishedAt = DateTime.UtcNow.AddMonths(-3),
             AddedToStoreAt = DateTime.UtcNow.AddMonths(-1),
@@ -140,7 +142,7 @@ internal static class DataSeeder
             Discontinued = false,
             Price = 60,
             UnitsInStock = 100,
-            PublisherId = publisher2.Id,
+            PublisherName = publisher2.Name,
             File = new byte[] { 0, 1, 0, 1, 0 },
             PublishedAt = DateTime.UtcNow.AddMonths(-2),
             AddedToStoreAt = DateTime.UtcNow.AddMonths(-1),
@@ -188,7 +190,7 @@ internal static class DataSeeder
             GameId = game2.Id,
             PlatformId = xboxPlatform.Id
         };
-        
+
         context.Add(strategyGenre);
         context.Add(rtsGenre);
         context.Add(cityBuilderGenre);
@@ -197,7 +199,7 @@ internal static class DataSeeder
         context.Add(tpsGenre);
         context.Add(actionGenre);
         context.SaveChanges();
-        
+
         context.AddRange(pcPlatform, psPlatform, xboxPlatform);
         context.SaveChanges();
 

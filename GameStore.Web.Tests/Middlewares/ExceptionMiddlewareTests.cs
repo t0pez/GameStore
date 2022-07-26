@@ -11,9 +11,9 @@ namespace GameStore.Web.Tests.Middlewares;
 
 public class ExceptionMiddlewareTests
 {
-    private readonly Mock<RequestDelegate> _requestDelegateMock;
     private readonly Mock<HttpContext> _httpContextMock;
     private readonly Mock<ILogger<ExceptionMiddleware>> _loggerMock;
+    private readonly Mock<RequestDelegate> _requestDelegateMock;
 
     public ExceptionMiddlewareTests()
     {
@@ -32,10 +32,10 @@ public class ExceptionMiddlewareTests
 
         var exceptionMiddleware = new ExceptionMiddleware(_requestDelegateMock.Object, _loggerMock.Object);
         exceptionMiddleware.Invoke(_httpContextMock.Object);
-        
+
         _httpContextMock.VerifySet(context => context.Response.StatusCode = (int)HttpStatusCode.NotFound);
     }
-    
+
     [Fact]
     public void Invoke_ThrowsInvalidOperationException_AddsCorrectStatusCode()
     {
@@ -44,10 +44,10 @@ public class ExceptionMiddlewareTests
 
         var exceptionMiddleware = new ExceptionMiddleware(_requestDelegateMock.Object, _loggerMock.Object);
         exceptionMiddleware.Invoke(_httpContextMock.Object);
-        
+
         _httpContextMock.VerifySet(context => context.Response.StatusCode = (int)HttpStatusCode.BadGateway);
-    } 
-    
+    }
+
     [Fact]
     public void Invoke_ThrowsArgumentException_AddsCorrectStatusCode()
     {
@@ -56,10 +56,10 @@ public class ExceptionMiddlewareTests
 
         var exceptionMiddleware = new ExceptionMiddleware(_requestDelegateMock.Object, _loggerMock.Object);
         exceptionMiddleware.Invoke(_httpContextMock.Object);
-        
+
         _httpContextMock.VerifySet(context => context.Response.StatusCode = (int)HttpStatusCode.BadRequest);
     }
-    
+
     [Fact]
     public void Invoke_ThrowsUnsupportedException_AddsCorrectStatusCode()
     {
@@ -68,7 +68,7 @@ public class ExceptionMiddlewareTests
 
         var exceptionMiddleware = new ExceptionMiddleware(_requestDelegateMock.Object, _loggerMock.Object);
         exceptionMiddleware.Invoke(_httpContextMock.Object);
-        
+
         _httpContextMock.VerifySet(context => context.Response.StatusCode = (int)HttpStatusCode.InternalServerError);
     }
 }

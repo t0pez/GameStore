@@ -16,9 +16,9 @@ namespace GameStore.Web.Tests.Controllers;
 
 public class PlatformTypesControllerTests
 {
+    private readonly Mock<IMapper> _mapperMock;
     private readonly PlatformTypesController _platformController;
     private readonly Mock<IPlatformTypeService> _platformServiceMock;
-    private readonly Mock<IMapper> _mapperMock;
 
     public PlatformTypesControllerTests()
     {
@@ -82,7 +82,7 @@ public class PlatformTypesControllerTests
         actualResult.Result.Should().BeOfType<ViewResult>()
                     .Which.Model.Should().BeOfType<PlatformTypeCreateRequestModel>();
     }
-    
+
     [Fact]
     public async void CreateAsync_CorrectParameters_ReturnsRedirect()
     {
@@ -95,19 +95,19 @@ public class PlatformTypesControllerTests
         Assert.IsType<RedirectToActionResult>(actualResult);
         _platformServiceMock.Verify(service => service.CreateAsync(It.IsAny<PlatformTypeCreateModel>()), Times.Once());
     }
-    
+
     [Fact]
     public async void UpdateAsync_ExistingPlatformType_ReturnsView()
     {
         var platformId = Guid.NewGuid();
-        
+
         var actualResult = await _platformController.UpdateAsync(platformId);
 
         actualResult.Result.Should().BeOfType<ViewResult>()
                     .Which.Model.Should().BeOfType<PlatformTypeUpdateRequestModel>()
                     .And.Subject.As<PlatformTypeUpdateRequestModel>().Id.Should().Be(platformId);
     }
-    
+
     [Fact]
     public async void UpdateAsync_CorrectParameters_ReturnsRedirect()
     {

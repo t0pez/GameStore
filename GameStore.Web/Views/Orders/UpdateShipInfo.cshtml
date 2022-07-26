@@ -1,0 +1,60 @@
+﻿@model GameStore.Web.Models.Order.ActiveOrderCreateRequestModel
+
+@{
+    ViewBag.Title = "Update ship info";
+    Layout = "_Layout";
+}
+
+<h2>Update ship info</h2>
+
+
+<form method="post" asp-controller="Orders" asp-action="UpdateShipInfo" asp-route-orderId="@Model.OrderId">
+
+    <div>
+        <input type="hidden" name="@nameof(Model.OrderId)" value="@Model.OrderId"/>
+
+        <div class="form-floating mb-3">
+            @Html.EditorFor(model => model.ShipAddress, new { htmlAttributes = new { @class = "form-control", placeholder = "ShipAddress", style = "min-width: 100%" } })
+            @Html.LabelFor(model => model.ShipAddress, new { @class = "ps-4" })
+            @Html.ValidationMessageFor(model => model.ShipAddress, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-floating mb-3">
+            @Html.EditorFor(model => model.ShipCity, new { htmlAttributes = new { @class = "form-control", placeholder = "ShipCity", style = "min-width: 100%" } })
+            @Html.LabelFor(model => model.ShipCity, new { @class = "ps-4" })
+            @Html.ValidationMessageFor(model => model.ShipCity, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-floating mb-3">
+            @Html.EditorFor(model => model.ShipCountry, new { htmlAttributes = new { @class = "form-control", placeholder = "ShipCountry", style = "min-width: 100%" } })
+            @Html.LabelFor(model => model.ShipCountry, new { @class = "ps-4" })
+            @Html.ValidationMessageFor(model => model.ShipCountry, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-floating mb-3">
+            @Html.EditorFor(model => model.ShipName, new { htmlAttributes = new { @class = "form-control", placeholder = "ShipName", style = "min-width: 100%" } })
+            @Html.LabelFor(model => model.ShipName, new { @class = "ps-4" })
+            @Html.ValidationMessageFor(model => model.ShipName, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-floating mb-3">
+            @Html.EditorFor(model => model.ShipPostalCode, new { htmlAttributes = new { @class = "form-control", placeholder = "ShipPostalCode", style = "min-width: 100%" } })
+            @Html.LabelFor(model => model.ShipPostalCode, new { @class = "ps-4" })
+            @Html.ValidationMessageFor(model => model.ShipPostalCode, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-floating mb-3">
+            @Html.EditorFor(model => model.ShipRegion, new { htmlAttributes = new { @class = "form-control", placeholder = "ShipRegion", style = "min-width: 100%" } })
+            @Html.LabelFor(model => model.ShipRegion, new { @class = "ps-4" })
+            @Html.ValidationMessageFor(model => model.ShipRegion, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-floating mb-3">
+            @Html.DropDownListFor(model => model.ShipperId, ViewData["Shippers"] as IEnumerable<SelectListItem>, new { @class = "form-select from-select-lg" })
+            @Html.LabelFor(model => model.ShipperId, "Shipper", new { @class = "ps-4" })
+            @Html.ValidationMessageFor(model => model.ShipperId, "", new { @class = "text-danger" })
+        </div>
+
+        <button type="submit">Submit</button>
+    </div>
+</form>

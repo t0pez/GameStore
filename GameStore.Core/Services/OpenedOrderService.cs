@@ -18,7 +18,7 @@ public class OpenedOrderService : IOpenedOrderService
         _unitOfWork = unitOfWork;
     }
 
-    private IRepository<OpenedOrder> OpenedOrderRepository => _unitOfWork.GetRepository<OpenedOrder>();
+    private IRepository<OpenedOrder> OpenedOrderRepository => _unitOfWork.GetEfRepository<OpenedOrder>();
 
     public async Task<IEnumerable<OpenedOrder>> GetAllAsync()
     {
@@ -33,12 +33,30 @@ public class OpenedOrderService : IOpenedOrderService
         await _unitOfWork.SaveChangesAsync();
     }
 
+    public async Task UpdateAsync(OpenedOrder updated)
+    {
+        var openedOrder =
+            await OpenedOrderRepository.GetSingleOrDefaultBySpecAsync(new OpenedOrderByOrderIdSpec(updated.OrderId))
+            ?? throw new ItemNotFoundException(typeof(OpenedOrder), updated.OrderId, nameof(updated.OrderId));
+
+        openedOrder.TimeOutDate = updated.TimeOutDate;
+
+        await OpenedOrderRepository.UpdateAsync(openedOrder);
+        await _unitOfWork.SaveChangesAsync();
+    }
+
     public async Task DeleteByOrderIdAsync(Guid orderId)
     {
-        var openedOrder = await OpenedOrderRepository.GetSingleOrDefaultBySpecAsync(new OpenedOrderByOrderIdSpec(orderId))
-                          ?? throw new ItemNotFoundException(typeof(OpenedOrder), orderId);
+        var openedOrder =
+            await OpenedOrderRepository.GetSingleOrDefaultBySpecAsync(new OpenedOrderByOrderIdSpec(orderId))
+            ?? throw new ItemNotFoundException(typeof(OpenedOrder), orderId);
 
         await OpenedOrderRepository.DeleteAsync(openedOrder);
         await _unitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<bool> IsOrderExistsAsync(Guid orderId)
+    {
+        return await OpenedOrderRepository.AnyAsync(new OpenedOrderByOrderIdSpec(orderId));
     }
 }

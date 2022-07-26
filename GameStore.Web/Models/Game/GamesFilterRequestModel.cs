@@ -10,6 +10,7 @@ public class GamesFilterRequestModel
 {
     [MinLength(3)]
     public string Name { get; set; }
+
     public decimal? MinPrice { get; set; }
     public decimal? MaxPrice { get; set; }
     public SelectList Genres { get; set; }
@@ -18,8 +19,8 @@ public class GamesFilterRequestModel
     public List<string> SelectedPlatforms { get; set; } = new();
     public SelectList Publishers { get; set; }
     public List<string> SelectedPublishers { get; set; } = new();
-    
-    public GameSearchFilterOrderByState OrderBy { get; set; } = GameSearchFilterOrderByState.Default;
+
+    public GameSearchFilterOrderByState OrderByState { get; set; } = GameSearchFilterOrderByState.Default;
 
     public int CurrentPage { get; set; }
     public int PageSize { get; set; }
@@ -30,5 +31,5 @@ public class GamesFilterRequestModel
                            SelectedGenres.Any() == false &&
                            SelectedPlatforms.Any() == false &&
                            SelectedPublishers.Any() == false &&
-                           OrderBy == GameSearchFilterOrderByState.Default;
+                           OrderByState == GameSearchFilterOrderByState.Default;
 }

@@ -14,7 +14,7 @@ public class DisplayExtensionsTests
     {
         var expectedDisplayNames = new[]
             { "Default", "Most popular", "Most commented", "Price from lowest", "Price from highest", "Newest" };
-        
+
         var enumProps = Enum.GetValues(typeof(GameSearchFilterOrderByState)).OfType<Enum>();
 
         var displayNames = enumProps.Select(enumElement => enumElement.GetDisplayName());

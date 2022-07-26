@@ -10,10 +10,6 @@ public class GetSingleBySpecWithoutResultData : DataAttribute
 {
     public override IEnumerable<object[]> GetData(MethodInfo testMethod)
     {
-         yield return new object[]
-        {
-            new GameByIdSpec(Guid.NewGuid())
-        };
         yield return new object[]
         {
             new GameByIdSpec(Guid.NewGuid())
@@ -22,7 +18,11 @@ public class GetSingleBySpecWithoutResultData : DataAttribute
         {
             new GameByIdSpec(Guid.NewGuid())
         };
-        
+        yield return new object[]
+        {
+            new GameByIdSpec(Guid.NewGuid())
+        };
+
         yield return new object[]
         {
             new GameByIdWithDetailsSpec(Guid.NewGuid())
@@ -35,7 +35,7 @@ public class GetSingleBySpecWithoutResultData : DataAttribute
         {
             new GameByIdWithDetailsSpec(Guid.NewGuid())
         };
-        
+
         yield return new object[]
         {
             new GameByKeySpec("wrong-game-1")
@@ -48,7 +48,7 @@ public class GetSingleBySpecWithoutResultData : DataAttribute
         {
             new GameByKeySpec("fourth-game00")
         };
-        
+
         yield return new object[]
         {
             new GameByKeyWithDetailsSpec("fIrst-game")

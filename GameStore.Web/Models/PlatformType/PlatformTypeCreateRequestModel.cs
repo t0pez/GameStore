@@ -4,5 +4,6 @@ namespace GameStore.Web.Models.PlatformType;
 
 public class PlatformTypeCreateRequestModel
 {
-    [Required] public string Name { get; set; }
+    [Required]
+    public string Name { get; set; }
 }

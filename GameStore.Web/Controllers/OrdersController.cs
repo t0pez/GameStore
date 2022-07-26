@@ -3,49 +3,54 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
-using GameStore.Core.Models.Baskets;
+using GameStore.Core.Interfaces.PaymentMethods;
+using GameStore.Core.Models.Dto.Filters;
+using GameStore.Core.Models.Mongo.Shippers;
 using GameStore.Core.Models.Orders;
 using GameStore.Core.Models.ServiceModels.Orders;
 using GameStore.Web.Interfaces;
-using GameStore.Web.Models.Baskets;
 using GameStore.Web.Models.Order;
 using GameStore.Web.ViewModels.Order;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GameStore.Web.Controllers;
 
 [Route("orders")]
 public class OrdersController : Controller
 {
-    private readonly IOrderService _orderService;
-    private readonly IOrderTimeOutService _timeOutService;
-    private readonly IBasketCookieService _basketCookieService;
-    private readonly IActiveOrderCookieService _activeOrderCookieService;
     private readonly IMapper _mapper;
+    private readonly IOrderService _orderService;
+    private readonly IShipperService _shipperService;
+    private readonly IOrderTimeOutService _timeOutService;
+    private readonly IUserCookieService _userCookieService;
 
-    public OrdersController(IOrderService orderService, IOrderTimeOutService timeOutService,
-                            IBasketCookieService basketCookieService, IActiveOrderCookieService activeOrderCookieService,
+    public OrdersController(IOrderService orderService, IShipperService shipperService,
+                            IOrderTimeOutService timeOutService,
+                            IUserCookieService userCookieService,
                             IMapper mapper)
     {
         _orderService = orderService;
-        _mapper = mapper;
-        _activeOrderCookieService = activeOrderCookieService;
-        _basketCookieService = basketCookieService;
+        _shipperService = shipperService;
         _timeOutService = timeOutService;
+        _userCookieService = userCookieService;
+        _mapper = mapper;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetAllAsync()
+    [HttpGet("history")]
+    public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetByFilterAsync(
+        AllOrdersFilterRequestModel filterRequest)
     {
-        var orders = await _orderService.GetAllAsync();
+        var filter = _mapper.Map<AllOrdersFilter>(filterRequest);
+        var orders = await _orderService.GetByFilterAsync(filter);
 
         var result = _mapper.Map<IEnumerable<OrderListViewModel>>(orders);
 
         return View(result);
     }
-    
+
     [HttpGet("customer/{customerId}")]
-    public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetByCustomerIdAsync(Guid customerId)
+    public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetByCustomerIdAsync(string customerId)
     {
         var orders = await _orderService.GetByCustomerIdAsync(customerId);
 
@@ -53,7 +58,7 @@ public class OrdersController : Controller
 
         return View(result);
     }
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<OrderViewModel>> GetWithDetailsAsync(Guid id)
     {
@@ -64,26 +69,94 @@ public class OrdersController : Controller
         return View(result);
     }
 
-    [HttpGet("new")]
-    public async Task<ActionResult<OrderViewModel>> CreateAsync()
+    [HttpGet("basket")]
+    public async Task<ActionResult<OrderViewModel>> GetCurrentBasketAsync()
     {
-        await ValidateActiveOrderCookie();
-        
-        var basketCookieModel = _basketCookieService.GetBasketFromCookie(HttpContext.Request.Cookies);
-        var basket = _mapper.Map<Basket>(basketCookieModel);
-        
-        var createModel = new OrderCreateModel { Basket = basket };
-        
-        var order = await _orderService.CreateAsync(createModel);
-        await _timeOutService.CreateOpenedOrderAsync(order);
+        if (_userCookieService.TryGetCookiesUserId(HttpContext.Request.Cookies, out var customerId) == false)
+        {
+            customerId = Guid.NewGuid().ToString();
+            _userCookieService.AppendUserId(HttpContext.Response.Cookies, customerId);
+        }
 
-        basketCookieModel = new BasketCookieModel(); 
-        _basketCookieService.AppendBasketCookie(HttpContext.Response.Cookies, basketCookieModel);
-        _activeOrderCookieService.AppendActiveOrder(HttpContext.Response.Cookies, order.Id);
-        
+        var order = await _orderService.GetBasketByCustomerIdAsync(customerId);
         var result = _mapper.Map<OrderViewModel>(order);
 
-        return View("Checkout", result);
+        if (order.Status == OrderStatus.InProcess)
+        {
+            return RedirectToAction("Payment", "Orders", new { orderId = order.Id });
+        }
+
+        ViewData["HasActiveOrder"] = await _orderService.IsCustomerHasActiveOrder(customerId);
+
+        return View(result);
+    }
+
+    [HttpPost("/games/{gameKey}/buy")]
+    public async Task<ActionResult> AddToBasketAsync(string gameKey, int quantity)
+    {
+        if (_userCookieService.TryGetCookiesUserId(HttpContext.Request.Cookies, out var customerId) == false)
+        {
+            customerId = Guid.NewGuid().ToString();
+            _userCookieService.AppendUserId(HttpContext.Response.Cookies, customerId);
+        }
+
+        var basketItem = new BasketItem
+        {
+            GameKey = gameKey,
+            Quantity = quantity
+        };
+
+        await _orderService.AddToOrderAsync(customerId, basketItem);
+
+        return RedirectToAction("GetWithDetails", "Games", new { gameKey });
+    }
+
+    [HttpGet("{orderId}/make-order")]
+    public async Task<ActionResult> MakeOrderAsync(Guid orderId)
+    {
+        await _orderService.MakeOrder(orderId);
+
+        return RedirectToAction("UpdateShipInfo", "Orders", new { orderId });
+    }
+
+    [HttpGet("{orderId}/ship-info")]
+    public async Task<ActionResult<ActiveOrderCreateRequestModel>> UpdateShipInfoAsync(Guid orderId)
+    {
+        var shippers = await _shipperService.GetAll();
+
+        var shippersSelectList = new SelectList(shippers, nameof(Shipper.ShipperId), nameof(Shipper.CompanyName));
+        ViewData["Shippers"] = shippersSelectList;
+
+        return View(new ActiveOrderCreateRequestModel { OrderId = orderId });
+    }
+
+    [HttpPost("{orderId}/ship-info")]
+    public async Task<ActionResult> UpdateShipInfoAsync(ActiveOrderCreateRequestModel requestModel)
+    {
+        var createModel = _mapper.Map<ActiveOrderCreateModel>(requestModel);
+
+        await _orderService.FillShippersAsync(createModel);
+
+        return RedirectToAction("Payment", "Orders", new { requestModel.OrderId });
+    }
+
+    [HttpGet("{orderId}/payment")]
+    public async Task<ActionResult> PaymentAsync(Guid orderId)
+    {
+        var order = await _orderService.GetByIdAsync(orderId);
+        var orderViewModel = _mapper.Map<OrderViewModel>(order);
+
+        return View("Checkout", orderViewModel);
+    }
+
+    [HttpPost("{orderId}/payment")]
+    public async Task<ActionResult> PaymentAsync(Guid orderId, PaymentType paymentType)
+    {
+        var order = await _orderService.GetByIdAsync(orderId);
+
+        await _timeOutService.CreateOpenedOrderAsync(order);
+
+        return RedirectToPayment(orderId, paymentType);
     }
 
     [HttpGet("{id}/update")]
@@ -100,44 +173,25 @@ public class OrdersController : Controller
     public async Task<ActionResult<OrderViewModel>> UpdateAsync(OrderUpdateRequestModel requestModel)
     {
         var updateModel = _mapper.Map<OrderUpdateModel>(requestModel);
-        
+
         if (updateModel.Status is OrderStatus.Completed or OrderStatus.Cancelled)
         {
             await _timeOutService.RemoveOpenedOrderByOrderIdAsync(updateModel.Id);
         }
-        
+
         await _orderService.UpdateAsync(updateModel);
 
         return RedirectToAction("GetWithDetails", "Orders", new { id = requestModel.Id });
     }
 
-    [HttpPost("{id}/delete")]
-    public async Task<ActionResult<IEnumerable<OrderListViewModel>>> DeleteAsync(Guid id)
+    private ActionResult RedirectToPayment(Guid orderId, PaymentType paymentType)
     {
-        await _orderService.DeleteAsync(id);
-        await _timeOutService.RemoveOpenedOrderByOrderIdAsync(id);
-
-        return RedirectToAction("GetAll", "Orders");
-    }
-
-    private async Task ValidateActiveOrderCookie()
-    {
-        if (_activeOrderCookieService.TryGetActiveOrderId(HttpContext.Request.Cookies, out var orderId))
+        return paymentType switch
         {
-            if (await IsOrderNotActiveAnymore(orderId))
-            {
-                _activeOrderCookieService.RemoveActiveOrder(HttpContext.Response.Cookies);
-            }
-            else
-            {
-                RedirectToAction("GetCurrentBasket", "Basket");
-            }
-        }
-    }
-
-    private async Task<bool> IsOrderNotActiveAnymore(Guid orderId)
-    {
-        var activeOrder = await _orderService.GetByIdAsync(orderId);
-        return activeOrder.Status is OrderStatus.Cancelled or OrderStatus.Completed;
+            PaymentType.Visa => RedirectToAction("VisaPay", "Payment", new { orderId }),
+            PaymentType.Ibox => RedirectToAction("IboxPay", "Payment", new { orderId }),
+            PaymentType.Bank => RedirectToAction("BankPay", "Payment", new { orderId }),
+            _                => throw new ArgumentOutOfRangeException(nameof(paymentType), paymentType, null)
+        };
     }
 }
