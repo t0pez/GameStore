@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations.Schema;
 using GameStore.Core.Models.Dto;
+using MongoDB.Bson.Serialization.Attributes;
 
 namespace GameStore.Core.Models.Orders;
 
@@ -14,9 +15,12 @@ public class OrderDetails
     public string GameKey { get; set; }
 
     [NotMapped]
+    [BsonIgnore]
     public ProductDto Game { get; set; }
 
     public Guid OrderId { get; set; }
+
+    [BsonIgnore]
     public Order Order { get; set; }
 
     public decimal TotalPrice => Price * Quantity - Discount;
