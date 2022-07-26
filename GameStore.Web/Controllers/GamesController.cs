@@ -86,6 +86,8 @@ public class GamesController : Controller
 
         await IncreaseViews(game);
 
+        ViewData["CustomerHasActiveOrder"] = false;
+        
         if (_userCookieService.TryGetCookiesUserId(HttpContext.Request.Cookies, out var customerId))
         {
             ViewData["CustomerHasActiveOrder"] = await _orderService.IsCustomerHasActiveOrder(customerId);
