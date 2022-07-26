@@ -26,12 +26,10 @@ public class ProductDtoSortSpec : PagedSpec<ProductDto>
                 SortBy(product => product.Price, thenByDatabase);
                 break;
             case GameSearchFilterOrderByState.PriceDescending:
-                Query
-                    .OrderBy(product => product.Price)
-                    .ThenBy(product => product.Database, thenByDatabase);
+                SortByDescending(product => product.Price, thenByDatabase);
                 break;
             case GameSearchFilterOrderByState.New:
-                SortBy(product => product.AddedToStoreAt, thenByDatabase);
+                SortByDescending(product => product.AddedToStoreAt, thenByDatabase);
                 break;
             case GameSearchFilterOrderByState.Default:
                 Query
@@ -48,6 +46,13 @@ public class ProductDtoSortSpec : PagedSpec<ProductDto>
     {
         Query
             .OrderBy(sortExpression)
+            .ThenBy(product => product.Database, thenByDatabase);
+    }
+
+    private void SortByDescending(Expression<Func<ProductDto, object>> orderExpression, bool thenByDatabase)
+    {
+        Query
+            .OrderByDescending(orderExpression)
             .ThenBy(product => product.Database, thenByDatabase);
     }
 }

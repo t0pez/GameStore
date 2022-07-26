@@ -130,19 +130,28 @@ public class SearchService : ISearchService
 
     private async Task<ProductFilter> GetProductsFilterAsync(AllProductsFilter filter)
     {
-        var allServerGameKeys = await GamesRepository.SelectBySpecAsync(new AllGamesSelectGameKeySpec());
-
-        var genresMongoIds =
-            await GenresRepository.SelectBySpecAsync(new GenreByGenresIdsSelectCategoryIdSpec(filter.GenresIds));
-
-        var suppliersMongoIds =
-            await SuppliersRepository.SelectBySpecAsync(
-                new SuppliersByNamesSelectSupplierIdSpec(filter.PublishersNames));
-
         var productsFilter = _mapper.Map<ProductFilter>(filter);
-        productsFilter.CategoriesIds = genresMongoIds;
-        productsFilter.SuppliersIds = suppliersMongoIds;
+        productsFilter.IsCategoriesIdsFilterEnabled = filter.GenresIds.Any();
+        productsFilter.IsSuppliersIdsFilterEnabled = filter.PublishersNames.Any();
+
+        var allServerGameKeys = await GamesRepository.SelectBySpecAsync(new AllGamesSelectGameKeySpec());
         productsFilter.GameKeysToIgnore = allServerGameKeys;
+
+        if (productsFilter.IsCategoriesIdsFilterEnabled)
+        {
+            var genresMongoIds =
+                await GenresRepository.SelectBySpecAsync(new GenreByGenresIdsSelectCategoryIdSpec(filter.GenresIds));
+            productsFilter.CategoriesIds = genresMongoIds;
+        }
+
+        if (productsFilter.IsSuppliersIdsFilterEnabled)
+        {
+            var suppliersMongoIds =
+                await SuppliersRepository.SelectBySpecAsync(
+                    new SuppliersByNamesSelectSupplierIdSpec(filter.PublishersNames));
+
+            productsFilter.SuppliersIds = suppliersMongoIds;
+        }
 
         return productsFilter;
     }

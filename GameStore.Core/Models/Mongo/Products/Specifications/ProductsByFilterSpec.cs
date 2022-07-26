@@ -38,13 +38,13 @@ public class ProductsByFilterSpec : PagedSpec<Product>
                 .Where(product => product.UnitPrice <= filter.MaxPrice);
         }
 
-        if (filter.CategoriesIds.Any())
+        if (filter.IsCategoriesIdsFilterEnabled)
         {
             Query
                 .Where(product => filter.CategoriesIds.Contains(product.CategoryId));
         }
 
-        if (filter.SuppliersIds.Any())
+        if (filter.IsSuppliersIdsFilterEnabled)
         {
             Query
                 .Where(product => filter.SuppliersIds.Contains(product.CategoryId));
