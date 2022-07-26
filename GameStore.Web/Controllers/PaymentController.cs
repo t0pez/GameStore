@@ -19,7 +19,7 @@ public class PaymentController : Controller
         _orderService = orderService;
     }
 
-    [HttpPost("visa")]
+    [HttpGet("visa")]
     public async Task<ActionResult> VisaPayAsync(Guid orderId)
     {
         var paymentGetaway = await GetPaymentGetaway(orderId, PaymentType.Visa);
@@ -37,7 +37,7 @@ public class PaymentController : Controller
         return File(result.InvoiceFileContent, "application/pdf", "invoice-file.pdf");
     }
 
-    [HttpPost("ibox")]
+    [HttpGet("ibox")]
     public async Task<ActionResult> IboxPayAsync(Guid orderId)
     {
         var paymentGetaway = await GetPaymentGetaway(orderId, PaymentType.Ibox);
