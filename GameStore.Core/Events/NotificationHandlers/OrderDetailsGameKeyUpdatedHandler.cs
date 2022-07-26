@@ -21,6 +21,11 @@ public class OrderDetailsGameKeyUpdatedHandler : INotificationHandler<GameKeyUpd
 
     public async Task Handle(GameKeyUpdatedNotification notification, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(notification.OldGameKey))
+        {
+            return;
+        }
+        
         var orderDetails =
             await OrderDetailsRepository.GetBySpecAsync(new OrderDetailsByGameKeySpec(notification.OldGameKey));
 

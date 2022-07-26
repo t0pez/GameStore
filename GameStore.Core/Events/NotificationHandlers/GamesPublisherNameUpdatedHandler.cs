@@ -22,6 +22,11 @@ public class GamesPublisherNameUpdatedHandler : INotificationHandler<PublisherNa
 
     public async Task Handle(PublisherNameUpdatedNotification notification, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(notification.OldName))
+        {
+            return;
+        }
+        
         var games = await GameRepository.GetBySpecAsync(new GamesByPublisherNameSpec(notification.OldName)
                                                             .IncludeDeleted());
 

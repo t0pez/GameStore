@@ -21,6 +21,11 @@ public class ProductsGameKeyUpdatedHandler : INotificationHandler<GameKeyUpdated
 
     public async Task Handle(GameKeyUpdatedNotification notification, CancellationToken cancellationToken)
     {
+        if (string.IsNullOrEmpty(notification.OldGameKey))
+        {
+            return;
+        }
+        
         var products = await ProductsRepository.GetBySpecAsync(new ProductsByGameKeySpec(notification.OldGameKey));
 
         foreach (var product in products)
