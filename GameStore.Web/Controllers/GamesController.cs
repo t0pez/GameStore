@@ -86,12 +86,7 @@ public class GamesController : Controller
 
         await IncreaseViews(game);
 
-        ViewData["CustomerHasActiveOrder"] = false;
-        
-        if (_userCookieService.TryGetCookiesUserId(HttpContext.Request.Cookies, out var customerId))
-        {
-            ViewData["CustomerHasActiveOrder"] = await _orderService.IsCustomerHasActiveOrder(customerId);
-        }
+        ViewData["CustomerHasActiveOrder"] = await IsCustomerHasActiveOrder();
 
         var result = _mapper.Map<GameViewModel>(game);
 
@@ -190,6 +185,16 @@ public class GamesController : Controller
         var updateModel = _mapper.Map<GameUpdateModel>(product);
 
         await _gameService.UpdateAsync(updateModel);
+    }
+
+    private async Task<bool> IsCustomerHasActiveOrder()
+    {
+        if (_userCookieService.TryGetCookiesUserId(HttpContext.Request.Cookies, out var customerId))
+        {
+            return await _orderService.IsCustomerHasActiveOrder(customerId);
+        }
+
+        return false;
     }
 
     private async Task FillViewData()
