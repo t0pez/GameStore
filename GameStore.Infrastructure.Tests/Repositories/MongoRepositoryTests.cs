@@ -44,6 +44,7 @@ public class MongoRepositoryTests
 
         var filter = new ProductFilter
         {
+            IsCategoriesIdsFilterEnabled = true,
             CategoriesIds = new List<int> { 1, 2 }
         };
 
