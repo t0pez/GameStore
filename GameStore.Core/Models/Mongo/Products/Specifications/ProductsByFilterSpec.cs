@@ -13,9 +13,6 @@ public class ProductsByFilterSpec : PagedSpec<Product>
 
         if (filter.GameKeysToIgnore.Any())
         {
-            Query
-                .Where(product => product.GameKey != null);
-
             foreach (var gameKey in filter.GameKeysToIgnore)
             {
                 Query
