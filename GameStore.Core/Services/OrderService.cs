@@ -165,8 +165,8 @@ public class OrderService : IOrderService
         {
             var orderDetail = _mapper.Map<OrderDetails>(item);
 
-            var quantity = GetQuantity(item, orderDetails, game);
-            orderDetails.Quantity = quantity;
+            var quantity = GetQuantity(item, orderDetail, game);
+            orderDetail.Quantity = quantity;
             orderDetail.OrderId = order.Id;
             order.OrderDetails.Add(orderDetail);
         }
