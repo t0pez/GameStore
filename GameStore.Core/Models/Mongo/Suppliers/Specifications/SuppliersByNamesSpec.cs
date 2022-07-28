@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Ardalis.Specification;
-using GameStore.SharedKernel.Specifications;
+using SpecificationExtensions.Core.Specifications;
 
 namespace GameStore.Core.Models.Mongo.Suppliers.Specifications;
 
-public class SuppliersByNamesSpec : PagedSpec<Supplier>
+public class SuppliersByNamesSpec : BaseSpec<Supplier>
 {
     public SuppliersByNamesSpec(IEnumerable<string> names)
     {

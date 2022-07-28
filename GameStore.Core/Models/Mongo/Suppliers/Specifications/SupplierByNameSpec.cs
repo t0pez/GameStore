@@ -1,9 +1,9 @@
 ﻿using Ardalis.Specification;
-using GameStore.SharedKernel.Specifications;
+using SpecificationExtensions.Core.Specifications;
 
 namespace GameStore.Core.Models.Mongo.Suppliers.Specifications;
 
-public class SupplierByNameSpec : PagedSpec<Supplier>
+public class SupplierByNameSpec : BaseSpec<Supplier>
 {
     public SupplierByNameSpec(string name)
     {

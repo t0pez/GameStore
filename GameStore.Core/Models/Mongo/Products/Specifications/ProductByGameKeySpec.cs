@@ -1,9 +1,9 @@
 ﻿using Ardalis.Specification;
-using GameStore.SharedKernel.Specifications;
+using SpecificationExtensions.Core.Specifications;
 
 namespace GameStore.Core.Models.Mongo.Products.Specifications;
 
-public class ProductByGameKeySpec : PagedSpec<Product>
+public class ProductByGameKeySpec : BaseSpec<Product>
 {
     public ProductByGameKeySpec(string gameKey)
     {

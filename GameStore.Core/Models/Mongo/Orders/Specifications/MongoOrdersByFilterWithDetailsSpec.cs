@@ -1,10 +1,10 @@
 ﻿using Ardalis.Specification;
 using GameStore.Core.Models.Mongo.Orders.Filters;
-using GameStore.SharedKernel.Specifications;
+using SpecificationExtensions.Core.Specifications;
 
 namespace GameStore.Core.Models.Mongo.Orders.Specifications;
 
-public class MongoOrdersByFilterWithDetailsSpec : PagedSpec<OrderMongo>
+public class MongoOrdersByFilterWithDetailsSpec : BaseSpec<OrderMongo>
 {
     public MongoOrdersByFilterWithDetailsSpec(MongoOrdersFilter filter)
     {
