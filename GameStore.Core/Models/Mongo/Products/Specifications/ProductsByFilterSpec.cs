@@ -1,11 +1,11 @@
 ﻿using System.Linq;
 using Ardalis.Specification;
 using GameStore.Core.Models.Mongo.Products.Filters;
-using GameStore.SharedKernel.Specifications;
+using SpecificationExtensions.Core.Specifications;
 
 namespace GameStore.Core.Models.Mongo.Products.Specifications;
 
-public class ProductsByFilterSpec : PagedSpec<Product>
+public class ProductsByFilterSpec : BaseSpec<Product>
 {
     public ProductsByFilterSpec(ProductFilter filter)
     {

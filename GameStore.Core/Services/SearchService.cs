@@ -23,7 +23,9 @@ using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.Publishers.Specifications;
 using GameStore.Core.PagedResult;
 using GameStore.SharedKernel.Interfaces.DataAccess;
+using GameStore.SharedKernel.Specifications;
 using GameStore.SharedKernel.Specifications.Filters;
+using SpecificationExtensions.Core.Extensions;
 
 namespace GameStore.Core.Services;
 
@@ -134,13 +136,15 @@ public class SearchService : ISearchService
         productsFilter.IsCategoriesIdsFilterEnabled = filter.GenresIds.Any();
         productsFilter.IsSuppliersIdsFilterEnabled = filter.PublishersNames.Any();
 
-        var allServerGameKeys = await GamesRepository.SelectBySpecAsync(new AllGamesSelectGameKeySpec());
+        var allServerGameKeys =
+            await GamesRepository.SelectBySpecAsync(new SafeDeleteSpec<Game>().LoadAll().Select(game => game.Key));
         productsFilter.GameKeysToIgnore = allServerGameKeys;
 
         if (productsFilter.IsCategoriesIdsFilterEnabled)
         {
             var genresMongoIds =
-                await GenresRepository.SelectBySpecAsync(new GenreByGenresIdsSelectCategoryIdSpec(filter.GenresIds));
+                await GenresRepository.SelectBySpecAsync(
+                    new GenresByIdsWithCategoryIdSpec(filter.GenresIds).Select(genre => genre.CategoryId.Value));
             productsFilter.CategoriesIds = genresMongoIds;
         }
 
@@ -148,7 +152,7 @@ public class SearchService : ISearchService
         {
             var suppliersMongoIds =
                 await SuppliersRepository.SelectBySpecAsync(
-                    new SuppliersByNamesSelectSupplierIdSpec(filter.PublishersNames));
+                    new SuppliersByNamesSpec(filter.PublishersNames).Select(supplier => supplier.SupplierId));
 
             productsFilter.SuppliersIds = suppliersMongoIds;
         }

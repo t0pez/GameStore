@@ -1,10 +1,10 @@
 ﻿using System;
 using Ardalis.Specification;
-using GameStore.SharedKernel.Specifications;
+using SpecificationExtensions.Core.Specifications;
 
 namespace GameStore.Core.Models.Mongo.Orders.Specifications;
 
-public class OrdersByDateSpec : PagedSpec<OrderMongo>
+public class OrdersByDateSpec : BaseSpec<OrderMongo>
 {
     public OrdersByDateSpec(DateTime startDate, DateTime endDate)
     {

@@ -22,7 +22,6 @@ using GameStore.Core.Models.RelationalModels.Specifications;
 using GameStore.Core.Models.ServiceModels.Enums;
 using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.SharedKernel.Interfaces.DataAccess;
-using GameStore.SharedKernel.Specifications.Extensions;
 using MediatR;
 using MongoDB.Bson;
 
@@ -159,7 +158,7 @@ public class GameService : IGameService
 
     public async Task<bool> IsGameKeyAlreadyExists(string gameKey)
     {
-        return await GameRepository.AnyAsync(new GameByKeySpec(gameKey).IncludeDeleted());
+        return await GameRepository.AnyAsync(new GameByKeySpec(gameKey).LoadAll());
     }
 
     private async Task MigrateMongoEntityAsync(GameUpdateModel updateModel)

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Ardalis.Specification;
 using AutoMapper;
 using FluentAssertions;
 using GameStore.Core.Models.Dto;
@@ -12,7 +13,6 @@ using GameStore.Core.Models.Mongo.Products;
 using GameStore.Core.Models.Mongo.Products.Filters;
 using GameStore.Core.Models.Mongo.Products.Specifications;
 using GameStore.Core.Models.Mongo.Suppliers;
-using GameStore.Core.Models.Mongo.Suppliers.Specifications;
 using GameStore.Core.Models.Publishers;
 using GameStore.Core.Models.Publishers.Specifications;
 using GameStore.Core.Models.ServiceModels.Enums;
@@ -90,13 +90,13 @@ public class SearchServiceTests
                                    repository.GetBySpecAsync(
                                        It.Is<ProductsByFilterSpec>(spec => spec.Filter == productFilter)))
                         .ReturnsAsync(products);
-        _gameRepoMock.Setup(repository => repository.SelectBySpecAsync(It.IsAny<AllGamesSelectGameKeySpec>()))
+        _gameRepoMock.Setup(repository => repository.SelectBySpecAsync(It.IsAny<ISpecification<Game, string>>()))
                      .ReturnsAsync(serverGameKeys);
         _genreRepoMock.Setup(repository =>
-                                 repository.SelectBySpecAsync(It.IsAny<GenreByGenresIdsSelectCategoryIdSpec>()))
+                                 repository.SelectBySpecAsync(It.IsAny<ISpecification<Genre, int>>()))
                       .ReturnsAsync(categoriesIds);
         _supplierRepoMock.Setup(repository =>
-                                    repository.SelectBySpecAsync(It.IsAny<SuppliersByNamesSelectSupplierIdSpec>()))
+                                    repository.SelectBySpecAsync(It.IsAny<ISpecification<Supplier, int>>()))
                          .ReturnsAsync(suppliersIds);
 
         var actualResult = await _searchService.GetProductDtosByFilterAsync(filter);

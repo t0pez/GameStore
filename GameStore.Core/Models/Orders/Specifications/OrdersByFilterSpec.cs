@@ -1,10 +1,10 @@
 ﻿using Ardalis.Specification;
 using GameStore.Core.Models.Orders.Filters;
-using GameStore.SharedKernel.Specifications;
+using SpecificationExtensions.Core.Specifications;
 
 namespace GameStore.Core.Models.Orders.Specifications;
 
-public class OrdersByFilterSpec : PagedSpec<Order>
+public class OrdersByFilterSpec : BaseSpec<Order>
 {
     public OrdersByFilterSpec(OrdersFilter filter)
     {

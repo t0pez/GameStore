@@ -11,7 +11,6 @@ using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.SharedKernel.Interfaces.DataAccess;
-using GameStore.SharedKernel.Specifications.Extensions;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
 
@@ -62,7 +61,7 @@ public class CommentService : ICommentService
         }
 
         var result = await CommentRepository.GetBySpecAsync(new CommentsWithoutParentByGameKeySpec(gameKey)
-                                                                .IncludeDeleted());
+                                                                .LoadAll());
 
         return result;
     }

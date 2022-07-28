@@ -3,11 +3,11 @@ using System.Linq;
 using System.Linq.Expressions;
 using Ardalis.Specification;
 using GameStore.Core.Models.Games.Specifications.Filters;
-using GameStore.SharedKernel.Specifications;
+using SpecificationExtensions.Core.Specifications;
 
 namespace GameStore.Core.Models.Dto.Specifications;
 
-public class ProductDtoSortSpec : PagedSpec<ProductDto>
+public class ProductDtoSortSpec : BaseSpec<ProductDto>
 {
     public ProductDtoSortSpec(GameSearchFilterOrderByState orderBy, bool thenByDatabase)
     {
