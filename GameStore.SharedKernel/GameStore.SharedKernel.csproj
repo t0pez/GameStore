@@ -6,8 +6,10 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Ardalis.Specification" Version="6.0.1"/>
+        <PackageReference Include="Ardalis.Specification" Version="6.1.0"/>
         <PackageReference Include="NLog" Version="4.7.14"/>
+        <PackageReference Include="t0pez.SpecificationExtensions.Core" Version="1.0.0"/>
+        <PackageReference Include="t0pez.SpecificationExtensions.Generators" Version="1.0.2"/>
     </ItemGroup>
 
 </Project>

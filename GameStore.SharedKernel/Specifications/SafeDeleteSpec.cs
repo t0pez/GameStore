@@ -1,19 +1,9 @@
-﻿using Ardalis.Specification;
-using GameStore.SharedKernel.Interfaces;
+﻿using GameStore.SharedKernel.Interfaces;
+using SpecificationExtensions.Core.Attributes;
 
 namespace GameStore.SharedKernel.Specifications;
 
-public class SafeDeleteSpec<TModel>
-    : PagedSpec<TModel> where TModel : ISafeDelete
+[SafeDeleteSpec(typeof(ISafeDelete), nameof(ISafeDelete.IsDeleted))]
+public partial class SafeDeleteSpec<TModel> where TModel : ISafeDelete
 {
-    protected SafeDeleteSpec()
-    {
-        Query
-            .Where(model => model.IsDeleted == IsIncludedDeleted ||
-                            model.IsDeleted == IsExcludedNotDeleted);
-    }
-
-    public bool IsIncludedDeleted { get; set; }
-
-    public bool IsExcludedNotDeleted { get; set; }
 }
