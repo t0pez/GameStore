@@ -4,7 +4,6 @@ using GameStore.Core.Events.Notifications;
 using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Games.Specifications;
 using GameStore.SharedKernel.Interfaces.DataAccess;
-using GameStore.SharedKernel.Specifications.Extensions;
 using MediatR;
 
 namespace GameStore.Core.Events.NotificationHandlers;
@@ -26,9 +25,9 @@ public class GamesPublisherNameUpdatedHandler : INotificationHandler<PublisherNa
         {
             return;
         }
-        
+
         var games = await GameRepository.GetBySpecAsync(new GamesByPublisherNameSpec(notification.OldName)
-                                                            .IncludeDeleted());
+                                                            .LoadAll());
 
         foreach (var game in games)
         {
