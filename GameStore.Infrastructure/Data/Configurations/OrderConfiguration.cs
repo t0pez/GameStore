@@ -1,4 +1,4 @@
-﻿using GameStore.Core.Models.Orders;
+﻿using GameStore.Core.Models.Server.Orders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,6 +12,7 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         builder.Property(order => order.IsDeleted)
                .IsRequired();
+
         builder.Property(order => order.CustomerId)
                .IsRequired();
 

@@ -12,6 +12,7 @@ public static class QuartsConfiguratorExtensions
 
         var jobKey = new JobKey(jobName);
         configurator.AddJob<OrderTimeOutJob>(options => options.WithIdentity(jobKey));
+
         configurator.AddTrigger(options =>
                                     options.WithIdentity(jobTriggerName)
                                            .ForJob(jobKey)

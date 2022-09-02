@@ -7,5 +7,6 @@ namespace GameStore.Web.ViewModels.Games;
 public class GamesGetAllViewModel
 {
     public PagedResult<ProductDto> GamesPaged { get; set; }
+
     public GamesFilterRequestModel Filter { get; set; } = new();
 }

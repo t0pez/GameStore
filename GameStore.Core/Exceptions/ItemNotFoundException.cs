@@ -21,8 +21,11 @@ public class ItemNotFoundException : Exception
     }
 
     public override string Message { get; }
+
     public string Entity { get; }
+
     public string PredicateProperty { get; }
+
     public string PredicateValue { get; }
 
     private string CraftExceptionMessage()

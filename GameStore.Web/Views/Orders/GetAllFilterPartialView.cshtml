@@ -1,0 +1,15 @@
+﻿@model GameStore.Web.Models.Order.AllOrdersFilterRequestModel
+
+<form method="get" asp-controller="Orders" asp-action="GetByFilter">
+    <div>
+        <h5>Date range</h5>
+        <div class="input-group">
+            <input type="date" class="form-control" asp-for="@Model.StartDate" placeholder="Start date">
+            <span class="input-group-text"> - </span>
+            <input type="date" class="form-control" asp-for="@Model.EndDate" placeholder="End date">
+        </div>
+        <span class="field-validation-valid text-danger" asp-validation-for="StartDate"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Filter</button>
+</form>

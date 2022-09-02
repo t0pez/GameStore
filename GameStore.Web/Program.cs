@@ -22,6 +22,7 @@ public class Program
         catch (Exception exception)
         {
             logger.Error(exception, "Stopped program because of exception");
+
             throw;
         }
         finally

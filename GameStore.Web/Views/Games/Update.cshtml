@@ -1,4 +1,5 @@
-﻿@model GameStore.Web.Models.Game.GameUpdateRequestModel
+﻿@using GameStore.Web.Helpers
+@model GameStore.Web.Models.Game.GameUpdateRequestModel
 
 @{
     ViewBag.Title = "Update";
@@ -30,7 +31,9 @@
                         @Html.LabelFor(model => model.Key, new { @class = "ps-4" })
                         @Html.ValidationMessageFor(model => model.Key, "", new { @class = "text-danger" })
                     </div>
-                    <button type="button" class="btn btn-info col-4">Generate</button>
+                    <div class="col-4">
+                        <button type="button" class="btn btn-info" onclick="generateKey()" style="min-height: 100%">Generate key</button>
+                    </div>
                 </div>
                 <div class="form-floating col-md mb-3">
                     @Html.EditorFor(model => model.Price, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
@@ -38,13 +41,13 @@
                     @Html.ValidationMessageFor(model => model.Price, "", new { @class = "text-danger" })
                 </div>
                 <div class="form-floating mb-3">
-                    @Html.DropDownListFor(model => model.PublisherName, ViewData["Publishers"] as IEnumerable<SelectListItem>, new { @class = "form-select from-select-lg" })
+                    @Html.DropDownListFor(model => model.PublisherName, ViewData[ViewKeys.Games.Publishers] as IEnumerable<SelectListItem>, new { @class = "form-select from-select-lg" })
                     @Html.LabelFor(model => model.PublisherName, "Publisher", new { @class = "ps-4" })
                     @Html.ValidationMessageFor(model => model.PublisherName, "", new { @class = "text-danger" })
                 </div>
                 <div class="mb-3">
                     <label for="File" class="form-label">Game file:</label>
-                    <input class="form-control form-control-lg" id="File" name="File" type="file" required>
+                    <input class="form-control form-control-lg" id="File" name="File" type="file">
                 </div>
             </div>
             <div class="form-floating mb-3 col-8">
@@ -57,12 +60,12 @@
         <div class="row mb-3">
             <div class="form-floating input-group col-6">
                 <label class="ps-4" for="genres">Genres</label>
-                <select id="genres" class="form-select form-select-lg" asp-for="GenresIds" asp-items="@(ViewData["Genres"] as IEnumerable<SelectListItem>)" style="height: 100%"></select>
+                <select id="genres" class="form-select form-select-lg" asp-for="GenresIds" asp-items="@(ViewData[ViewKeys.Games.Genres] as IEnumerable<SelectListItem>)" style="height: 100%"></select>
             </div>
 
             <div class="form-floating input-group col-6">
                 <label class="ps-4" for="platforms">Platforms</label>
-                <select id="platforms" class="form-select form-select-lg" asp-for="PlatformsIds" asp-items="@(ViewData["Platforms"] as IEnumerable<SelectListItem>)" style="height: 100%"></select>
+                <select id="platforms" class="form-select form-select-lg" asp-for="PlatformsIds" asp-items="@(ViewData[ViewKeys.Games.Platforms] as IEnumerable<SelectListItem>)" style="height: 100%"></select>
             </div>
         </div>
 

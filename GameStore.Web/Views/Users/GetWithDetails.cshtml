@@ -1,0 +1,51 @@
+﻿@using GameStore.Web.Helpers
+@model GameStore.Web.ViewModels.User.UserViewModel
+
+@{
+    ViewBag.Title = Model.UserName;
+    Layout = "_Layout";
+    var isCanDelete = (bool)ViewData[ViewKeys.Users.IsCanDelete];
+}
+
+<div>
+    <h2 class="mt-5">@Model.UserName</h2>
+    <hr/>
+
+    <div class="row">
+
+        <div class="col-6">
+
+            <div class="mb-3">
+                <div>
+                    @Html.LabelFor(model => model.UserName, "Name:", new { @class = "form-label fw-bolder" })
+                    @Html.DisplayFor(model => model.UserName)
+                </div>
+
+                <div>
+                    @Html.LabelFor(model => model.Role, "Role:", new { @class = "form-label fw-bolder" })
+                    @Html.DisplayFor(model => model.Role)
+                </div>
+            </div>
+        </div>
+
+        <div class="col-6">
+
+            <div class="mb-3">
+                @Html.ActionLink("Edit", "Update", new { id = Model.Id }, new { @class = "btn btn-info" })
+            </div>
+
+            @if (isCanDelete)
+            {
+                <div class="mb-3">
+                    <form method="post" asp-action="Delete" class="mb-3">
+                        <input type="hidden" name="@nameof(Model.Id)" value="@Model.Id">
+                        <button class="btn btn-warning">Delete</button>
+                    </form>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<p>
+    @Html.ActionLink("Back to List", "GetAll", new { }, new { @class = "btn btn-outline-secondary" })
+</p>

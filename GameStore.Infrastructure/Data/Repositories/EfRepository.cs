@@ -93,6 +93,7 @@ public class EfRepository<TModel> : IRepository<TModel> where TModel : class
         }
 
         var specResult = ApplySpecifications(spec);
+
         return specResult.CountAsync();
     }
 

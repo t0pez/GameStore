@@ -1,4 +1,6 @@
-﻿@using GameStore.Core.Models.ServiceModels.Enums
+﻿@using GameStore.Web.Extensions
+@using GameStore.Web.Infrastructure.Authorization
+@using GameStore.Core.Models.ServiceModels.Enums
 @model GameStore.Web.ViewModels.Publisher.PublisherViewModel
 
 @{
@@ -83,15 +85,20 @@
         <div class="col-6">
             @if (Model.Database != Database.Mongo)
             {
-                <div class="mb-3">
-                    @Html.ActionLink("Edit", "Update", new { companyName = Model.Name }, new { @class = "btn btn-info" })
-                </div>
-
-                <div>
-                    <form method="post" asp-controller="Publisher" asp-action="Delete" asp-route-companyName="@Model.Name">
-                        <button type="submit" class="btn btn-warning">Delete</button>
-                    </form>
-                </div>
+                @if (User.HasPermissionOfLevel(ApiRoles.Publisher, Model.Name))
+                {
+                    <div class="mb-3">
+                        @Html.ActionLink("Edit", "Update", new { companyName = Model.Name }, new { @class = "btn btn-info" })
+                    </div>
+                }
+                @if (User.HasPermissionOfLevel(ApiRoles.Manager))
+                {
+                    <div>
+                        <form method="post" asp-controller="Publisher" asp-action="Delete" asp-route-companyName="@Model.Name">
+                            <button type="submit" class="btn btn-warning">Delete</button>
+                        </form>
+                    </div>
+                }
             }
         </div>
 

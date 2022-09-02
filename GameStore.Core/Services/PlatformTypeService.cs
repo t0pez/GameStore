@@ -5,8 +5,8 @@ using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.Loggers;
-using GameStore.Core.Models.PlatformTypes;
-using GameStore.Core.Models.PlatformTypes.Specifications;
+using GameStore.Core.Models.Server.PlatformTypes;
+using GameStore.Core.Models.Server.PlatformTypes.Specifications;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using MongoDB.Bson;
@@ -30,14 +30,16 @@ public class PlatformTypeService : IPlatformTypeService
 
     public async Task<ICollection<PlatformType>> GetAllAsync()
     {
-        var result = await Repository.GetBySpecAsync(new PlatformTypesListSpec());
+        var result = await Repository.GetBySpecAsync(new PlatformTypesSpec());
 
         return result;
     }
 
     public async Task<PlatformType> GetByIdAsync(Guid id)
     {
-        var result = await Repository.GetSingleOrDefaultBySpecAsync(new PlatformTypeByIdSpec(id))
+        var spec = new PlatformTypesSpec().ById(id);
+
+        var result = await Repository.GetSingleOrDefaultBySpecAsync(spec)
                      ?? throw new ItemNotFoundException(typeof(PlatformType), id);
 
         return result;
@@ -45,43 +47,48 @@ public class PlatformTypeService : IPlatformTypeService
 
     public async Task CreateAsync(PlatformTypeCreateModel createModel)
     {
-        var platformType = _mapper.Map<PlatformType>(createModel);
+        var platform = _mapper.Map<PlatformType>(createModel);
 
-        await Repository.AddAsync(platformType);
+        await Repository.AddAsync(platform);
         await _unitOfWork.SaveChangesAsync();
 
-        await _mongoLogger.LogCreateAsync(platformType);
+        await _mongoLogger.LogCreateAsync(platform);
     }
 
     public async Task UpdateAsync(PlatformTypeUpdateModel updateModel)
     {
-        var platformType = await Repository.GetSingleOrDefaultBySpecAsync(new PlatformTypeByIdSpec(updateModel.Id))
-                           ?? throw new ItemNotFoundException(typeof(PlatformType), updateModel.Id,
-                                                              nameof(updateModel.Id));
-        var oldPlatformVersion = platformType.ToBsonDocument();
+        var spec = new PlatformTypesSpec().ById(updateModel.Id);
 
-        UpdateValues(updateModel, platformType);
+        var platform = await Repository.GetSingleOrDefaultBySpecAsync(spec)
+                       ?? throw new ItemNotFoundException(typeof(PlatformType), updateModel.Id,
+                                                          nameof(updateModel.Id));
 
-        await Repository.UpdateAsync(platformType);
+        var oldPlatformVersion = platform.ToBsonDocument();
+
+        UpdateValues(platform, updateModel);
+
+        await Repository.UpdateAsync(platform);
         await _unitOfWork.SaveChangesAsync();
 
-        await _mongoLogger.LogUpdateAsync(typeof(PlatformType), oldPlatformVersion, platformType.ToBsonDocument());
+        await _mongoLogger.LogUpdateAsync(typeof(PlatformType), oldPlatformVersion, platform.ToBsonDocument());
     }
 
     public async Task DeleteAsync(Guid id)
     {
-        var platformType = await Repository.GetSingleOrDefaultBySpecAsync(new PlatformTypeByIdSpec(id))
-                           ?? throw new ItemNotFoundException(typeof(PlatformType), id);
+        var spec = new PlatformTypesSpec().ById(id);
 
-        platformType.IsDeleted = true;
-        await Repository.UpdateAsync(platformType);
+        var platform = await Repository.GetSingleOrDefaultBySpecAsync(spec)
+                       ?? throw new ItemNotFoundException(typeof(PlatformType), id);
+
+        platform.IsDeleted = true;
+        await Repository.UpdateAsync(platform);
         await _unitOfWork.SaveChangesAsync();
 
-        await _mongoLogger.LogDeleteAsync(platformType);
+        await _mongoLogger.LogDeleteAsync(platform);
     }
 
-    private void UpdateValues(PlatformTypeUpdateModel updateModel, PlatformType platformType)
+    private void UpdateValues(PlatformType platform, PlatformTypeUpdateModel updateModel)
     {
-        platformType.Name = updateModel.Name;
+        platform.Name = updateModel.Name;
     }
 }

@@ -2,7 +2,7 @@ namespace GameStore.Web.Models;
 
 public class ErrorViewModel
 {
-    public string? RequestId { get; set; }
+    public string ErrorName { get; set; }
 
-    public bool IsShowRequestId => string.IsNullOrEmpty(RequestId) == false;
+    public string Description { get; set; }
 }

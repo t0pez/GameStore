@@ -1,6 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
-using GameStore.Core.Models.Comments;
+using GameStore.Core.Models.Server.Comments;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameStore.Web.Models.Comment;
@@ -17,5 +17,6 @@ public class CommentCreateRequestModel
     public string Message { get; set; }
 
     public Guid? ParentId { get; set; }
+
     public CommentState State { get; set; }
 }

@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using AutoMapper;
 using GameStore.Core.Models.Dto;
-using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Server.Games;
 using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.Web.Models.Game;
 using GameStore.Web.ViewModels.Games;

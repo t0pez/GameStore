@@ -27,7 +27,9 @@ public class GameUpdateRequestModel
     public decimal Price { get; set; }
 
     public bool Discontinued { get; set; }
+
     public byte[] File { get; set; }
+
     public string PublisherName { get; set; }
 
     [Required]

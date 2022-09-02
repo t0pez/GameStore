@@ -1,9 +1,16 @@
-﻿@using GameStore.Core.Models.ServiceModels.Enums
+﻿@using GameStore.Web.Extensions
+@using GameStore.Web.Helpers
+@using GameStore.Web.Infrastructure.Authorization
+@using GameStore.Core.Models.ServiceModels.Enums
 @model GameStore.Web.ViewModels.Games.GameViewModel
 
 @{
     ViewBag.Title = Model.Name;
     Layout = "_Layout";
+
+    var canEdit = User.HasPermissionOfLevel(ApiRoles.Publisher, Model.Publisher?.Name);
+    var canDelete = User.HasPermissionOfLevel(ApiRoles.Manager);
+    var customerHasActiveOrder = (bool)ViewData[ViewKeys.Games.CustomerHasActiveOrder];
 }
 
 <h2 class="mt-5">@Model.Name</h2>
@@ -50,17 +57,24 @@
                 <div>
                     <label class="form-label">Genres: </label>
                     <table class="table">
-                        @foreach (var item in Model.Genres)
+                        @if (Model.Genres.Any())
                         {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Name)
-                                </td>
+                            foreach (var item in Model.Genres)
+                            {
+                                <tr>
+                                    <td>
+                                        @Html.DisplayFor(modelItem => item.Name)
+                                    </td>
 
-                                <td>
-                                    @Html.ActionLink("Checkout", "GetWithDetails", "Genres", new { id = item.Id })
-                                </td>
-                            </tr>
+                                    <td>
+                                        @Html.ActionLink("Checkout", "GetWithDetails", "Genres", new { id = item.Id })
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <p>Other</p>
                         }
                     </table>
                 </div>
@@ -85,15 +99,24 @@
         </div>
 
         <div class="col-6">
-            <div class="mb-3">
-                @Html.ActionLink("Edit", "Update", new { gameKey = Model.Key }, new { @class = "btn btn-info" })
-            </div>
-            <div class="mb-3">
-                <form method="post" asp-action="Delete" class="mb-3">
-                    <input type="hidden" name="@nameof(Model.Id)" value="@Model.Id">
-                    <button class="btn btn-warning">Delete</button>
-                </form>
-            </div>
+
+            @if (canEdit)
+            {
+                <div class="mb-3">
+                    @Html.ActionLink("Edit", "Update", new { gameKey = Model.Key }, new { @class = "btn btn-info" })
+                </div>
+            }
+
+            @if (canDelete)
+            {
+                <div class="mb-3">
+                    <form method="post" asp-action="Delete" asp-route-gameKey="@Model.Key" class="mb-3">
+                        <input type="hidden" name="@nameof(Model.Database)" value="@((int)Model.Database)">
+                        <button class="btn btn-warning">Delete</button>
+                    </form>
+                </div>
+            }
+
             <div class="mb-3">
                 @Html.ActionLink("Download", "GetFile", new { gameKey = Model.Key }, new { @class = "btn btn-outline-secondary" })
             </div>
@@ -113,8 +136,13 @@
                         @Html.ActionLink(Model.Publisher.Name, "GetWithDetails", "Publisher", new { companyName = Model.Publisher.Name })
                     </p>
                 }
+                else
+                {
+                    <p>Unknown</p>
+                }
             </div>
-            @if ((bool)ViewData["CustomerHasActiveOrder"] == false)
+
+            @if (customerHasActiveOrder == false)
             {
                 <div class="mb-3">
                     <form method="post" asp-controller="Orders" asp-action="AddToBasket" asp-route-gameKey="@Model.Key">

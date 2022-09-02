@@ -1,4 +1,5 @@
-﻿@model GameStore.Web.Models.Genre.GenreCreateRequestModel
+﻿@using GameStore.Web.Helpers
+@model GameStore.Web.Models.Genre.GenreCreateRequestModel
 
 @{
     ViewBag.Title = "Create";
@@ -21,7 +22,7 @@
         </div>
         <div class="col-4">
             <div class="form-floating mb-3">
-                @Html.DropDownListFor(model => model.ParentId, ViewData["Genres"] as IEnumerable<SelectListItem>, new { @class = "form-select from-select-lg" })
+                @Html.DropDownListFor(model => model.ParentId, ViewData[ViewKeys.Genres.ParentGenres] as IEnumerable<SelectListItem>, new { @class = "form-select from-select-lg" })
                 @Html.LabelFor(model => model.Name, new { @class = "ps-4" })
                 @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
             </div>

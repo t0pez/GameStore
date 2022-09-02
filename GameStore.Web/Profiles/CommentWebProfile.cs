@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GameStore.Core.Models.Comments;
+using GameStore.Core.Models.Server.Comments;
 using GameStore.Core.Models.ServiceModels.Comments;
 using GameStore.Web.Models.Comment;
 using GameStore.Web.ViewModels.Comments;
@@ -21,6 +21,7 @@ public class CommentWebProfile : Profile
                        expression => expression.MapFrom(comment => comment.Name))
             .ForMember(model => model.MessageIsDeleted,
                        expression => expression.MapFrom(comment => comment.IsDeleted));
+
         CreateMap<Comment, CommentInReplyViewModel>()
             .ForMember(model => model.AuthorName,
                        expression => expression.MapFrom(comment => comment.Name))

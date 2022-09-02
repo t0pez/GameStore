@@ -2,7 +2,7 @@
 using System.Linq;
 using AutoMapper;
 using GameStore.Core.Models.Dto.Filters;
-using GameStore.Core.Models.Games.Specifications.Filters;
+using GameStore.Core.Models.Server.Games.Filters;
 using GameStore.Web.Models.Game;
 
 namespace GameStore.Web.Profiles;

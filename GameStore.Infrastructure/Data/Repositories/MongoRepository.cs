@@ -112,6 +112,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
                                                               null))
         {
             var updatingEntityProperty = propertyInfo.GetValue(updated);
+
             if (updatingEntityProperty is null)
             {
                 continue;
@@ -197,6 +198,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
             spec.IncludeExpressions
                 .Where(expression => expression.PropertyType.IsCollection() == false)
                 .Select(info => info.LambdaExpression);
+
         var multiIncludeExpressions =
             spec.IncludeExpressions
                 .Where(expression => expression.PropertyType.IsCollection())
@@ -206,6 +208,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
                                    .Select(includeExpression =>
                                                includeExpression.Body.GetMemberExpressions().First().Member.Name)
                                    .ToList();
+
         var multiIncludeStrings = multiIncludeExpressions
                                   .Select(includeExpression =>
                                               includeExpression.Body.GetMemberExpressions().First().Member.Name)
@@ -215,6 +218,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
         {
             var singleNavProps = typeof(T).GetProperties()
                                           .Where(propInfo => singleIncludeStrings.Contains(propInfo.Name));
+
             AddSingleIncludeProperties(model, singleNavProps);
         }
 
@@ -222,6 +226,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
         {
             var multiNavProps =
                 typeof(T).GetProperties().Where(propInfo => multiIncludeStrings.Contains(propInfo.Name));
+
             AddManyIncludeProperties(model, multiNavProps);
         }
     }
@@ -236,12 +241,14 @@ public class MongoRepository<T> : IRepository<T> where T : class
             var targetNavIdPropName = navProp.GetCustomAttribute<NavigationPropertyAttribute>()?.NavigationIdName;
 
             var sourceNavIdValue = sourceEntityType.GetProperty(targetNavIdPropName)?.GetValue(model);
+
             var targetNavIdProperty = targetEntityType.GetProperties()
                                                       .Single(info => info.GetCustomAttribute<NavigationIdAttribute>()
                                                                   is not null);
 
             var mongoCollectionName =
                 targetEntityType.GetCustomAttribute<MongoCollectionNameAttribute>()?.CollectionName;
+
             var collection = GetMongoCollection(targetEntityType, mongoCollectionName);
 
             var query = GetQuery(targetEntityType, collection);
@@ -251,6 +258,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
             var firstOrDefaultMethod = typeof(Queryable).GetMethods()
                                                         .First(info => info.Name == nameof(Queryable.FirstOrDefault) &&
                                                                        info.GetParameters().Length == 2);
+
             var firstOrDefaultGenericMethod = firstOrDefaultMethod.MakeGenericMethod(targetEntityType);
             var navEntity = firstOrDefaultGenericMethod.Invoke(null, new[] { query, lambda });
 
@@ -273,10 +281,12 @@ public class MongoRepository<T> : IRepository<T> where T : class
                                                                info.GetCustomAttribute<NavigationIdAttribute>() is not
                                                                    null)
                                                    .GetValue(model);
+
             var navIdProperty = targetEntityType.GetProperty(targetNavIdPropName);
 
             var mongoCollectionName =
                 targetEntityType.GetCustomAttribute<MongoCollectionNameAttribute>()?.CollectionName;
+
             var collection = GetMongoCollection(targetEntityType, mongoCollectionName);
 
             var query = GetQuery(targetEntityType, collection);
@@ -285,11 +295,13 @@ public class MongoRepository<T> : IRepository<T> where T : class
 
             var whereMethod = typeof(Queryable).GetMethods()
                                                .First(info => info.Name == nameof(Queryable.Where));
+
             var whereGenericMethod = whereMethod.MakeGenericMethod(targetEntityType);
             var navEntities = whereGenericMethod.Invoke(null, new[] { query, lambda });
 
             var toListMethod =
                 typeof(IAsyncCursorSourceExtensions).GetMethod(nameof(IAsyncCursorSourceExtensions.ToList));
+
             var toListGenericMethod = toListMethod?.MakeGenericMethod(targetEntityType);
             var mapped = toListGenericMethod?.Invoke(_database, new[] { navEntities, null });
 
@@ -313,6 +325,7 @@ public class MongoRepository<T> : IRepository<T> where T : class
                                                                              nameof(IMongoCollectionExtensions
                                                                                  .AsQueryable) &&
                                                                              info.GetParameters().Length == 2);
+
         var asQueryableGenericMethod = asQueryableMethod.MakeGenericMethod(targetEntityType);
         var query = asQueryableGenericMethod.Invoke(null, new[] { mongoCollection, null });
 

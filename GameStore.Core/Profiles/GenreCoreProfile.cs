@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.Mongo.Categories;
+using GameStore.Core.Models.Server.Genres;
 using GameStore.Core.Models.ServiceModels.Genres;
 
 namespace GameStore.Core.Profiles;

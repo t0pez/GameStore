@@ -21,6 +21,7 @@
 
     <ItemGroup>
         <Compile Remove="Models\Mongo\Categories\Specifications\CategoryByNameSpec.cs"/>
+        <Compile Remove="Models\RelationalModels\UserPublisher.cs"/>
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-﻿using GameStore.Core.Models.Orders;
+﻿using GameStore.Core.Models.Server.Orders;
 
 namespace GameStore.Core.Helpers.PdfGenerators;
 

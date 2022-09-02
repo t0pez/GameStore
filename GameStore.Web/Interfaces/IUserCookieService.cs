@@ -1,10 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using System;
 
 namespace GameStore.Web.Interfaces;
 
 public interface IUserCookieService
 {
-    public bool IsCookiesContainsUserId(IRequestCookieCollection cookies);
-    public bool TryGetCookiesUserId(IRequestCookieCollection cookies, out string userId);
-    public void AppendUserId(IResponseCookies cookies, string userId);
+    public bool IsCookiesContainsUserId();
+    public Guid GetCookiesUserId();
+    public void AppendUserId(Guid userId);
+    public void RemoveUserId();
 }

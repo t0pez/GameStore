@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using GameStore.Core.Models.Dto;
 using GameStore.Core.Models.Dto.Filters;
-using GameStore.Core.Models.Orders;
+using GameStore.Core.Models.Server.Orders;
 using GameStore.Core.Models.ServiceModels.Orders;
 using GameStore.Web.Models.Order;
 using GameStore.Web.ViewModels.Order;
@@ -14,6 +14,9 @@ public class OrderWebProfile : Profile
     {
         CreateMap<Order, OrderViewModel>();
         CreateMap<Order, OrderListViewModel>();
+
+        CreateMap<Order, OrderUpdateRequestModel>();
+        CreateMap<OrderUpdateRequestModel, OrderUpdateModel>();
 
         CreateMap<OrderDto, OrderViewModel>();
         CreateMap<OrderDto, OrderListViewModel>();

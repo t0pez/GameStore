@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
+using GameStore.Web.Infrastructure.Authorization;
 using GameStore.Web.Models.PlatformType;
 using GameStore.Web.ViewModels.PlatformTypes;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameStore.Web.Controllers;
@@ -41,12 +43,14 @@ public class PlatformTypesController : Controller
     }
 
     [HttpGet("new")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult<PlatformTypeCreateRequestModel>> CreateAsync()
     {
         return View(new PlatformTypeCreateRequestModel());
     }
 
     [HttpPost("new")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult> CreateAsync(PlatformTypeCreateRequestModel model)
     {
         var createModel = _mapper.Map<PlatformTypeCreateModel>(model);
@@ -56,12 +60,16 @@ public class PlatformTypesController : Controller
     }
 
     [HttpGet("update/{id}")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult<PlatformTypeUpdateRequestModel>> UpdateAsync([FromRoute] Guid id)
     {
-        return View(new PlatformTypeUpdateRequestModel { Id = id });
+        var platformToUpdate = await _platformTypeService.GetByIdAsync(id);
+
+        return View(new PlatformTypeUpdateRequestModel { Id = id, Name = platformToUpdate.Name });
     }
 
     [HttpPost("update/{id}")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult> UpdateAsync(PlatformTypeUpdateRequestModel model)
     {
         var updateModel = _mapper.Map<PlatformTypeUpdateModel>(model);
@@ -71,6 +79,7 @@ public class PlatformTypesController : Controller
     }
 
     [HttpPost("delete")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {
         await _platformTypeService.DeleteAsync(id);

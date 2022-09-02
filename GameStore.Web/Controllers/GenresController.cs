@@ -4,10 +4,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
-using GameStore.Core.Models.Genres;
 using GameStore.Core.Models.ServiceModels.Genres;
+using GameStore.Web.Helpers;
+using GameStore.Web.Infrastructure.Authorization;
 using GameStore.Web.Models.Genre;
 using GameStore.Web.ViewModels.Genres;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -44,16 +46,20 @@ public class GenresController : Controller
     }
 
     [HttpGet("new")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult> CreateAsync()
     {
         var genres = await _genreService.GetAllAsync();
-        var genresSelectList = new SelectList(genres, nameof(Genre.Id), nameof(Genre.Name));
-        ViewData["Genres"] = genresSelectList;
+        var genresSelectList = genres.Select(genre => new SelectListItem(genre.Name, genre.Id.ToString())).ToList();
+        genresSelectList.Add(new SelectListItem("", Guid.Empty.ToString()));
+
+        ViewData[ViewKeys.Genres.ParentGenres] = genresSelectList;
 
         return View(new GenreCreateRequestModel());
     }
 
     [HttpPost("new")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult> CreateAsync(GenreCreateRequestModel model)
     {
         var createModel = _mapper.Map<GenreCreateModel>(model);
@@ -63,6 +69,7 @@ public class GenresController : Controller
     }
 
     [HttpGet("update/{id}")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult<GenreUpdateRequestModel>> UpdateAsync([FromRoute] Guid id)
     {
         var genres = await _genreService.GetAllAsync();
@@ -76,14 +83,22 @@ public class GenresController : Controller
         var genresSelectList = genres.Except(new[] { currentGenre })
                                      .Select(genre => new SelectListItem(genre.Name, genre.Id.ToString()))
                                      .ToList();
-        genresSelectList.Add(new SelectListItem("Empty", Guid.Empty.ToString()));
 
-        ViewData["Genres"] = genresSelectList;
+        genresSelectList.Add(new SelectListItem("", Guid.Empty.ToString()));
 
-        return View(new GenreUpdateRequestModel { Id = id });
+        SetParentGenreAsSelected(currentGenre.ParentId, genresSelectList);
+
+        ViewData[ViewKeys.Genres.ParentGenres] = genresSelectList;
+
+        return View(new GenreUpdateRequestModel
+        {
+            Id = id,
+            Name = currentGenre.Name
+        });
     }
 
     [HttpPost("update/{id}")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult> UpdateAsync(GenreUpdateRequestModel model)
     {
         var updateModel = _mapper.Map<GenreUpdateModel>(model);
@@ -93,10 +108,23 @@ public class GenresController : Controller
     }
 
     [HttpPost("delete")]
+    [Authorize(Roles = ApiRoles.Manager)]
     public async Task<ActionResult> DeleteAsync(Guid id)
     {
         await _genreService.DeleteAsync(id);
 
         return RedirectToAction("GetAll", "Genres");
+    }
+
+    private void SetParentGenreAsSelected(Guid? parentGenreId, IEnumerable<SelectListItem> genresSelectList)
+    {
+        if (parentGenreId is not null)
+        {
+            genresSelectList.First(item => item.Value == parentGenreId.ToString()).Selected = true;
+        }
+        else
+        {
+            genresSelectList.First(item => item.Value == Guid.Empty.ToString()).Selected = true;
+        }
     }
 }

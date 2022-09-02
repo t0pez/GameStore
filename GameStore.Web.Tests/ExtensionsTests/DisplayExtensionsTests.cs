@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 using FluentAssertions;
-using GameStore.Core.Models.Games.Specifications.Filters;
+using GameStore.Core.Models.Server.Games.Filters;
 using GameStore.Web.Extensions;
 using Xunit;
 

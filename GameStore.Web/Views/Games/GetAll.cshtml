@@ -44,11 +44,11 @@
 
         <div>
             <label>Page size: </label>
-            <a asp-action="GetAll" asp-route-pageSize="10" asp-route-currentPage="1">10</a>
-            <a asp-action="GetAll" asp-route-pageSize="20" asp-route-currentPage="1">20</a>
-            <a asp-action="GetAll" asp-route-pageSize="50" asp-route-currentPage="1">50</a>
-            <a asp-action="GetAll" asp-route-pageSize="100" asp-route-currentPage="1">100</a>
-            <a asp-action="GetAll" asp-route-pageSize="0" asp-route-currentPage="1">All</a>
+            <button class="btn" onclick="setNewPageSize('10')">10</button>
+            <button class="btn" onclick="setNewPageSize('20')">20</button>
+            <button class="btn" onclick="setNewPageSize('50')">50</button>
+            <button class="btn" onclick="setNewPageSize('100')">100</button>
+            <button class="btn" onclick="setNewPageSize('0')">All</button>
         </div>
 
         <div>

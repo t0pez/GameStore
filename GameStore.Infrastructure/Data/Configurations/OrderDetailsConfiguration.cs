@@ -1,4 +1,4 @@
-﻿using GameStore.Core.Models.Orders;
+﻿using GameStore.Core.Models.Server.Orders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -12,8 +12,10 @@ public class OrderDetailsConfiguration : IEntityTypeConfiguration<OrderDetails>
 
         builder.Property(details => details.Quantity)
                .IsRequired();
+
         builder.Property(details => details.Discount)
                .IsRequired();
+
         builder.Property(details => details.Price)
                .IsRequired();
     }

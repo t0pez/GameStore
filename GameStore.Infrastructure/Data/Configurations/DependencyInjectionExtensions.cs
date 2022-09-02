@@ -10,7 +10,7 @@ namespace GameStore.Infrastructure.Data.Configurations;
 
 public static class DependencyInjectionExtensions
 {
-    public static void ConfigureNorthwindDatabase(this IServiceCollection services)
+    public static void ConfigureNorthwindDatabase(this IServiceCollection _)
     {
         if (BsonClassMap.IsClassMapRegistered(typeof(OrderDetailsMongo)) == false)
         {

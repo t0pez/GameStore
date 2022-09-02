@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
-using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Server.Games;
 using GameStore.Core.Models.ServiceModels.Enums;
 using GameStore.Core.Models.ServiceModels.Games;
 

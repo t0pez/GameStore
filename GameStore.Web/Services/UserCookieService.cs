@@ -9,18 +9,36 @@ public class UserCookieService : IUserCookieService
     private const string UserCookieName = "_userId";
     private readonly CookieOptions _cookieOptions = new() { Expires = DateTimeOffset.UtcNow.AddYears(2) };
 
-    public bool IsCookiesContainsUserId(IRequestCookieCollection cookies)
+    private readonly IHttpContextAccessor _httpContextAccessor;
+
+    public UserCookieService(IHttpContextAccessor httpContextAccessor)
     {
-        return cookies.ContainsKey(UserCookieName);
+        _httpContextAccessor = httpContextAccessor;
     }
 
-    public bool TryGetCookiesUserId(IRequestCookieCollection cookies, out string userId)
+    private IRequestCookieCollection RequestCookies => _httpContextAccessor.HttpContext.Request.Cookies;
+
+    private IResponseCookies ResponseCookies => _httpContextAccessor.HttpContext.Response.Cookies;
+
+    public bool IsCookiesContainsUserId()
     {
-        return cookies.TryGetValue(UserCookieName, out userId);
+        return RequestCookies.ContainsKey(UserCookieName);
     }
 
-    public void AppendUserId(IResponseCookies cookies, string userId)
+    public Guid GetCookiesUserId()
     {
-        cookies.Append(UserCookieName, userId, _cookieOptions);
+        RequestCookies.TryGetValue(UserCookieName, out var userId);
+
+        return Guid.Parse(userId);
+    }
+
+    public void AppendUserId(Guid userId)
+    {
+        ResponseCookies.Append(UserCookieName, userId.ToString(), _cookieOptions);
+    }
+
+    public void RemoveUserId()
+    {
+        ResponseCookies.Delete(UserCookieName);
     }
 }

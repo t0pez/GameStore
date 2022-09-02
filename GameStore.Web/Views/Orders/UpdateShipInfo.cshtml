@@ -1,4 +1,5 @@
-﻿@model GameStore.Web.Models.Order.ActiveOrderCreateRequestModel
+﻿@using GameStore.Web.Helpers
+@model GameStore.Web.Models.Order.ActiveOrderCreateRequestModel
 
 @{
     ViewBag.Title = "Update ship info";
@@ -50,7 +51,7 @@
         </div>
 
         <div class="form-floating mb-3">
-            @Html.DropDownListFor(model => model.ShipperId, ViewData["Shippers"] as IEnumerable<SelectListItem>, new { @class = "form-select from-select-lg" })
+            @Html.DropDownListFor(model => model.ShipperId, ViewData[ViewKeys.Orders.Shippers] as IEnumerable<SelectListItem>, new { @class = "form-select from-select-lg" })
             @Html.LabelFor(model => model.ShipperId, "Shipper", new { @class = "ps-4" })
             @Html.ValidationMessageFor(model => model.ShipperId, "", new { @class = "text-danger" })
         </div>

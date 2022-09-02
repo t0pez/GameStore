@@ -71,9 +71,9 @@ function addCommentQuote(name, id) {
 }
 
 function removeCommentReplyingStatus() {
-    let section = document.getElementById("StatusSection")
-    let sectionText = document.getElementById("StatusSectionText")
-    let status = document.getElementById("Status")
+    let section = document.getElementById("StateSection")
+    let sectionText = document.getElementById("StateSectionText")
+    let status = document.getElementById("State")
     let parentId = document.getElementById("ParentId")
 
     sectionText.innerText = "";
@@ -85,9 +85,24 @@ function removeCommentReplyingStatus() {
 
 
 function submitOrderPaymentType(type) {
-    let form = document.getElementById("SubmitForm")
-    let paymentTypeElement = document.getElementById("PaymentType")
+    setElementValue("PaymentType", type);
 
-    paymentTypeElement.value = type
+    submitForm("SubmitForm")
+}
+
+function setNewPageSize(pageSize) {
+    setElementValue("PageSize", pageSize)
+    setElementValue("CurrentPage", 1)
+
+    submitForm("FilterForm");
+}
+
+function setElementValue(id, value) {
+    let element = document.getElementById(id)
+    element.value = value
+}
+
+function submitForm(id) {
+    let form = document.getElementById(id)
     form.submit()
 }

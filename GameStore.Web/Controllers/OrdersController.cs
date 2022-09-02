@@ -4,13 +4,17 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.PaymentMethods;
+using GameStore.Core.Interfaces.TimeOutServices;
 using GameStore.Core.Models.Dto.Filters;
 using GameStore.Core.Models.Mongo.Shippers;
-using GameStore.Core.Models.Orders;
+using GameStore.Core.Models.Server.Orders;
 using GameStore.Core.Models.ServiceModels.Orders;
+using GameStore.Web.Helpers;
+using GameStore.Web.Infrastructure.Authorization;
 using GameStore.Web.Interfaces;
 using GameStore.Web.Models.Order;
 using GameStore.Web.ViewModels.Order;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -37,20 +41,34 @@ public class OrdersController : Controller
         _mapper = mapper;
     }
 
+    [Authorize(Roles = ApiRoles.Manager)]
     [HttpGet("history")]
     public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetByFilterAsync(
         AllOrdersFilterRequestModel filterRequest)
     {
+        if (filterRequest.StartDate.HasValue &&
+            filterRequest.EndDate.HasValue &&
+            filterRequest.StartDate > filterRequest.EndDate)
+        {
+            ModelState.AddModelError(nameof(filterRequest.StartDate), "Min date can't be greater than max");
+        }
+
         var filter = _mapper.Map<AllOrdersFilter>(filterRequest);
         var orders = await _orderService.GetByFilterAsync(filter);
 
-        var result = _mapper.Map<IEnumerable<OrderListViewModel>>(orders);
+        var orderViewModels = _mapper.Map<IEnumerable<OrderListViewModel>>(orders);
+
+        var result = new GetAllViewModel
+        {
+            Orders = orderViewModels,
+            Filter = filterRequest
+        };
 
         return View(result);
     }
 
     [HttpGet("customer/{customerId}")]
-    public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetByCustomerIdAsync(string customerId)
+    public async Task<ActionResult<IEnumerable<OrderListViewModel>>> GetByCustomerIdAsync(Guid customerId)
     {
         var orders = await _orderService.GetByCustomerIdAsync(customerId);
 
@@ -72,11 +90,7 @@ public class OrdersController : Controller
     [HttpGet("basket")]
     public async Task<ActionResult<OrderViewModel>> GetCurrentBasketAsync()
     {
-        if (_userCookieService.TryGetCookiesUserId(HttpContext.Request.Cookies, out var customerId) == false)
-        {
-            customerId = Guid.NewGuid().ToString();
-            _userCookieService.AppendUserId(HttpContext.Response.Cookies, customerId);
-        }
+        var customerId = _userCookieService.GetCookiesUserId();
 
         var order = await _orderService.GetBasketByCustomerIdAsync(customerId);
         var result = _mapper.Map<OrderViewModel>(order);
@@ -86,7 +100,7 @@ public class OrdersController : Controller
             return RedirectToAction("Payment", "Orders", new { orderId = order.Id });
         }
 
-        ViewData["HasActiveOrder"] = await _orderService.IsCustomerHasActiveOrder(customerId);
+        ViewData[ViewKeys.Orders.HasActiveOrder] = await _orderService.IsCustomerHasActiveOrderAsync(customerId);
 
         return View(result);
     }
@@ -94,11 +108,7 @@ public class OrdersController : Controller
     [HttpPost("/games/{gameKey}/buy")]
     public async Task<ActionResult> AddToBasketAsync(string gameKey, int quantity)
     {
-        if (_userCookieService.TryGetCookiesUserId(HttpContext.Request.Cookies, out var customerId) == false)
-        {
-            customerId = Guid.NewGuid().ToString();
-            _userCookieService.AppendUserId(HttpContext.Response.Cookies, customerId);
-        }
+        var customerId = _userCookieService.GetCookiesUserId();
 
         var basketItem = new BasketItem
         {
@@ -125,7 +135,7 @@ public class OrdersController : Controller
         var shippers = await _shipperService.GetAll();
 
         var shippersSelectList = new SelectList(shippers, nameof(Shipper.ShipperId), nameof(Shipper.CompanyName));
-        ViewData["Shippers"] = shippersSelectList;
+        ViewData[ViewKeys.Orders.Shippers] = shippersSelectList;
 
         return View(new ActiveOrderCreateRequestModel { OrderId = orderId });
     }
@@ -159,6 +169,7 @@ public class OrdersController : Controller
         return RedirectToPayment(orderId, paymentType);
     }
 
+    [Authorize(Roles = ApiRoles.Manager)]
     [HttpGet("{id}/update")]
     public async Task<ActionResult<OrderUpdateRequestModel>> UpdateAsync(Guid id)
     {
@@ -169,10 +180,11 @@ public class OrdersController : Controller
         return View(result);
     }
 
+    [Authorize(Roles = ApiRoles.Manager)]
     [HttpPost("{id}/update")]
-    public async Task<ActionResult<OrderViewModel>> UpdateAsync(OrderUpdateRequestModel requestModel)
+    public async Task<ActionResult<OrderViewModel>> UpdateAsync(OrderUpdateRequestModel request)
     {
-        var updateModel = _mapper.Map<OrderUpdateModel>(requestModel);
+        var updateModel = _mapper.Map<OrderUpdateModel>(request);
 
         if (updateModel.Status is OrderStatus.Completed or OrderStatus.Cancelled)
         {
@@ -181,7 +193,7 @@ public class OrdersController : Controller
 
         await _orderService.UpdateAsync(updateModel);
 
-        return RedirectToAction("GetWithDetails", "Orders", new { id = requestModel.Id });
+        return RedirectToAction("GetWithDetails", "Orders", new { id = request.Id });
     }
 
     private ActionResult RedirectToPayment(Guid orderId, PaymentType paymentType)

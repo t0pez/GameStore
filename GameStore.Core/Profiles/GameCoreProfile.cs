@@ -2,9 +2,9 @@
 using System.Linq;
 using AutoMapper;
 using GameStore.Core.Models.Dto;
-using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Mongo.Products;
-using GameStore.Core.Models.RelationalModels;
+using GameStore.Core.Models.Server.Games;
+using GameStore.Core.Models.Server.RelationalModels;
 using GameStore.Core.Models.ServiceModels.Games;
 
 namespace GameStore.Core.Profiles;
@@ -99,7 +99,6 @@ public class GameCoreProfile : Profile
             .ForMember(product => product.Category, expression => expression.Ignore())
             .ForMember(product => product.SupplierId, expression => expression.Ignore())
             .ForMember(product => product.Supplier, expression => expression.Ignore())
-            .ForMember(product => product.Database, expression => expression.Ignore())
-            ;
+           .ForMember(product => product.Database, expression => expression.Ignore());
     }
 }
