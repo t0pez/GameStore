@@ -1,12 +1,15 @@
 ﻿@using Microsoft.AspNetCore.Routing
+@using GameStore.Web.Extensions
+@using GameStore.Web.Infrastructure.Authorization
 @using GameStore.Web.ViewModels.Comments
 @using GameStore.Web.Models.Comment
-@using GameStore.Core.Models.Comments
+@using GameStore.Core.Models.Server.Comments
 @model ICollection<GameStore.Web.ViewModels.Comments.CommentViewModel>
 
 @{
     ViewBag.Title = "Comments";
     Layout = "_Layout";
+    var username = User.Claims.FirstOrDefault(claim => claim.Type == Claims.UserName)?.Value;
 }
 
 <h2 class="mt-5">Comments</h2>
@@ -33,20 +36,18 @@
                     </div>
                     <div class="col-4"></div>
                     <div class="col-4">
-                        <button type="button" class="btn btn-sm btn-default btn-hover-primary"
-                                data-bs-toggle="modal" data-bs-target="#editModal"
-                                data-id="@comment.Id" data-author-name="@comment.AuthorName" data-body="@comment.Body">
-                            Edit
-                        </button>
-                        <button type="button" class="btn btn-sm btn-default btn-hover-primary"
-                                data-bs-toggle="modal" data-bs-target="#deleteModal"
-                                data-id="@comment.Id">
-                            Delete
-                        </button>
-                        <button type="button" class="btn btn-sm btn-default btn-hover-primary"
-                                data-bs-toggle="modal" data-bs-target="#banModal">
-                            Ban
-                        </button>
+                        @if (User.HasPermissionOfLevel(ApiRoles.Moderator))
+                        {
+                            <button type="button" class="btn btn-sm btn-default btn-hover-primary"
+                                    data-bs-toggle="modal" data-bs-target="#deleteModal"
+                                    data-id="@comment.Id">
+                                Delete
+                            </button>
+                            <button type="button" class="btn btn-sm btn-default btn-hover-primary"
+                                    data-bs-toggle="modal" data-bs-target="#banModal">
+                                Ban
+                            </button>
+                        }
                     </div>
                 </div>
                 <hr>
@@ -134,7 +135,7 @@
 
                 <div class="row">
                     <div class="form-floating mb-3 col-4">
-                        <input class="form-control form-control-lg" placeholder="Author"
+                        <input class="form-control form-control-lg" placeholder="Author" value="@username"
                                id="AuthorName" name="AuthorName" type="text" required/>
 
                         <label class="ps-4" for="AuthorName">Your name:</label>
@@ -160,33 +161,6 @@
         </form>
     </div>
 
-    <div class="modal fade" id="editModal" role="dialog">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <form method="post" asp-controller="Comments" asp-action="UpdateComment" asp-route-gameKey="@gameKey">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="editModalLabel">Edit message</h5>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="edit-id" name="Id"/>
-                        <div class="form-group">
-                            <label for="edit-author-name" class="col-form-label">Author name:</label>
-                            <input type="text" class="form-control" id="edit-author-name" name="AuthorName">
-                        </div>
-                        <div class="form-group">
-                            <label for="edit-body" class="col-form-label">Message:</label>
-                            <textarea class="form-control" id="edit-body" name="Body"></textarea>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="submit" class="btn btn-primary">Edit message</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <div class="modal fade" id="deleteModal" role="dialog">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
@@ -210,7 +184,7 @@
     <div class="modal fade" id="banModal" role="dialog">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form method="post" asp-controller="Comments" asp-action="DeleteComment" asp-route-gameKey="@gameKey">
+                <form>
                     <div class="modal-header">
                         <h5 class="modal-title" id="banModalLabel">Ban user</h5>
                     </div>
@@ -232,23 +206,6 @@
     </div>
 
     <script>
-    let editModal = document.getElementById('editModal')
-    editModal.addEventListener('show.bs.modal', function (event) {
-    let button = $(event.relatedTarget)
-    let id = button.data('id')
-    let authorName = button.data('author-name')
-    let body = button.data('body')
-    
-    let modalId = document.getElementById('edit-id')
-    let modalAuthorName = document.getElementById('edit-author-name')
-    let modalBody = document.getElementById('edit-body')
-  
-    modalId.value = id
-    modalAuthorName.value = authorName
-    modalBody.value = body
-    })
-    
-    
     let deleteModal = document.getElementById('deleteModal')
     deleteModal.addEventListener('show.bs.modal', function(event) {
         let button = $(event.relatedTarget)

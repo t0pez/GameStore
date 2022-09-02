@@ -23,6 +23,7 @@ public class Product
     public string GameKey { get; set; }
 
     public string ProductName { get; set; }
+
     public string QuantityPerUnit { get; set; }
 
     [BsonRepresentation(BsonType.Decimal128)]

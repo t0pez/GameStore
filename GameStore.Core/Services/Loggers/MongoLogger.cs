@@ -45,7 +45,7 @@ public class MongoLogger : IMongoLogger
             EntityType = type.Name,
             LogDate = DateTime.UtcNow,
             Action = action,
-            VersionOfObject = versionOfObject
+            OldObject = versionOfObject
         };
 
         await LogsRepository.AddAsync(log);

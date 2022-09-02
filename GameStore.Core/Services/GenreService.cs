@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.Loggers;
-using GameStore.Core.Models.Genres;
-using GameStore.Core.Models.Genres.Specifications;
+using GameStore.Core.Models.Server.Genres;
+using GameStore.Core.Models.Server.Genres.Specifications;
 using GameStore.Core.Models.ServiceModels.Genres;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using MongoDB.Bson;
@@ -30,15 +31,20 @@ public class GenreService : IGenreService
 
     public async Task<ICollection<Genre>> GetAllAsync()
     {
-        var result = await Repository.GetBySpecAsync(new GenresListSpec());
+        var spec = new GenresSpec();
+        var result = await Repository.GetBySpecAsync(spec);
 
         return result;
     }
 
     public async Task<Genre> GetByIdAsync(Guid id)
     {
-        var result = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdWithDetailsSpec(id))
+        var spec = new GenresSpec().ById(id).WithDetails();
+
+        var result = await Repository.GetSingleOrDefaultBySpecAsync(spec)
                      ?? throw new ItemNotFoundException(typeof(Genre), id);
+
+        result.SubGenres = result.SubGenres.Where(subGenre => subGenre.IsDeleted == false).ToList();
 
         return result;
     }
@@ -46,6 +52,11 @@ public class GenreService : IGenreService
     public async Task CreateAsync(GenreCreateModel createModel)
     {
         var genre = _mapper.Map<Genre>(createModel);
+
+        if (createModel.ParentId == Guid.Empty)
+        {
+            genre.ParentId = null;
+        }
 
         await Repository.AddAsync(genre);
         await _unitOfWork.SaveChangesAsync();
@@ -55,8 +66,11 @@ public class GenreService : IGenreService
 
     public async Task UpdateAsync(GenreUpdateModel updateModel)
     {
-        var genre = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdSpec(updateModel.Id))
+        var spec = new GenresSpec().ById(updateModel.Id);
+
+        var genre = await Repository.GetSingleOrDefaultBySpecAsync(spec)
                     ?? throw new ItemNotFoundException(typeof(Genre), updateModel.Id, nameof(updateModel.Id));
+
         var oldGenreVersion = genre.ToBsonDocument();
 
         UpdateValues(updateModel, genre);
@@ -69,7 +83,9 @@ public class GenreService : IGenreService
 
     public async Task DeleteAsync(Guid id)
     {
-        var genre = await Repository.GetSingleOrDefaultBySpecAsync(new GenreByIdSpec(id))
+        var spec = new GenresSpec().ById(id);
+
+        var genre = await Repository.GetSingleOrDefaultBySpecAsync(spec)
                     ?? throw new ItemNotFoundException(typeof(Genre), id);
 
         await SetNewParentForChildrenGenres(genre);
@@ -87,10 +103,10 @@ public class GenreService : IGenreService
         genre.ParentId = updateModel.ParentId != Guid.Empty ? updateModel.ParentId : null;
     }
 
-
     private async Task SetNewParentForChildrenGenres(Genre genre)
     {
-        var children = await Repository.GetBySpecAsync(new GenresByParentIdSpec(genre.Id));
+        var subGenresByParentIdSpec = new GenresSpec().ByParentId(genre.Id);
+        var children = await Repository.GetBySpecAsync(subGenresByParentIdSpec);
 
         var newParentId = genre.ParentId;
 

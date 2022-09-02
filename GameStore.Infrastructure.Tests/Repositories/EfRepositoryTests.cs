@@ -1,6 +1,6 @@
 ﻿using System;
 using GameStore.Core.Models.Dto;
-using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Server.Games;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.Infrastructure.Tests.TestData.Repositories;
@@ -29,7 +29,7 @@ public class EfRepositoryTests
     [Fact]
     public async void GetBySpecAsync_NullSpec_ReturnsAllModels()
     {
-        const int expectedResultCount = 6;
+        const int expectedResultCount = 4;
 
         var actualResult = await _gameRepository.GetBySpecAsync();
         var actualResultCount = actualResult.Count;
@@ -76,7 +76,7 @@ public class EfRepositoryTests
     public async void AddAsync_CorrectModel(
         Game model)
     {
-        const int expectedCount = 7;
+        const int expectedCount = 5;
 
         await _gameRepository.AddAsync(model);
         await _context.SaveChangesAsync();
@@ -112,7 +112,7 @@ public class EfRepositoryTests
     [DeleteAsyncCorrectModelData]
     public async void DeleteAsync_ExistingModel(Game model)
     {
-        const int expectedCount = 5;
+        const int expectedCount = 3;
 
         await _gameRepository.DeleteAsync(model);
         await _context.SaveChangesAsync();
@@ -125,6 +125,7 @@ public class EfRepositoryTests
     private ApplicationContext GetInMemoryContext()
     {
         var dbOptionBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+
         dbOptionBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString())
                        .EnableDetailedErrors()
                        .EnableSensitiveDataLogging();
@@ -147,6 +148,7 @@ public class EfRepositoryTests
             PublisherName = "First publisher",
             Publisher = new PublisherDto { Name = "First publisher" }
         };
+
         var game2 = new Game
         {
             Id = Guid.Parse("6fd6d158-7ffd-472a-b972-08da067d7601"),
@@ -158,6 +160,7 @@ public class EfRepositoryTests
             PublisherName = "First publisher",
             Publisher = new PublisherDto { Name = "First publisher" }
         };
+
         var game3 = new Game
         {
             Id = Guid.Parse("6fd6d158-7ffd-472a-b973-08da067d7601"),
@@ -169,6 +172,7 @@ public class EfRepositoryTests
             PublisherName = "Second publisher",
             Publisher = new PublisherDto { Name = "Second publisher" }
         };
+
         var game4 = new Game
         {
             Id = Guid.Parse("6fd6d158-7ffd-472a-b974-08da067d7601"),

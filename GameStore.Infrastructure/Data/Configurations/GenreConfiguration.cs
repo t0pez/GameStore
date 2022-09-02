@@ -1,4 +1,4 @@
-﻿using GameStore.Core.Models.Genres;
+﻿using GameStore.Core.Models.Server.Genres;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

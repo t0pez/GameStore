@@ -8,13 +8,13 @@ using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.Dto;
 using GameStore.Core.Models.Dto.Filters;
-using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Mongo.Orders;
 using GameStore.Core.Models.Mongo.Orders.Filters;
 using GameStore.Core.Models.Mongo.Orders.Specifications;
-using GameStore.Core.Models.Orders;
-using GameStore.Core.Models.Orders.Filters;
-using GameStore.Core.Models.Orders.Specifications;
+using GameStore.Core.Models.Server.Games;
+using GameStore.Core.Models.Server.Orders;
+using GameStore.Core.Models.Server.Orders.Filters;
+using GameStore.Core.Models.Server.Orders.Specifications;
 using GameStore.Core.Models.ServiceModels.Orders;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using MongoDB.Bson;
@@ -37,16 +37,18 @@ public class OrderService : IOrderService
     }
 
     private IRepository<Order> OrdersEfRepository => _unitOfWork.GetEfRepository<Order>();
+
     private IRepository<OrderMongo> OrdersMongoRepository => _unitOfWork.GetMongoRepository<OrderMongo>();
 
     public async Task<ICollection<OrderDto>> GetByFilterAsync(AllOrdersFilter filter)
     {
         var serverOrdersFilter = _mapper.Map<OrdersFilter>(filter);
-        var mongoOrdersFilter = _mapper.Map<MongoOrdersFilter>(filter);
+        var serverOrdersByFilterSpec = new OrdersByFilterSpec(serverOrdersFilter);
+        var filteredServerOrders = await OrdersEfRepository.GetBySpecAsync(serverOrdersByFilterSpec);
 
-        var filteredServerOrders = await OrdersEfRepository.GetBySpecAsync(new OrdersByFilterSpec(serverOrdersFilter));
-        var filteredMongoOrders =
-            await OrdersMongoRepository.GetBySpecAsync(new MongoOrdersByFilterWithDetailsSpec(mongoOrdersFilter));
+        var mongoOrdersFilter = _mapper.Map<MongoOrdersFilter>(filter);
+        var mongoOrdersByFilterSpec = new MongoOrdersByFilterWithDetailsSpec(mongoOrdersFilter);
+        var filteredMongoOrders = await OrdersMongoRepository.GetBySpecAsync(mongoOrdersByFilterSpec);
 
         var mappedServerOrders = _mapper.Map<IEnumerable<OrderDto>>(filteredServerOrders);
         var mappedMongoOrders = _mapper.Map<IEnumerable<OrderDto>>(filteredMongoOrders);
@@ -58,7 +60,9 @@ public class OrderService : IOrderService
 
     public async Task<Order> GetByIdAsync(Guid orderId)
     {
-        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(new OrderByIdWithDetailsSpec(orderId))
+        var spec = new OrdersSpec().ById(orderId).WithDetails();
+
+        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(spec)
                     ?? throw new ItemNotFoundException(typeof(Order), orderId);
 
         await IncludeProductDtoInOrderAsync(order);
@@ -66,33 +70,39 @@ public class OrderService : IOrderService
         return order;
     }
 
-    public async Task<Order> GetBasketByCustomerIdAsync(string customerId)
+    public async Task<Order> GetBasketByCustomerIdAsync(Guid customerId)
     {
         var order = await GetActiveOrderByCustomerIdOrDefaultAsync(customerId) ??
                     await GetBasketOrderByCustomerIdOrDefaultAsync(customerId);
 
-        if (order is null)
+        if (order is not null)
         {
-            var createModel = new OrderCreateModel
-            {
-                CustomerId = customerId
-            };
-            order = await CreateAsync(createModel);
+            return order;
         }
+
+        var createModel = new OrderCreateModel
+        {
+            CustomerId = customerId
+        };
+
+        order = await CreateAsync(createModel);
 
         return order;
     }
 
-    public async Task<ICollection<Order>> GetByCustomerIdAsync(string customerId)
+    public async Task<ICollection<Order>> GetByCustomerIdAsync(Guid customerId)
     {
-        var result = await OrdersEfRepository.GetBySpecAsync(new OrdersByCustomerIdSpec(customerId));
+        var spec = new OrdersSpec().ByCustomerId(customerId);
+        var result = await OrdersEfRepository.GetBySpecAsync(spec);
 
         return result;
     }
 
     public async Task<Order> CreateAsync(OrderCreateModel createModel)
     {
-        if (await IsCustomerHasActiveOrder(createModel.CustomerId))
+        var isCustomerHasActiveOrder = await IsCustomerHasActiveOrderAsync(createModel.CustomerId);
+
+        if (isCustomerHasActiveOrder)
         {
             throw new InvalidOperationException("Customer already has an active order");
         }
@@ -111,7 +121,9 @@ public class OrderService : IOrderService
 
     public async Task MakeOrder(Guid orderId)
     {
-        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(new OrderByIdWithDetailsSpec(orderId))
+        var spec = new OrdersSpec().ById(orderId).WithDetails();
+
+        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(spec)
                     ?? throw new ItemNotFoundException(typeof(Order), orderId);
 
         foreach (var orderDetail in order.OrderDetails)
@@ -120,7 +132,7 @@ public class OrderService : IOrderService
                        ?? throw new ItemNotFoundException(typeof(Game), orderDetail.GameKey,
                                                           nameof(orderDetail.GameKey));
 
-            orderDetail.Price = orderDetail.Quantity * game.Price - orderDetail.Discount;
+            orderDetail.Price = game.Price;
         }
 
         await OrdersEfRepository.UpdateAsync(order);
@@ -129,7 +141,9 @@ public class OrderService : IOrderService
 
     public async Task FillShippersAsync(ActiveOrderCreateModel createModel)
     {
-        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(new OrderByIdSpec(createModel.OrderId))
+        var spec = new OrdersSpec().ById(createModel.OrderId);
+
+        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(spec)
                     ?? throw new ItemNotFoundException(typeof(Order), createModel.OrderId, nameof(createModel.OrderId));
 
         UpdateValues(order, createModel);
@@ -140,14 +154,18 @@ public class OrderService : IOrderService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public async Task AddToOrderAsync(string customerId, BasketItem item)
+    public async Task AddToOrderAsync(Guid customerId, BasketItem item)
     {
-        if (await _searchService.IsGameKeyExistsAsync(item.GameKey) == false)
+        var isGameExist = await _searchService.IsGameKeyExistsAsync(item.GameKey);
+
+        if (isGameExist == false)
         {
             throw new ItemNotFoundException(typeof(Game), item.GameKey, nameof(item.GameKey));
         }
 
-        if (await IsCustomerHasActiveOrder(customerId))
+        var isCustomerHasActiveOrder = await IsCustomerHasActiveOrderAsync(customerId);
+
+        if (isCustomerHasActiveOrder)
         {
             throw new InvalidOperationException("User already has an active order");
         }
@@ -165,7 +183,7 @@ public class OrderService : IOrderService
         {
             var orderDetail = _mapper.Map<OrderDetails>(item);
 
-            var quantity = GetQuantity(item, orderDetail, game);
+            var quantity = GetQuantity(orderDetail, game);
             orderDetail.Quantity = quantity;
             orderDetail.OrderId = order.Id;
             order.OrderDetails.Add(orderDetail);
@@ -177,8 +195,9 @@ public class OrderService : IOrderService
 
     public async Task UpdateAsync(OrderUpdateModel updateModel)
     {
-        var order =
-            await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(new OrderByIdWithDetailsSpec(updateModel.Id));
+        var spec = new OrdersSpec().ById(updateModel.Id).WithDetails();
+        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(spec);
+
         var oldOrderVersion = order.ToBsonDocument();
 
         UpdateValues(order, updateModel);
@@ -188,15 +207,20 @@ public class OrderService : IOrderService
         await _mongoLogger.LogUpdateAsync(typeof(Order), oldOrderVersion, order.ToBsonDocument());
     }
 
-    public async Task<bool> IsCustomerHasActiveOrder(string customerId)
+    public async Task<bool> IsCustomerHasActiveOrderAsync(Guid customerId)
     {
-        return await OrdersEfRepository.AnyAsync(new OrderInProcessByCustomerIdSpec(customerId));
+        return await OrdersEfRepository.AnyAsync(new OrdersSpec().InProcess().ByCustomerId(customerId));
     }
 
-    private async Task<Order> GetBasketOrderByCustomerIdOrDefaultAsync(string customerId)
+    public async Task<bool> IsCustomerHasBasketAsync(Guid customerId)
     {
-        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(
-            new OrderInBasketByCustomerIdWithDetailsSpec(customerId));
+        return await OrdersEfRepository.AnyAsync(new OrdersSpec().InBasket().ByCustomerId(customerId));
+    }
+
+    private async Task<Order> GetBasketOrderByCustomerIdOrDefaultAsync(Guid customerId)
+    {
+        var spec = new OrdersSpec().InBasket().ByCustomerId(customerId).WithDetails();
+        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(spec);
 
         if (order is not null)
         {
@@ -206,10 +230,11 @@ public class OrderService : IOrderService
         return order;
     }
 
-    private async Task<Order> GetActiveOrderByCustomerIdOrDefaultAsync(string customerId)
+    private async Task<Order> GetActiveOrderByCustomerIdOrDefaultAsync(Guid customerId)
     {
-        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(
-            new OrderInProcessByCustomerIdWithDetailsSpec(customerId));
+        var spec = new OrdersSpec().InProcess().ByCustomerId(customerId).WithDetails();
+
+        var order = await OrdersEfRepository.GetSingleOrDefaultBySpecAsync(spec);
 
         if (order is not null)
         {
@@ -242,6 +267,16 @@ public class OrderService : IOrderService
         var quantity = orderDetails.Quantity + item.Quantity > game.UnitsInStock
             ? game.UnitsInStock
             : orderDetails.Quantity + item.Quantity;
+
+        return quantity;
+    }
+
+    private int GetQuantity(OrderDetails orderDetails, ProductDto game)
+    {
+        var quantity = orderDetails.Quantity > game.UnitsInStock
+            ? game.UnitsInStock
+            : orderDetails.Quantity;
+
         return quantity;
     }
 
@@ -251,9 +286,11 @@ public class OrderService : IOrderService
         order.OrderDetails = updateModel.OrderDetails;
         order.OrderDate = updateModel.OrderDate;
         order.Status = updateModel.Status;
+
+        order.OrderDetails = updateModel.OrderDetails;
     }
 
-    private static void UpdateValues(Order order, ActiveOrderCreateModel createModel)
+    private void UpdateValues(Order order, ActiveOrderCreateModel createModel)
     {
         order.Freight = createModel.Freight;
         order.ShipAddress = createModel.ShipAddress;

@@ -2,15 +2,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GameStore.Core.Events.Notifications;
+using GameStore.Core.Events.PublisherNameUpdated;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Extensions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Models.Dto;
 using GameStore.Core.Models.Mongo.Suppliers;
-using GameStore.Core.Models.Publishers;
-using GameStore.Core.Models.Publishers.Specifications;
+using GameStore.Core.Models.Server.Publishers;
+using GameStore.Core.Models.Server.Publishers.Specifications;
 using GameStore.Core.Models.ServiceModels.Publishers;
 using GameStore.SharedKernel.Interfaces.DataAccess;
 using MediatR;
@@ -37,11 +37,12 @@ public class PublisherService : IPublisherService
     }
 
     private IRepository<Publisher> PublishersRepository => _unitOfWork.GetEfRepository<Publisher>();
+
     private IRepository<Supplier> SuppliersRepository => _unitOfWork.GetMongoRepository<Supplier>();
 
     public async Task<ICollection<PublisherDto>> GetAllAsync()
     {
-        var filteredPublishers = await PublishersRepository.GetBySpecAsync(new PublishersListSpec());
+        var filteredPublishers = await PublishersRepository.GetBySpecAsync(new PublishersSpec());
         var filteredSuppliers = await SuppliersRepository.GetBySpecAsync();
 
         var mappedPublishers = _mapper.Map<IEnumerable<PublisherDto>>(filteredPublishers);
@@ -75,9 +76,11 @@ public class PublisherService : IPublisherService
 
     public async Task UpdateAsync(PublisherUpdateModel updateModel)
     {
-        var publisher =
-            await PublishersRepository.GetSingleOrDefaultBySpecAsync(new PublisherByNameSpec(updateModel.OldName))
-            ?? throw new ItemNotFoundException(typeof(Publisher), updateModel.OldName, nameof(updateModel.OldName));
+        var spec = new PublishersSpec().ByName(updateModel.OldName);
+
+        var publisher = await PublishersRepository.GetSingleOrDefaultBySpecAsync(spec)
+                        ?? throw new ItemNotFoundException(typeof(Publisher), updateModel.OldName,
+                                                           nameof(updateModel.OldName));
 
         var oldPublisherVersion = publisher.ToBsonDocument();
 
@@ -90,13 +93,15 @@ public class PublisherService : IPublisherService
 
         if (updateModel.IsNameChanged)
         {
-            await _mediator.Publish(new PublisherNameUpdatedNotification(updateModel.OldName, updateModel.Name));
+            await _mediator.Publish(new PublisherNameUpdatedEvent(updateModel.OldName, updateModel.Name));
         }
     }
 
     public async Task DeleteAsync(string companyName)
     {
-        var publisher = await PublishersRepository.GetSingleOrDefaultBySpecAsync(new PublisherByNameSpec(companyName))
+        var spec = new PublishersSpec().ByName(companyName);
+
+        var publisher = await PublishersRepository.GetSingleOrDefaultBySpecAsync(spec)
                         ?? throw new ItemNotFoundException(typeof(Publisher), companyName);
 
         publisher.IsDeleted = true;
@@ -109,7 +114,7 @@ public class PublisherService : IPublisherService
 
     public async Task<bool> IsCompanyNameAlreadyExists(string companyName)
     {
-        return await PublishersRepository.AnyAsync(new PublisherByNameSpec(companyName));
+        return await PublishersRepository.AnyAsync(new PublishersSpec().ByName(companyName));
     }
 
     private void UpdatePublisherValues(Publisher publisher, PublisherUpdateModel updateModel)
@@ -117,5 +122,14 @@ public class PublisherService : IPublisherService
         publisher.Name = updateModel.Name;
         publisher.Description = updateModel.Description;
         publisher.HomePage = updateModel.HomePage;
+        publisher.Address = updateModel.Address;
+        publisher.City = updateModel.City;
+        publisher.Country = updateModel.Country;
+        publisher.Fax = updateModel.Fax;
+        publisher.Phone = updateModel.Phone;
+        publisher.Region = updateModel.Region;
+        publisher.ContactName = updateModel.ContactName;
+        publisher.ContactTitle = updateModel.ContactTitle;
+        publisher.PostalCode = updateModel.PostalCode;
     }
 }

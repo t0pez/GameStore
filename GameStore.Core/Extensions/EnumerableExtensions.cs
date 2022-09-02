@@ -9,6 +9,7 @@ public static class EnumerableExtensions
         (this IEnumerable<TSource> source, Func<TSource, TKey> keySelector)
     {
         var seenKeys = new HashSet<TKey>();
+
         foreach (var element in source)
         {
             if (seenKeys.Add(keySelector(element)))

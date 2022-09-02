@@ -8,10 +8,14 @@ namespace GameStore.Core.Models.Mongo.MongoLogs;
 public class MongoLog
 {
     public string EntityType { get; set; }
+
     public DateTime LogDate { get; set; }
+
     public LogOperation Action { get; set; }
-    public BsonDocument VersionOfObject { get; set; }
-    public BsonDocument NewVersionOfObject { get; set; }
+
+    public BsonDocument OldObject { get; set; }
+
+    public BsonDocument NewObject { get; set; }
 }
 
 public enum LogOperation

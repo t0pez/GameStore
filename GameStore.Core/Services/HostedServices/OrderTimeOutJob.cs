@@ -3,7 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
-using GameStore.Core.Models.Orders;
+using GameStore.Core.Interfaces.TimeOutServices;
+using GameStore.Core.Models.Server.Orders;
 using GameStore.Core.Models.ServiceModels.Orders;
 using Quartz;
 

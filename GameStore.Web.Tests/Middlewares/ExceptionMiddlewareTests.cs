@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Net;
+using System.Threading.Tasks;
+using AutoFixture.Xunit2;
 using GameStore.Core.Exceptions;
+using GameStore.Tests.Infrastructure.Attributes;
 using GameStore.Web.Middlewares;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
@@ -11,64 +13,71 @@ namespace GameStore.Web.Tests.Middlewares;
 
 public class ExceptionMiddlewareTests
 {
-    private readonly Mock<HttpContext> _httpContextMock;
-    private readonly Mock<ILogger<ExceptionMiddleware>> _loggerMock;
-    private readonly Mock<RequestDelegate> _requestDelegateMock;
-
-    public ExceptionMiddlewareTests()
+    [Theory]
+    [AutoMoqData]
+    public async Task Invoke_ThrowsItemNotFound_AddsCorrectStatusCode(
+        [Frozen] Mock<HttpContext> httpContextMock,
+        [Frozen] Mock<RequestDelegate> requestDelegateMock,
+        ExceptionMiddleware sut)
     {
-        _loggerMock = new Mock<ILogger<ExceptionMiddleware>>();
-        _httpContextMock = new Mock<HttpContext>();
-        _httpContextMock.Setup(context => context.Response.StatusCode)
-                        .Verifiable();
-        _requestDelegateMock = new Mock<RequestDelegate>();
+        requestDelegateMock.Setup(rd => rd.Invoke(It.IsAny<HttpContext>()))
+                           .ThrowsAsync(new ItemNotFoundException());
+
+        await sut.InvokeAsync(httpContextMock.Object, requestDelegateMock.Object);
+
+        httpContextMock.Verify(context => context.Response.Redirect(It.Is<string>(s => s.Contains(
+                                                                        ((int)HttpStatusCode
+                                                                           .NotFound).ToString()))));
     }
 
-    [Fact]
-    public void Invoke_ThrowsItemNotFound_AddsCorrectStatusCode()
+    [Theory]
+    [AutoMoqData]
+    public async Task Invoke_ThrowsInvalidOperationException_AddsCorrectStatusCode(
+        [Frozen] Mock<HttpContext> httpContextMock,
+        [Frozen] Mock<RequestDelegate> requestDelegateMock,
+        ExceptionMiddleware sut)
     {
-        _requestDelegateMock.Setup(rd => rd.Invoke(It.IsAny<HttpContext>()))
-                            .ThrowsAsync(new ItemNotFoundException());
+        requestDelegateMock.Setup(rd => rd.Invoke(It.IsAny<HttpContext>()))
+                           .ThrowsAsync(new InvalidOperationException());
 
-        var exceptionMiddleware = new ExceptionMiddleware(_requestDelegateMock.Object, _loggerMock.Object);
-        exceptionMiddleware.Invoke(_httpContextMock.Object);
+        await sut.InvokeAsync(httpContextMock.Object, requestDelegateMock.Object);
 
-        _httpContextMock.VerifySet(context => context.Response.StatusCode = (int)HttpStatusCode.NotFound);
+        httpContextMock.Verify(context => context.Response.Redirect(It.Is<string>(s => s.Contains(
+                                                                        ((int)HttpStatusCode
+                                                                           .BadGateway).ToString()))));
     }
 
-    [Fact]
-    public void Invoke_ThrowsInvalidOperationException_AddsCorrectStatusCode()
+    [Theory]
+    [AutoMoqData]
+    public async Task Invoke_ThrowsArgumentException_AddsCorrectStatusCode(
+        [Frozen] Mock<HttpContext> httpContextMock,
+        [Frozen] Mock<RequestDelegate> requestDelegateMock,
+        ExceptionMiddleware sut)
     {
-        _requestDelegateMock.Setup(rd => rd.Invoke(It.IsAny<HttpContext>()))
-                            .ThrowsAsync(new InvalidOperationException());
+        requestDelegateMock.Setup(rd => rd.Invoke(It.IsAny<HttpContext>()))
+                           .ThrowsAsync(new ArgumentException());
 
-        var exceptionMiddleware = new ExceptionMiddleware(_requestDelegateMock.Object, _loggerMock.Object);
-        exceptionMiddleware.Invoke(_httpContextMock.Object);
+        await sut.InvokeAsync(httpContextMock.Object, requestDelegateMock.Object);
 
-        _httpContextMock.VerifySet(context => context.Response.StatusCode = (int)HttpStatusCode.BadGateway);
+        httpContextMock.Verify(context => context.Response.Redirect(It.Is<string>(s => s.Contains(
+                                                                        ((int)HttpStatusCode
+                                                                           .BadRequest).ToString()))));
     }
 
-    [Fact]
-    public void Invoke_ThrowsArgumentException_AddsCorrectStatusCode()
+    [Theory]
+    [AutoMoqData]
+    public async Task Invoke_ThrowsUnsupportedException_AddsCorrectStatusCode(
+        [Frozen] Mock<HttpContext> httpContextMock,
+        [Frozen] Mock<RequestDelegate> requestDelegateMock,
+        ExceptionMiddleware sut)
     {
-        _requestDelegateMock.Setup(rd => rd.Invoke(It.IsAny<HttpContext>()))
-                            .ThrowsAsync(new ArgumentException());
+        requestDelegateMock.Setup(rd => rd.Invoke(It.IsAny<HttpContext>()))
+                           .ThrowsAsync(new Exception());
 
-        var exceptionMiddleware = new ExceptionMiddleware(_requestDelegateMock.Object, _loggerMock.Object);
-        exceptionMiddleware.Invoke(_httpContextMock.Object);
+        await sut.InvokeAsync(httpContextMock.Object, requestDelegateMock.Object);
 
-        _httpContextMock.VerifySet(context => context.Response.StatusCode = (int)HttpStatusCode.BadRequest);
-    }
-
-    [Fact]
-    public void Invoke_ThrowsUnsupportedException_AddsCorrectStatusCode()
-    {
-        _requestDelegateMock.Setup(rd => rd.Invoke(It.IsAny<HttpContext>()))
-                            .ThrowsAsync(new Exception());
-
-        var exceptionMiddleware = new ExceptionMiddleware(_requestDelegateMock.Object, _loggerMock.Object);
-        exceptionMiddleware.Invoke(_httpContextMock.Object);
-
-        _httpContextMock.VerifySet(context => context.Response.StatusCode = (int)HttpStatusCode.InternalServerError);
+        httpContextMock.Verify(context => context.Response.Redirect(It.Is<string>(s => s.Contains(
+                                                                        ((int)HttpStatusCode
+                                                                           .InternalServerError).ToString()))));
     }
 }

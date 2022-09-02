@@ -14,7 +14,8 @@ public static class MapperConfigurationExtensions
             new GenreWebProfile(),
             new OrderWebProfile(),
             new PlatformTypeWebProfile(),
-            new PublisherWebProfile()
+            new PublisherWebProfile(),
+            new UsersWebProfile()
         });
     }
 }

@@ -7,58 +7,65 @@ using Microsoft.Extensions.Logging;
 
 namespace GameStore.Web.Middlewares;
 
-public class ExceptionMiddleware
+public class ExceptionMiddleware : IMiddleware
 {
     private readonly ILogger<ExceptionMiddleware> _logger;
-    private readonly RequestDelegate _next;
 
-    public ExceptionMiddleware(RequestDelegate next, ILogger<ExceptionMiddleware> logger)
+    public ExceptionMiddleware(ILogger<ExceptionMiddleware> logger)
     {
-        _next = next;
         _logger = logger;
     }
 
-    public async Task Invoke(HttpContext context)
+    public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
+        int? statusCode = null;
+        string message = default;
+
         try
         {
-            await _next(context);
+            await next(context);
         }
         catch (ItemNotFoundException e)
         {
             _logger.LogError(e, e.Message);
 
-            context.Response.StatusCode = (int)HttpStatusCode.NotFound;
-            AddErrorToResponse(context, e);
+            statusCode = (int)HttpStatusCode.NotFound;
+            message = e.Message;
         }
         catch (InvalidOperationException e)
         {
             _logger.LogError(e, e.Message);
 
-            context.Response.StatusCode = (int)HttpStatusCode.BadGateway;
-            AddErrorToResponse(context, e);
+            statusCode = (int)HttpStatusCode.BadGateway;
+            message = e.Message;
         }
         catch (ArgumentException e)
         {
             _logger.LogError(e, e.Message);
 
-            context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
-            AddErrorToResponse(context, e);
+            statusCode = (int)HttpStatusCode.BadRequest;
+            message = e.Message;
+        }
+        catch (UnauthorizedAccessException e)
+        {
+            _logger.LogError(e, e.Message);
+
+            statusCode = (int)HttpStatusCode.Unauthorized;
+            message = e.Message;
         }
         catch (Exception e)
         {
             _logger.LogError(e, e.Message);
 
-            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-            AddErrorToResponse(context, e);
+            statusCode = (int)HttpStatusCode.InternalServerError;
+            message = e.Message;
         }
-    }
-
-    private static void AddErrorToResponse(HttpContext context, Exception e)
-    {
-        var exceptionName = e.GetType().Name;
-
-        context.Response.Headers.Add("exception", exceptionName);
-        context.Response.Headers.Add("exceptionMessage", e.Message);
+        finally
+        {
+            if (statusCode.HasValue)
+            {
+                context.Response.Redirect($"/error?statusCode={statusCode}&message={message}");
+            }
+        }
     }
 }

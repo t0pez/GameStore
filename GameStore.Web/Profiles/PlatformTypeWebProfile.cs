@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using GameStore.Core.Models.PlatformTypes;
-using GameStore.Core.Models.RelationalModels;
+using GameStore.Core.Models.Server.PlatformTypes;
+using GameStore.Core.Models.Server.RelationalModels;
 using GameStore.Core.Models.ServiceModels.PlatformTypes;
 using GameStore.Web.Models.PlatformType;
 using GameStore.Web.ViewModels.PlatformTypes;
@@ -22,6 +22,7 @@ public class PlatformTypeWebProfile : Profile
                        expression => expression.MapFrom(gameGenre => gameGenre.PlatformId))
             .ForMember(viewModel => viewModel.Name,
                        expression => expression.MapFrom(gameGenre => gameGenre.Platform.Name));
+
         CreateMap<GamePlatformType, PlatformTypeListViewModel>()
             .ForMember(viewModel => viewModel.Id,
                        expression => expression.MapFrom(gameGenre => gameGenre.PlatformId))

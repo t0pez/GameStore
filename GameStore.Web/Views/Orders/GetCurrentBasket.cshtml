@@ -1,4 +1,5 @@
-﻿@model GameStore.Web.ViewModels.Order.OrderViewModel
+﻿@using GameStore.Web.Helpers
+@model GameStore.Web.ViewModels.Order.OrderViewModel
 
 @{
     ViewBag.Title = "Basket";
@@ -36,7 +37,7 @@ else
         </div>
     }
 
-    if ((bool)ViewData["HasActiveOrder"] == false)
+    if ((bool)ViewData[ViewKeys.Orders.HasActiveOrder] == false)
     {
         @Html.ActionLink("Create order", "MakeOrder", "Orders", new { orderId = Model.Id }, new { @class = "btn btn-primary" })
     }

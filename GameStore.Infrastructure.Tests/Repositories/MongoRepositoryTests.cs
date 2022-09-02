@@ -61,7 +61,7 @@ public class MongoRepositoryTests
         const string expectedCategoryName = "Condiments";
 
         var actualResult =
-            await _repository.GetFirstOrDefaultBySpecAsync(new ProductByGameKeyWithDetailsSpec(expectedGameKey));
+            await _repository.GetFirstOrDefaultBySpecAsync(new ProductsSpec().ByGameKey(expectedGameKey).WithDetails());
 
         actualResult.GameKey.Should().Be(expectedGameKey);
         actualResult.CategoryId.Should().Be(expectedCategoryId);

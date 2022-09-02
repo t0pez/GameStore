@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using GameStore.Core.Models.Dto;
-using GameStore.Core.Models.Publishers;
+using GameStore.Core.Models.Server.Publishers;
 using GameStore.Core.Models.ServiceModels.Publishers;
 using GameStore.Web.Models.Publisher;
 using GameStore.Web.ViewModels.Publisher;

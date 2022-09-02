@@ -1,9 +1,9 @@
 ﻿using System;
-using GameStore.Core.Models.Comments;
-using GameStore.Core.Models.Games;
 using GameStore.Core.Models.Mongo.Products;
 using GameStore.Core.Models.Mongo.Suppliers;
-using GameStore.Core.Models.RelationalModels;
+using GameStore.Core.Models.Server.Comments;
+using GameStore.Core.Models.Server.Games;
+using GameStore.Core.Models.Server.RelationalModels;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.SharedKernel.Interfaces.DataAccess;
@@ -86,6 +86,7 @@ public class UnitOfWorkTests
     private ApplicationContext GetInMemoryContext()
     {
         var dbOptionBuilder = new DbContextOptionsBuilder<ApplicationContext>();
+
         dbOptionBuilder.UseInMemoryDatabase(Guid.NewGuid().ToString())
                        .EnableDetailedErrors()
                        .EnableSensitiveDataLogging();

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using GameStore.Core.Models.Games;
+using GameStore.Core.Models.Server.Games;
 using Xunit.Sdk;
 
 namespace GameStore.Infrastructure.Tests.TestData.Repositories;
@@ -18,6 +18,7 @@ public class UpdateAsyncIncorrectModelData : DataAttribute
                 Key = "key-1"
             }
         };
+
         yield return new object[]
         {
             new Game
@@ -26,6 +27,7 @@ public class UpdateAsyncIncorrectModelData : DataAttribute
                 Key = "key-2"
             }
         };
+
         yield return new object[]
         {
             new Game
@@ -34,6 +36,7 @@ public class UpdateAsyncIncorrectModelData : DataAttribute
                 Key = "key-3"
             }
         };
+
         yield return new object[]
         {
             new Game

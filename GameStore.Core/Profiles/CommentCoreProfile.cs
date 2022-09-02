@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using GameStore.Core.Models.Comments;
+using GameStore.Core.Models.Server.Comments;
 using GameStore.Core.Models.ServiceModels.Comments;
 
 namespace GameStore.Core.Profiles;

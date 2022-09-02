@@ -1,0 +1,81 @@
+﻿@using GameStore.Core.Models.Constants
+@using GameStore.Web.Helpers
+@model GameStore.Web.Models.User.UserUpdateRequestModel
+
+@{
+    ViewBag.Title = "Update";
+    Layout = "_Layout";
+    var rolesSelectList = new SelectList(new[] { Roles.Administrator, Roles.Manager, Roles.Moderator, Roles.Publisher, Roles.User });
+    var publishersSelectList = ViewData[ViewKeys.Users.Publishers] as SelectList;
+}
+
+<h2>Update</h2>
+
+<form method="post">
+    <input type="hidden" name="@nameof(Model.Id)" value="@Model.Id"/>
+    <input type="hidden" name="@nameof(Model.OldEmail)" value="@Model.OldEmail"/>
+    <input type="hidden" name="@nameof(Model.OldUserName)" value="@Model.OldUserName"/>
+
+    <div class="form-floating mb-3">
+        @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+        @Html.LabelFor(model => model.Email, new { @class = "ps-4" })
+        @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+    </div>
+
+    <div class="form-floating mb-3">
+        @Html.EditorFor(model => model.UserName, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+        @Html.LabelFor(model => model.UserName, new { @class = "ps-4" })
+        @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+    </div>
+
+    @if (User.IsInRole(Roles.Administrator))
+    {
+        <div class="form-floating mb-3">
+            @Html.DropDownListFor(model => model.Role, rolesSelectList, new { @class = "form-select from-select-lg" })
+            @Html.LabelFor(model => model.Role, "Role", new { @class = "ps-4" })
+            @Html.ValidationMessageFor(model => model.Role, "", new { @class = "text-danger" })
+        </div>
+
+        <div class="form-floating mb-3" id="PublisherEditSection" hidden="hidden">
+            @Html.DropDownListFor(model => model.PublisherName, publishersSelectList, new { @class = "form-select from-select-lg" })
+            @Html.LabelFor(model => model.PublisherName, "PublisherName", new { @class = "ps-4" })
+            @Html.ValidationMessageFor(model => model.PublisherName, "", new { @class = "text-danger" })
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
+
+<script type="text/javascript">
+ 
+  function roleDropdownListener() {
+    let rolesSelect = document.getElementById("@nameof(Model.Role)")
+    
+    if (rolesSelect.options[rolesSelect.selectedIndex].value === "@(Roles.Publisher)") { 
+       enablePublisherNameEditor()
+    }
+    else {
+       disablePublisherNameEditor()
+       let publisherSelect = document.getElementById("@nameof(Model.PublisherName)")
+       publisherSelect.selectedIndex = -1
+    }
+  }
+  
+  function enablePublisherNameEditor() {
+    let publisherEditSection = document.getElementById("PublisherEditSection")
+    publisherEditSection.hidden = false
+  }
+  
+  function disablePublisherNameEditor() {
+    let publisherEditSection = document.getElementById("PublisherEditSection")
+    publisherEditSection.hidden = true
+  }
+  
+  document.getElementById("@nameof(Model.Role)").addEventListener("click", roleDropdownListener)
+  
+  if ("@Model.Role" === "@Roles.Publisher") {
+       let publisherEditSection = document.getElementById("PublisherEditSection")
+       publisherEditSection.hidden = false
+  }
+  
+</script>

@@ -1,4 +1,4 @@
-using GameStore.Core.Events.Notifications;
+using GameStore.Core.Events.GameKeyUpdated;
 using GameStore.Core.Profiles;
 using GameStore.Infrastructure;
 using GameStore.Infrastructure.Data.Configurations;
@@ -8,6 +8,7 @@ using GameStore.Web.Infrastructure;
 using GameStore.Web.Middlewares;
 using GameStore.Web.Profiles;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -31,20 +32,24 @@ public class Startup
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddMvc();
-        services.AddMediatR(typeof(Startup), typeof(GameKeyUpdatedNotification));
+
+        services.AddMediatR(typeof(Startup), typeof(GameKeyUpdatedEvent))
+                .AddHttpContextAccessor();
 
         services.AddControllers()
+                .AddRazorRuntimeCompilation()
                 .AddNewtonsoftJson(options =>
                                    {
                                        options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
                                    });
+
         services.AddQuartz(configurator =>
                            {
                                configurator.UseMicrosoftDependencyInjectionJobFactory();
                                configurator.AddOrderTimeOutHostedService();
                            });
-        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
+        services.AddQuartzHostedService(options => options.WaitForJobsToComplete = true);
 
         services.AddScoped<WorkTimeTrackingFilter>();
 
@@ -52,12 +57,17 @@ public class Startup
                                                   {
                                                       var connectionString =
                                                           Configuration.GetConnectionString("DefaultConnection");
+
                                                       options.UseSqlServer(connectionString);
                                                   });
+
         services.ConfigureNorthwindDatabase();
 
         services.ConfigureDomainServices(Configuration);
+
         services.ConfigureWebServices();
+
+        services.ConfigureMiddlewares();
 
         services.AddAutoMapper(
             configuration =>
@@ -65,6 +75,13 @@ public class Startup
                 configuration.AddCoreProfiles();
                 configuration.AddWebProfiles();
             });
+
+        services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                           {
+                               options.LoginPath = "/auth/login";
+                               options.AccessDeniedPath = "/unauthorized";
+                           });
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -74,13 +91,22 @@ public class Startup
             app.UseDeveloperExceptionPage();
         }
 
+        app.UseMiddleware<ExceptionMiddleware>();
+        app.UseMiddleware<UserCookieIdMiddleware>();
+        app.UseMiddleware<UserRoleMiddleware>();
+
         app.UseHttpsRedirection();
         app.UseRouting();
         app.UseStaticFiles();
         app.UseCookiePolicy();
 
-        app.UseMiddleware<ExceptionMiddleware>();
+        app.UseAuthentication();
+        app.UseAuthorization();
 
-        app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
+        app.UseEndpoints(endpoints =>
+                         {
+                             endpoints.MapControllers();
+                             endpoints.MapFallbackToController("GetAll", "Games");
+                         });
     }
 }

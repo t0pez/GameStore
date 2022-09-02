@@ -1,4 +1,6 @@
-﻿@model GameStore.Web.ViewModels.Genres.GenreViewModel
+﻿@using GameStore.Web.Extensions
+@using GameStore.Web.Infrastructure.Authorization
+@model GameStore.Web.ViewModels.Genres.GenreViewModel
 
 @{
     ViewBag.Title = "Details";
@@ -46,14 +48,17 @@
     </div>
 
     <div class="col-6">
-        <div class="mb-3">
-            @Html.ActionLink("Edit", "Update", new { id = Model.Id }, new { @class = "btn btn-info" })
-        </div>
-        <div>
-            <form method="post" asp-controller="Genres" asp-action="Delete">
-                <input type="hidden" name="id" id="id" value="@Model.Id"/>
-                <button type="submit" class="btn btn-warning">Delete</button>
-            </form>
-        </div>
+        @if (User.HasPermissionOfLevel(ApiRoles.Manager))
+        {
+            <div class="mb-3">
+                @Html.ActionLink("Edit", "Update", new { id = Model.Id }, new { @class = "btn btn-info" })
+            </div>
+            <div>
+                <form method="post" asp-controller="Genres" asp-action="Delete">
+                    <input type="hidden" name="id" id="id" value="@Model.Id"/>
+                    <button type="submit" class="btn btn-warning">Delete</button>
+                </form>
+            </div>
+        }
     </div>
 </div>

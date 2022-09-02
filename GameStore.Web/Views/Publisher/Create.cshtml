@@ -14,8 +14,6 @@
 
         <div class="mt-auto">
 
-            <h4>Create publisher</h4>
-
             @Html.ValidationSummary(true, "", new { @class = "text-danger" })
             <div class="row">
 
@@ -39,14 +37,64 @@
                 </div>
             </div>
 
-            <div class="mb-3">
-                <button type="submit" class="btn btn-primary">
-                    Create
-                </button>
+            <div class="row mb-3">
+                <div class="form-floating col-4">
+                    @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+                    @Html.LabelFor(model => model.Address, new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-floating col-4">
+                    @Html.EditorFor(model => model.City, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+                    @Html.LabelFor(model => model.City, new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.City, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-floating col-4">
+                    @Html.EditorFor(model => model.ContactName, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+                    @Html.LabelFor(model => model.ContactName, new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.ContactName, "", new { @class = "text-danger" })
+                </div>
             </div>
 
-            <div>
+            <div class="row mb-3">
+                <div class="form-floating col-4">
+                    @Html.EditorFor(model => model.ContactTitle, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+                    @Html.LabelFor(model => model.ContactTitle, new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.ContactTitle, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-floating col-4">
+                    @Html.EditorFor(model => model.Region, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+                    @Html.LabelFor(model => model.Region, new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.Region, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-floating col-4">
+                    @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+                    @Html.LabelFor(model => model.Phone, new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                </div>
+            </div>
 
+            <div class="row mb-3">
+                <div class="form-floating col-4">
+                    @Html.EditorFor(model => model.Fax, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+                    @Html.LabelFor(model => model.Fax, new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.Fax, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-floating col-4">
+                    @Html.EditorFor(model => model.Country, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+                    @Html.LabelFor(model => model.Country, new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.Country, "", new { @class = "text-danger" })
+                </div>
+                <div class="form-floating col-4">
+                    @Html.EditorFor(model => model.PostalCode, new { htmlAttributes = new { @class = "form-control", placeholder = "Name", style = "min-width: 100%" } })
+                    @Html.LabelFor(model => model.PostalCode, new { @class = "ps-4" })
+                    @Html.ValidationMessageFor(model => model.PostalCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <button type="submit" class="btn btn-primary">
+                    Update
+                </button>
             </div>
         </div>
     </form>

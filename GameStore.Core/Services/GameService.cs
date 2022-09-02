@@ -3,22 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
-using GameStore.Core.Events.Notifications;
+using GameStore.Core.Events.GameKeyUpdated;
 using GameStore.Core.Exceptions;
 using GameStore.Core.Extensions;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
 using GameStore.Core.Models.Dto;
-using GameStore.Core.Models.Games;
-using GameStore.Core.Models.Games.Specifications;
-using GameStore.Core.Models.Genres;
-using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.Mongo.Products;
-using GameStore.Core.Models.PlatformTypes;
-using GameStore.Core.Models.PlatformTypes.Specifications;
-using GameStore.Core.Models.RelationalModels;
-using GameStore.Core.Models.RelationalModels.Specifications;
+using GameStore.Core.Models.Mongo.Products.Specifications;
+using GameStore.Core.Models.Server.Games;
+using GameStore.Core.Models.Server.Games.Specifications;
+using GameStore.Core.Models.Server.RelationalModels;
+using GameStore.Core.Models.Server.RelationalModels.Specifications;
 using GameStore.Core.Models.ServiceModels.Enums;
 using GameStore.Core.Models.ServiceModels.Games;
 using GameStore.SharedKernel.Interfaces.DataAccess;
@@ -35,7 +32,6 @@ public class GameService : IGameService
     private readonly IMapper _mapper;
     private readonly IMediator _mediator;
     private readonly IMongoLogger _mongoLogger;
-
     private readonly ISearchService _searchService;
     private readonly IUnitOfWork _unitOfWork;
 
@@ -54,8 +50,7 @@ public class GameService : IGameService
     }
 
     private IRepository<Game> GameRepository => _unitOfWork.GetEfRepository<Game>();
-    private IRepository<Genre> GenreRepository => _unitOfWork.GetEfRepository<Genre>();
-    private IRepository<PlatformType> PlatformTypesRepository => _unitOfWork.GetEfRepository<PlatformType>();
+
     private IRepository<Product> ProductsRepository => _unitOfWork.GetMongoRepository<Product>();
 
     public async Task<Game> CreateAsync(GameCreateModel model)
@@ -69,7 +64,7 @@ public class GameService : IGameService
 
     public async Task<int> GetTotalCountAsync()
     {
-        var games = await GameRepository.GetBySpecAsync(new GamesListSpec());
+        var games = await GameRepository.GetBySpecAsync(new GamesSpec());
         var products = await ProductsRepository.GetBySpecAsync();
 
         var mappedGames = _mapper.Map<IEnumerable<ProductDto>>(games);
@@ -83,7 +78,9 @@ public class GameService : IGameService
 
     public async Task<Game> GetByKeyAsync(string gameKey)
     {
-        var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeyWithDetailsSpec(gameKey))
+        var spec = new GamesSpec().ByKey(gameKey).WithDetails();
+
+        var result = await GameRepository.GetSingleOrDefaultBySpecAsync(spec)
                      ?? throw new ItemNotFoundException(typeof(Game), gameKey);
 
         return result;
@@ -91,7 +88,9 @@ public class GameService : IGameService
 
     public async Task<Game> GetByIdAsync(Guid id)
     {
-        var result = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByIdSpec(id))
+        var spec = new GamesSpec().ById(id);
+
+        var result = await GameRepository.GetSingleOrDefaultBySpecAsync(spec)
                      ?? throw new ItemNotFoundException(typeof(Game), id);
 
         return result;
@@ -103,9 +102,11 @@ public class GameService : IGameService
         {
             case Database.Server:
                 await UpdateServerEntityAsync(updateModel);
+
                 break;
             case Database.Mongo:
                 await UpdateMongoEntityAsync(updateModel);
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -118,9 +119,11 @@ public class GameService : IGameService
         {
             case Database.Server:
                 await UpdateServerEntityAsync(updateModel);
+
                 break;
             case Database.Mongo:
                 await MigrateMongoEntityAsync(updateModel);
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException();
@@ -139,9 +142,11 @@ public class GameService : IGameService
         {
             case Database.Server:
                 await UpdateServerEntityAsync(updateModel);
+
                 break;
             case Database.Mongo:
                 await MigrateMongoEntityAsync(updateModel);
+
                 break;
             default:
                 throw new ArgumentOutOfRangeException(nameof(database), database, null);
@@ -150,7 +155,9 @@ public class GameService : IGameService
 
     public async Task<byte[]> GetFileAsync(string gameKey)
     {
-        var game = await GameRepository.GetSingleOrDefaultBySpecAsync(new GameByKeySpec(gameKey))
+        var spec = new GamesSpec().ByKey(gameKey);
+
+        var game = await GameRepository.GetSingleOrDefaultBySpecAsync(spec)
                    ?? throw new ItemNotFoundException(typeof(Game), gameKey);
 
         return game.File;
@@ -158,7 +165,10 @@ public class GameService : IGameService
 
     public async Task<bool> IsGameKeyAlreadyExists(string gameKey)
     {
-        return await GameRepository.AnyAsync(new GameByKeySpec(gameKey).LoadAll());
+        var gameSpec = new GamesSpec().ByKey(gameKey).LoadAll();
+        var productSpec = new ProductsSpec().ByGameKey(gameKey);
+
+        return await GameRepository.AnyAsync(gameSpec) || await ProductsRepository.AnyAsync(productSpec);
     }
 
     private async Task MigrateMongoEntityAsync(GameUpdateModel updateModel)
@@ -185,10 +195,12 @@ public class GameService : IGameService
 
     private async Task UpdateServerEntityAsync(GameUpdateModel updateModel)
     {
-        var game = await GameRepository.GetSingleOrDefaultBySpecAsync(
-                       new GameByKeyWithDetailsSpec(updateModel.OldGameKey ?? updateModel.Key))
-                   ?? throw new ItemNotFoundException(typeof(Game), updateModel.OldGameKey,
-                                                      nameof(updateModel.OldGameKey));
+        var gameKey = updateModel.OldGameKey ?? updateModel.Key;
+        var spec = new GamesSpec().ByKey(gameKey).WithDetails();
+
+        var game = await GameRepository.GetSingleOrDefaultBySpecAsync(spec)
+                   ?? throw new ItemNotFoundException(typeof(Game), gameKey);
+
         updateModel.Id = game.Id.ToString();
         var oldVersionOfGame = game.ToBsonDocument();
 
@@ -215,7 +227,7 @@ public class GameService : IGameService
     {
         if (updateModel.IsGameKeyChanged)
         {
-            await _mediator.Publish(new GameKeyUpdatedNotification(updateModel.OldGameKey, updateModel.Key));
+            await _mediator.Publish(new GameKeyUpdatedEvent(updateModel.OldGameKey, updateModel.Key));
         }
     }
 
@@ -230,34 +242,8 @@ public class GameService : IGameService
         return game;
     }
 
-    private async Task<IEnumerable<Guid>> GetGenresWithChildrenAsync(IEnumerable<Guid> genresIds)
-    {
-        var genres = await GenreRepository.GetBySpecAsync(new GenresByIdsWithDetailsSpec(genresIds));
-        var allChildren = GetAllChildrenGenres(genres);
-
-        var result = allChildren.Select(genre => genre.Id);
-
-        return result;
-    }
-
-    private IEnumerable<Genre> GetAllChildrenGenres(IEnumerable<Genre> genres)
-    {
-        var result = genres.ToList();
-
-        foreach (var genre in genres)
-        {
-            var children = GetAllChildrenGenres(genre.SubGenres);
-            result.AddRange(children);
-        }
-
-        return result;
-    }
-
     private async Task UpdateGameValues(Game game, GameUpdateModel updateModel)
     {
-        await AssertGenresExistsAsync(updateModel.GenresIds);
-        await AssertPlatformsExistsAsync(updateModel.PlatformsIds);
-
         await UpdateGameRelationshipModelsAsync(updateModel);
 
         game.Name = updateModel.Name;
@@ -274,38 +260,18 @@ public class GameService : IGameService
         }
     }
 
-    private async Task AssertGenresExistsAsync(IEnumerable<Guid> genresIds)
-    {
-        foreach (var genreId in genresIds)
-        {
-            if (await GenreRepository.AnyAsync(new GenreByIdSpec(genreId)) == false)
-            {
-                throw new ItemNotFoundException(typeof(Genre), genreId);
-            }
-        }
-    }
-
-    private async Task AssertPlatformsExistsAsync(IEnumerable<Guid> platformsIds)
-    {
-        foreach (var platformId in platformsIds)
-        {
-            if (await PlatformTypesRepository.AnyAsync(new PlatformTypeByIdSpec(platformId)) == false)
-            {
-                throw new ItemNotFoundException(typeof(PlatformType), platformId);
-            }
-        }
-    }
-
     private async Task UpdateGameRelationshipModelsAsync(GameUpdateModel updateModel)
     {
         var newGameGenres =
             updateModel.GenresIds.Select(id => new GameGenre { GameId = Guid.Parse(updateModel.Id), GenreId = id });
+
         var newGamePlatforms =
             updateModel.PlatformsIds.Select(id => new GamePlatformType
                                                 { GameId = Guid.Parse(updateModel.Id), PlatformId = id });
 
         await _gameGenreService.UpdateManyToManyAsync(newGameGenres,
                                                       new GameGenresByGameIdSpec(Guid.Parse(updateModel.Id)));
+
         await _gamePlatformService.UpdateManyToManyAsync(newGamePlatforms,
                                                          new GamePlatformsByPlatformIdSpec(Guid.Parse(updateModel.Id)));
     }

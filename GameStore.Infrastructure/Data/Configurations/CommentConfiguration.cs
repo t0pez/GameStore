@@ -1,4 +1,4 @@
-﻿using GameStore.Core.Models.Comments;
+﻿using GameStore.Core.Models.Server.Comments;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
@@ -19,9 +19,11 @@ internal class CommentConfiguration : IEntityTypeConfiguration<Comment>
         builder.HasOne(comment => comment.Game)
                .WithMany(game => game.Comments)
                .HasForeignKey(comment => comment.GameId);
+
         builder.HasOne(comment => comment.Parent)
                .WithMany(comment => comment.Replies)
                .HasForeignKey(reply => reply.ParentId);
+
         builder.HasMany(comment => comment.Replies)
                .WithOne(reply => reply.Parent)
                .HasForeignKey(reply => reply.ParentId);

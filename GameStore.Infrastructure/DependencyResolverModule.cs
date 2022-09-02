@@ -3,10 +3,12 @@ using GameStore.Core.Interfaces;
 using GameStore.Core.Interfaces.Loggers;
 using GameStore.Core.Interfaces.PaymentMethods;
 using GameStore.Core.Interfaces.RelationshipModelsServices;
+using GameStore.Core.Interfaces.TimeOutServices;
 using GameStore.Core.Services;
 using GameStore.Core.Services.Loggers;
 using GameStore.Core.Services.PaymentMethods;
 using GameStore.Core.Services.RelationshipModelsServices;
+using GameStore.Core.Services.TimeOutServices;
 using GameStore.Infrastructure.Data.Context;
 using GameStore.Infrastructure.Data.Repositories;
 using GameStore.SharedKernel.Interfaces.DataAccess;
@@ -28,10 +30,12 @@ public static class DependencyResolverModule
                 .AddScoped<IPlatformTypeService, PlatformTypeService>()
                 .AddScoped<IShipperService, ShipperService>()
                 .AddScoped<IOrderService, OrderService>()
+                .AddScoped<IOrderMergingService, OrderMergingService>()
                 .AddScoped<IOpenedOrderService, OpenedOrderService>()
                 .AddScoped<IOrderTimeOutService, OrderTimeOutService>()
                 .AddScoped<IPaymentService, PaymentService>()
                 .AddScoped<ISearchService, SearchService>()
+                .AddScoped<IUserService, UserService>()
                 .AddScoped<IMongoLogger, MongoLogger>()
                 .AddScoped<IPaymentMethodFactory, PaymentMethodFactory>()
                 .AddScoped<IInvoiceFileGenerator, InvoiceFileGenerator>()

@@ -1,5 +1,5 @@
 ﻿using System.Text;
-using GameStore.Core.Models.Orders;
+using GameStore.Core.Models.Server.Orders;
 using SelectPdf;
 
 namespace GameStore.Core.Helpers.PdfGenerators;

@@ -1,4 +1,10 @@
-﻿@model GameStore.Web.Models.Game.GamesFilterRequestModel
+﻿@using GameStore.Web.Helpers
+@model GameStore.Web.Models.Game.GamesFilterRequestModel
+
+@{
+    var publishedAtSelectList = ViewData[ViewKeys.Games.PublishedAt] as SelectList;
+    var orderBySelectList = ViewData[ViewKeys.Games.OrderBy] as SelectList;
+}
 
 <form id="FilterForm" method="get" asp-controller="Games" asp-action="GetAll">
     <input type="hidden" asp-for="CurrentPage">
@@ -13,10 +19,12 @@
     <div>
         <h5>Price</h5>
         <div class="input-group">
-            <input type="text" class="form-control" asp-for="@Model.MinPrice" placeholder="Minimal price">
+            <input type="number" class="form-control" asp-for="@Model.MinPrice" placeholder="Minimal price">
             <span class="input-group-text"> - </span>
-            <input type="text" class="form-control" asp-for="@Model.MaxPrice" placeholder="Maximal price">
+            <input type="number" class="form-control" asp-for="@Model.MaxPrice" placeholder="Maximal price">
+
         </div>
+        <span class="field-validation-valid text-danger" asp-validation-for="MinPrice"></span>
     </div>
 
     <hr>
@@ -53,7 +61,8 @@
 
     <div>
         <h5>Publishers</h5>
-        <table class="table">
+        <div class="overflow-scroll" style="height: 250px">
+
             @foreach (var publisher in Model.Publishers)
             {
                 <div class="form-check">
@@ -61,13 +70,32 @@
                     <label class="form-check-label" asp-for="SelectedPublishers">@publisher.Text</label>
                 </div>
             }
-        </table>
+        </div>
+    </div>
+
+    <hr>
+
+    <div>
+        @foreach (var item in publishedAtSelectList)
+        {
+            <div>
+                @if (item.Value != ((int)Model.PublishedAtByState).ToString())
+                {
+                    <input id="@item.Value" type="radio" asp-for="@Model.PublishedAtByState" value="@item.Value" class="form-check-input me-1">
+                }
+                else
+                {
+                    <input id="@item.Value" type="radio" asp-for="@Model.PublishedAtByState" value="@item.Value" class="form-check-input me-1" checked="checked">
+                }
+                <label for="@item.Value">@item.Text</label>
+            </div>
+        }
     </div>
 
     <hr>
 
     <div class="input-group mb-3">
-        @Html.DropDownList(nameof(Model.OrderByState), ViewData["OrderBy"] as SelectList, new { @class = "form-control" })
+        @Html.DropDownList(nameof(Model.OrderByState), orderBySelectList, new { @class = "form-control" })
     </div>
 
     <div>

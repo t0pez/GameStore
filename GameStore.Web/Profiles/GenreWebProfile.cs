@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
-using GameStore.Core.Models.Genres;
-using GameStore.Core.Models.RelationalModels;
+using GameStore.Core.Models.Server.Genres;
+using GameStore.Core.Models.Server.RelationalModels;
 using GameStore.Core.Models.ServiceModels.Genres;
 using GameStore.Web.Models.Genre;
 using GameStore.Web.ViewModels.Genres;
@@ -24,6 +24,7 @@ public class GenreWebProfile : Profile
                        expression => expression.MapFrom(gameGenre => gameGenre.Genre.Name))
             .ForMember(viewModel => viewModel.SubGenres,
                        expression => expression.MapFrom(gameGenre => gameGenre.Genre.SubGenres));
+
         CreateMap<GameGenre, GenreListViewModel>()
             .ForMember(viewModel => viewModel.Id,
                        expression => expression.MapFrom(gameGenre => gameGenre.GenreId))

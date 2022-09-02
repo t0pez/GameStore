@@ -4,8 +4,10 @@ using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.ServiceModels.Comments;
+using GameStore.Web.Infrastructure.Authorization;
 using GameStore.Web.Models.Comment;
 using GameStore.Web.ViewModels.Comments;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GameStore.Web.Controllers;
@@ -39,6 +41,7 @@ public class CommentsController : Controller
         return RedirectToAction("GetComments", new { gameKey = request.GameKey });
     }
 
+    [NonAction]
     [HttpPost("{gameKey}/comment/update")]
     public async Task<ActionResult> UpdateCommentAsync(CommentUpdateRequestModel request)
     {
@@ -49,6 +52,7 @@ public class CommentsController : Controller
         return RedirectToAction("GetComments", new { gameKey = request.GameKey });
     }
 
+    [Authorize(Roles = ApiRoles.Moderator)]
     [HttpPost("{gameKey}/comment/delete")]
     public async Task<ActionResult> DeleteCommentAsync(Guid id, string gameKey)
     {

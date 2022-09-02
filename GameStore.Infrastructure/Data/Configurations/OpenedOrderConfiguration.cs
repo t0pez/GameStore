@@ -1,4 +1,4 @@
-﻿using GameStore.Core.Models.Orders;
+﻿using GameStore.Core.Models.Server.Orders;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 

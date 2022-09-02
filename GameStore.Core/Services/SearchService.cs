@@ -1,29 +1,28 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using GameStore.Core.Extensions;
+using GameStore.Core.Helpers.GameKeyGeneration;
 using GameStore.Core.Interfaces;
 using GameStore.Core.Models.Dto;
 using GameStore.Core.Models.Dto.Filters;
 using GameStore.Core.Models.Dto.Specifications;
-using GameStore.Core.Models.Games;
-using GameStore.Core.Models.Games.Specifications;
-using GameStore.Core.Models.Games.Specifications.Filters;
-using GameStore.Core.Models.Genres;
-using GameStore.Core.Models.Genres.Specifications;
 using GameStore.Core.Models.Mongo.Products;
 using GameStore.Core.Models.Mongo.Products.Filters;
 using GameStore.Core.Models.Mongo.Products.Specifications;
 using GameStore.Core.Models.Mongo.Suppliers;
 using GameStore.Core.Models.Mongo.Suppliers.Specifications;
-using GameStore.Core.Models.Publishers;
-using GameStore.Core.Models.Publishers.Specifications;
+using GameStore.Core.Models.Server.Games;
+using GameStore.Core.Models.Server.Games.Filters;
+using GameStore.Core.Models.Server.Games.Specifications;
+using GameStore.Core.Models.Server.Genres;
+using GameStore.Core.Models.Server.Genres.Specifications;
+using GameStore.Core.Models.Server.Publishers;
+using GameStore.Core.Models.Server.Publishers.Specifications;
 using GameStore.Core.PagedResult;
 using GameStore.SharedKernel.Interfaces.DataAccess;
-using GameStore.SharedKernel.Specifications;
 using GameStore.SharedKernel.Specifications.Filters;
 using SpecificationExtensions.Core.Extensions;
 
@@ -42,18 +41,20 @@ public class SearchService : ISearchService
     }
 
     private IRepository<Game> GamesRepository => _unitOfWork.GetEfRepository<Game>();
+
     private IRepository<Product> ProductsRepository => _unitOfWork.GetMongoRepository<Product>();
+
     private IRepository<Genre> GenresRepository => _unitOfWork.GetEfRepository<Genre>();
+
     private IRepository<Publisher> PublishersRepository => _unitOfWork.GetEfRepository<Publisher>();
+
     private IRepository<Supplier> SuppliersRepository => _unitOfWork.GetMongoRepository<Supplier>();
 
     public async Task<PagedResult<ProductDto>> GetProductDtosByFilterAsync(AllProductsFilter filter)
     {
-        var gamesFilter = _mapper.Map<GameSearchFilter>(filter);
-        var filteredGames = await GamesRepository.GetBySpecAsync(new GamesByFilterSpec(gamesFilter));
-
-        var productsFilter = await GetProductsFilterAsync(filter);
-        var filteredProducts = await ProductsRepository.GetBySpecAsync(new ProductsByFilterSpec(productsFilter));
+        filter.GenresIds = await GetGenresWithChildrenAsync(filter.GenresIds);
+        var filteredGames = await GetFilteredGamesAsync(filter);
+        var filteredProducts = await GetFilteredProductsAsync(filter);
 
         await SetProductsGameKeysAsync(filteredProducts);
 
@@ -76,7 +77,9 @@ public class SearchService : ISearchService
     public async Task<ProductDto> GetProductDtoByGameKeyOrDefaultAsync(string gameKey)
     {
         ProductDto result = null;
-        var game = await GamesRepository.GetSingleOrDefaultBySpecAsync(new GameByKeyWithDetailsSpec(gameKey));
+
+        var gamesSpec = new GamesSpec().ByKey(gameKey).WithDetails();
+        var game = await GamesRepository.GetSingleOrDefaultBySpecAsync(gamesSpec);
 
         if (IsGameFoundInServer(game))
         {
@@ -87,8 +90,9 @@ public class SearchService : ISearchService
 
         if (IsGameNotFoundInServer(game))
         {
-            var product =
-                await ProductsRepository.GetFirstOrDefaultBySpecAsync(new ProductByGameKeyWithDetailsSpec(gameKey));
+            var productsSpec = new ProductsSpec().ByGameKey(gameKey).WithDetails();
+
+            var product = await ProductsRepository.GetFirstOrDefaultBySpecAsync(productsSpec);
 
             if (IsProductFoundInMongo(product))
             {
@@ -105,7 +109,9 @@ public class SearchService : ISearchService
     public async Task<PublisherDto> GetPublisherDtoByCompanyNameOrDefaultAsync(string companyName)
     {
         PublisherDto result = null;
-        var publisher = await PublishersRepository.GetSingleOrDefaultBySpecAsync(new PublisherByNameSpec(companyName));
+
+        var publishersSpec = new PublishersSpec().ByName(companyName);
+        var publisher = await PublishersRepository.GetSingleOrDefaultBySpecAsync(publishersSpec);
 
         if (IsPublisherFoundInServer(publisher))
         {
@@ -114,7 +120,9 @@ public class SearchService : ISearchService
 
         if (IsPublisherNotFoundInServer(publisher))
         {
-            var supplier = await SuppliersRepository.GetFirstOrDefaultBySpecAsync(new SupplierByNameSpec(companyName));
+            var suppliersSpec = new SuppliersSpec().ByName(companyName);
+            var supplier = await SuppliersRepository.GetFirstOrDefaultBySpecAsync(suppliersSpec);
+
             if (IsSupplierFoundInMongo(supplier))
             {
                 result = _mapper.Map<PublisherDto>(supplier);
@@ -126,8 +134,34 @@ public class SearchService : ISearchService
 
     public async Task<bool> IsGameKeyExistsAsync(string gameKey)
     {
-        return await GamesRepository.AnyAsync(new GameByKeySpec(gameKey)) ||
-               await ProductsRepository.AnyAsync(new ProductByGameKeySpec(gameKey));
+        return await GamesRepository.AnyAsync(new GamesSpec().ByKey(gameKey)) ||
+               await ProductsRepository.AnyAsync(new ProductsSpec().ByGameKey(gameKey));
+    }
+
+    private async Task<List<Game>> GetFilteredGamesAsync(AllProductsFilter filter)
+    {
+        var gamesFilter = _mapper.Map<GameSearchFilter>(filter);
+
+        var spec = new GamesByFilterSpec(gamesFilter);
+        var filteredGames = await GamesRepository.GetBySpecAsync(spec);
+
+        return filteredGames;
+    }
+
+    private async Task<List<Product>> GetFilteredProductsAsync(AllProductsFilter filter)
+    {
+        var productsFilter = await GetProductsFilterAsync(filter);
+
+        var allServerGameKeysSpec = new GamesSpec().LoadAll().Select(game => game.Key);
+
+        var allServerGameKeys = await GamesRepository.SelectBySpecAsync(allServerGameKeysSpec);
+
+        var productsByFilterExceptServerGameKeysSpec =
+            new ProductsByFilterSpec(productsFilter).ExceptBy(allServerGameKeys, product => product.GameKey);
+
+        var filteredProducts = await ProductsRepository.GetBySpecAsync(productsByFilterExceptServerGameKeysSpec);
+
+        return filteredProducts;
     }
 
     private async Task<ProductFilter> GetProductsFilterAsync(AllProductsFilter filter)
@@ -136,23 +170,22 @@ public class SearchService : ISearchService
         productsFilter.IsCategoriesIdsFilterEnabled = filter.GenresIds.Any();
         productsFilter.IsSuppliersIdsFilterEnabled = filter.PublishersNames.Any();
 
-        var allServerGameKeys =
-            await GamesRepository.SelectBySpecAsync(new SafeDeleteSpec<Game>().LoadAll().Select(game => game.Key));
-        productsFilter.GameKeysToIgnore = allServerGameKeys;
-
         if (productsFilter.IsCategoriesIdsFilterEnabled)
         {
-            var genresMongoIds =
-                await GenresRepository.SelectBySpecAsync(
-                    new GenresByIdsWithCategoryIdSpec(filter.GenresIds).Select(genre => genre.CategoryId.Value));
+            var categoriesIdsSpec =
+                new GenresSpec().ByIds(filter.GenresIds).WithCategoryId().Select(genre => genre.CategoryId.Value);
+
+            var genresMongoIds = await GenresRepository.SelectBySpecAsync(categoriesIdsSpec);
+
             productsFilter.CategoriesIds = genresMongoIds;
         }
 
         if (productsFilter.IsSuppliersIdsFilterEnabled)
         {
-            var suppliersMongoIds =
-                await SuppliersRepository.SelectBySpecAsync(
-                    new SuppliersByNamesSpec(filter.PublishersNames).Select(supplier => supplier.SupplierId));
+            var suppliersIdsSpec =
+                new SuppliersSpec().ByNames(filter.PublishersNames).Select(supplier => supplier.SupplierId);
+
+            var suppliersMongoIds = await SuppliersRepository.SelectBySpecAsync(suppliersIdsSpec);
 
             productsFilter.SuppliersIds = suppliersMongoIds;
         }
@@ -160,11 +193,38 @@ public class SearchService : ISearchService
         return productsFilter;
     }
 
+    private async Task<IEnumerable<Guid>> GetGenresWithChildrenAsync(IEnumerable<Guid> genresIds)
+    {
+        var genresByIdsWithDetailsSpec = new GenresSpec().ByIds(genresIds).WithDetails();
+        var genres = await GenresRepository.GetBySpecAsync(genresByIdsWithDetailsSpec);
+
+        var allChildren = GetAllChildrenGenres(genres);
+
+        var result = allChildren.Select(genre => genre.Id);
+
+        return result;
+    }
+
+    private IEnumerable<Genre> GetAllChildrenGenres(IEnumerable<Genre> genres)
+    {
+        var result = genres.ToList();
+
+        foreach (var genre in genres)
+        {
+            var children = GetAllChildrenGenres(genre.SubGenres);
+            result.AddRange(children);
+        }
+
+        return result;
+    }
+
     private IEnumerable<ProductDto> SortItems(AllProductsFilter filter, IEnumerable<ProductDto> uniqueItems)
     {
         var isPublishedAtFilterEnabled = filter.PublishedAtState != GameSearchFilterPublishedAtState.Default;
         var isPlatformFilterEnabled = filter.PlatformsIds.Any();
+
         var orderByDatabase = isPlatformFilterEnabled || isPublishedAtFilterEnabled;
+
         var sortedItems = new ProductDtoSortSpec(filter.OrderByState, orderByDatabase).Evaluate(uniqueItems);
 
         return sortedItems;
@@ -174,8 +234,8 @@ public class SearchService : ISearchService
     {
         foreach (var product in filteredProducts.Where(product => product.GameKey == null))
         {
-            var key = Regex.Replace(product.ProductName.Trim().ToLower(), @"\s{2,}", " ")
-                           .Replace(' ', '-');
+            var key = GameKeyGenerator.GenerateGameKey(product.ProductName);
+
             product.GameKey = key;
             await ProductsRepository.UpdateAsync(product);
         }
@@ -183,8 +243,10 @@ public class SearchService : ISearchService
 
     private async Task IncludeGenre(Product product, ProductDto result)
     {
-        var genre = await GenresRepository.GetSingleOrDefaultBySpecAsync(
-            new GenreByCategoryIdSpec(product.CategoryId));
+        var genreByCategoryIdSpec = new GenresSpec().ByCategoryId(product.CategoryId);
+
+        var genre = await GenresRepository.GetSingleOrDefaultBySpecAsync(genreByCategoryIdSpec);
+
         if (genre is not null)
         {
             result.Genres.Add(genre);
@@ -194,6 +256,7 @@ public class SearchService : ISearchService
     private async Task IncludePublisher(Game game, ProductDto result)
     {
         var publisherDto = await GetPublisherDtoByCompanyNameOrDefaultAsync(game.PublisherName);
+
         if (publisherDto is not null)
         {
             result.Publisher = publisherDto;

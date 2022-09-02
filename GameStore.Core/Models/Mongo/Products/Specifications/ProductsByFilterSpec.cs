@@ -11,15 +11,6 @@ public class ProductsByFilterSpec : BaseSpec<Product>
     {
         Filter = filter;
 
-        if (filter.GameKeysToIgnore.Any())
-        {
-            foreach (var gameKey in filter.GameKeysToIgnore)
-            {
-                Query
-                    .Where(product => product.GameKey != gameKey);
-            }
-        }
-
         if (string.IsNullOrEmpty(filter.Name) == false)
         {
             Query
